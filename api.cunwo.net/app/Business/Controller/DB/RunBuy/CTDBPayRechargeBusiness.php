@@ -1,0 +1,11 @@
+<?php
+// 充值
+namespace App\Business\Controller\DB\RunBuy;
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\CompController as Controller;
+class CTDBPayRechargeBusiness extends BasicPublicCTDBBusiness
+{
+    public static $model_name = 'RunBuy\PayRecharge';
+
+}
