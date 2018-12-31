@@ -77,7 +77,7 @@
       <th>总销量<hr/>月销量</th>
       <th>是否热销<hr/>是否上架</th>
       <th>介绍</th>
-      <th>操作</th>
+      <th style="width: 150px;">操作</th>
     </tr>
     </thead>
     <tbody id="data_list" class=" baguetteBoxOne gallery" >

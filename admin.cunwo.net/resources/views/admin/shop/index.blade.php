@@ -100,7 +100,7 @@
       <th>营业开始时间<hr/>营业结束时间<hr/>更新时间</th>
       <th>综合排序<hr/>人均</th>
       <th>介绍</th>
-      <th>操作</th>
+      <th style="width: 150px;">操作</th>
     </tr>
     </thead>
     <tbody id="data_list" class=" baguetteBoxOne gallery" >

@@ -61,7 +61,7 @@
       <th>ID</th>
       <th>标签名称</th>
       <th>排序[降序]</th>
-      <th>操作</th>
+      <th style="width: 150px;">操作</th>
     </tr>
     </thead>
     <tbody id="data_list">

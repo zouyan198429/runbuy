@@ -87,7 +87,7 @@
       {{--<th>电话</th>--}}
       <th>是否城市分站</th>
       <th>热门城市</th>
-      <th>操作</th>
+      <th style="width: 150px;">操作</th>
     </tr>
     </thead>
     <tbody id="data_list">

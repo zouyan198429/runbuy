@@ -86,7 +86,7 @@
       <th>所在地址</th>
       <th>介绍</th>
       <th>状态</th>
-      <th>操作</th>
+      <th style="width: 150px;">操作</th>
     </tr>
     </thead>
     <tbody id="data_list">
