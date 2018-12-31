@@ -11,9 +11,11 @@ $(function(){
 function reset_list_self(is_read_page, ajax_async, reset_total){
     console.log('is_read_page', typeof(is_read_page));
     console.log('ajax_async', typeof(ajax_async));
+    var layer_index = layer.load();
     reset_list(is_read_page, false, reset_total);
     // initList();
     initPic();
+    layer.close(layer_index)//手动关闭
 }
 
 // window.onload = function() {

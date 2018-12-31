@@ -44,7 +44,9 @@ const REL_CHANGE = {
 };
 
 window.onload = function() {
+    var layer_index = layer.load();
     initPic();
+    layer.close(layer_index)//手动关闭
 };
 function initPic(){
     baguetteBox.run('.baguetteBoxOne');
