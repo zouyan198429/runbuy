@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BaseModel extends Model
 {
+    public static $modelPath = ''; // 模型路径 名称\..\名称
     /**
      * The attributes that aren't mass assignable.
      * 所有属性都是可批量赋值
@@ -146,7 +147,7 @@ class BaseModel extends Model
      */
     public function getCustomMorphedByMany($modelName = null)
     {
-        $related = "App\\Models\\" . $modelName;
+        $related = "App\\Models\\". static::$modelPath . "\\" . $modelName;
         return $this->morphedByMany(
             $related// 站点新闻模型 'App\Models\SiteNews'
             ,'module'// 关系名称-注意：这个值必须是表中 ***_type 的星号部分，暂时还没有指定***_type 这个字段
@@ -155,10 +156,45 @@ class BaseModel extends Model
         // ,'module_id' // 关系表中的与新闻表主键对应的字段
         // ,'id'// 资源对象主键字段名
         // ,'id'// 主表新闻主键字段名
-        )->withPivot('id', 'company_id', 'operate_staff_id', 'operate_staff_id_history' )->withTimestamps();
+        )->withPivot('id', 'resource_id_history', 'operate_staff_id', 'operate_staff_id_history' )->withTimestamps();
     }
 
     // _________自己编写的通过__call或 __get 调用的方法_____结束____________
 
+
+    //------- 多对多的多态关联-----开始------------------
+
+    /**
+     * 获取指定***模块所有图片资源[二维对象]
+     */
+    public function siteResources()
+    {
+        return $this->morphToMany(
+            'App\Models\\'. static::$modelPath . '\Resource'//资源对象
+            ,'module' // 关系名称-注意：这个值必须是表中 ***_type 的星号部分，暂时还没有指定***_type 这个字段
+            ,'resource_module'// 关系表名称
+        // ,'module_id'// 关系表中的与新闻表主键对应的字段
+        // ,'resource_id'// 关系表中的与资源对象主键对应的字段
+        // ,'id'// 主表新闻主键字段名
+        // ,'id'// 资源对象主键字段名
+        // ,$inverse 参数 flase[默认]，module_type 可以在 AppServiceProvider 中指定段名; true： 必须用App\Models\Resource
+        )->withPivot('id', 'resource_id_history', 'operate_staff_id', 'operate_staff_id_history' )->withTimestamps();// ->withPivot('notice', 'id')
+    }
+
+    // 同步修改图片资源关系-
+    /**
+     * 获取指定***模块所有图片资源[二维对象]
+     *       $siteNew = SiteNews::find(1);
+     *       $siteNew->siteResources()->sync([1, 2]);
+     *          的封装
+     * 模块 单条的对象  SiteNews::find(1)->updateResourceByResourceIds([1,2,3]);
+     * @param array $resourceIds 需要操作的资源id数组,空数组：代表删除
+     */
+    public function updateResourceByResourceIds($resourceIds = [])
+    {
+        $this->siteResources()->sync($resourceIds);
+    }
+
+    //------- 多对多的多态关联-----结束------------------
 
 }

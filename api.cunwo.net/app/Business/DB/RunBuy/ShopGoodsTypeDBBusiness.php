@@ -63,7 +63,8 @@ class ShopGoodsTypeDBBusiness extends BasePublicDBBusiness
                 $resultDatas = static::create($saveData);
                 $id = $resultDatas['id'] ?? 0;
             }else{// 修改
-                $saveBoolen = static::saveById($saveData, $id);
+                $modelObj = null;
+                $saveBoolen = static::saveById($saveData, $id, $modelObj);
                 // $resultDatas = static::getInfo($id);
 
             }

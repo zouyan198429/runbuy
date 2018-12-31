@@ -2,6 +2,7 @@
 
 namespace App\Business\DB;
 
+use App\Business\DB\RunBuy\ResourceDBBusiness;
 use App\Business\DB\RunBuy\StaffDBBusiness;
 use App\Business\DB\RunBuy\StaffHistoryDBBusiness;
 use App\Services\DB\CommonDB;
@@ -201,8 +202,8 @@ class BaseDBBusiness
     {
 //        $modelObj = null;
 //        Common::getObjByModelName(static::$model_name, $modelObj);
-        static::getModelObj($modelObj );
-        return CommonDB::saveById($modelObj, $dataParams, $id);
+         static::getModelObj($modelObj );
+         return CommonDB::saveById($modelObj, $dataParams, $id);
     }
 
     /**
@@ -648,7 +649,9 @@ class BaseDBBusiness
      */
     public static function addOprate(&$saveData, $operate_staff_id = 0, &$operate_staff_id_history = 0){
         if(!is_numeric($operate_staff_id) || $operate_staff_id <= 0) return $saveData;
-        $operate_staff_id_history = static::getStaffHistoryId($operate_staff_id);
+
+        if ($operate_staff_id_history <= 0) $operate_staff_id_history = static::getStaffHistoryId($operate_staff_id);
+
         // 加入操作人员信息
         $oprateArr = [
             'operate_staff_id' => $operate_staff_id,// $controller->operate_staff_id,
@@ -795,6 +798,39 @@ class BaseDBBusiness
         $info['history_id'] = $historyId ;
         $info['now_state'] = 0;// 最新的试题 0没有变化 ;1 已经删除  2 试卷不同
         return $info;
+    }
+
+    /**
+     * 保存图片资源关系
+     *
+     * @param int  $company_id 企业id
+     * @param int $id 主表记录id
+     * @param array $resourceIds 关系表id数组
+     * @param int $operate_staff_id 操作人id
+     * @param int $operate_staff_id_history 操作人id历史 默认 0
+     * @param array $otherData 其它参数数组 - 一维
+     * @return null
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function saveResourceSync($id, $resourceIds = [], $operate_staff_id = 0, $operate_staff_id_history = 0, $otherData = []){
+        // 加入company_id字段
+        $syncResourceArr = [];
+        $temArr =  [
+            // 'company_id' => $company_id,
+//                    'operate_staff_id' => $operate_staff_id,
+//                    'operate_staff_id_history' => $operate_staff_id_history,
+        ];
+        // 加入操作人员信息
+        static::addOprate($temArr, $operate_staff_id,$operate_staff_id_history);
+        foreach($resourceIds as $resourceId){
+            $syncResourceArr[$resourceId] = $temArr;
+            // 资源id 历史 resource_id_history
+            $syncResourceArr[$resourceId]['resource_id_history'] = ResourceDBBusiness::getIdHistory($resourceId);
+        }
+        $syncParams =[
+            'siteResources' => $syncResourceArr,//标签
+        ];
+        return static::sync($id, $syncParams);
     }
 
 }

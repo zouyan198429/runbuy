@@ -304,7 +304,6 @@ class CommonAPIFormModel
         if ($id <=0){
             throws('参数[id]格式不正确！');
         }
-
         // 字段数组
         $dataParams = CommonRequest::get($request, 'dataParams');
         // json 转成数组
@@ -312,7 +311,6 @@ class CommonAPIFormModel
 
         // 获得对象
         static::requestGetObj($request,$modelObj);
-
         if(static::$dataFromType == 1){// 直接通过数据模型获得数据
             $result = CommonDB::saveById($modelObj, $dataParams, $id);
         }else{// 调用中间层的方法来获得数据

@@ -25,8 +25,8 @@ Route::get('excel/import_test','ExcelController@import_test'); // 导入 - 测�
 //
 // admin
 // 上传图片
-Route::post('admin/upload', 'admin\UploadController@index');
-Route::post('admin/upload/ajax_del', 'admin\UploadController@ajax_del');// 根据id删除文件
+Route::post('admin/upload', 'Admin\UploadController@index');
+Route::post('admin/upload/ajax_del', 'Admin\UploadController@ajax_del');// 根据id删除文件
 
 //// 登陆
 Route::any('admin/ajax_login', 'Admin\IndexController@ajax_login');// 登陆

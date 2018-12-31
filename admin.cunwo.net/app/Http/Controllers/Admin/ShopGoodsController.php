@@ -55,12 +55,13 @@ class ShopGoodsController extends WorksController
           //   'department_id' => 0,
             'now_shop_state' => 0,
             'shop_id' => $shop_id,
+            'resource_list' => [],
         ];
         $operate = "添加";
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIShopGoodsBusiness::getInfoData($request, $this, $id, ['shop']);
+            $info = CTAPIShopGoodsBusiness::getInfoData($request, $this, $id, ['shop', 'siteResources']);
             $intro = $info['intro'] ?? '';
             $info['intro'] = replace_enter_char($intro,2);
         }else{
@@ -149,6 +150,16 @@ class ShopGoodsController extends WorksController
         $intro = CommonRequest::get($request, 'intro');
         $intro =  replace_enter_char($intro,1);
 
+        // 图片资源
+        $resource_id = CommonRequest::get($request, 'resource_id');
+        if(is_string($resource_id) || is_numeric($resource_id)){
+            $resource_id = explode(',' ,$resource_id);
+        }
+
+        $resource_ids = implode(',', $resource_id);
+        if(!empty($resource_ids)) $resource_ids = ',' . $resource_ids . ',';
+
+
         $saveData = [
             'seller_id' => $seller_id,
             'shop_id' => $shop_id,
@@ -159,6 +170,8 @@ class ShopGoodsController extends WorksController
             'sort_num' => $sort_num,
             'price' => $price,
             'intro' => $intro,
+            'resource_ids' => $resource_ids,// 图片资源id串(逗号分隔-未尾逗号结束)
+            'resourceIds' => $resource_id,// 此下标为图片资源关系
         ];
 
 //        if($id <= 0) {// 新加;要加入的特别字段
@@ -180,7 +193,7 @@ class ShopGoodsController extends WorksController
      */
     public function ajax_alist(Request $request){
         $this->InitParams($request);
-        return  CTAPIShopGoodsBusiness::getList($request, $this, 2 + 4, [], ['city', 'cityPartner', 'seller', 'shop', 'type']);
+        return  CTAPIShopGoodsBusiness::getList($request, $this, 2 + 4, [], ['city', 'cityPartner', 'seller', 'shop', 'type', 'siteResources']);
     }
 
     /**

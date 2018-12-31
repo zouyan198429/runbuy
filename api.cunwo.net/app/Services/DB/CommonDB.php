@@ -662,12 +662,15 @@ class CommonDB
 
     // 通过id修改记录
     public static function saveById(&$modelObj, $dataParams, $id){
-        $requestData = $modelObj->find($id);
+        // $requestData = $modelObj->find($id);
+        $modelObj = $modelObj->find($id);
 
         foreach($dataParams as $field => $val){
-            $requestData->{$field} = $val;
+            // $requestData->{$field} = $val;
+            $modelObj->{$field} = $val;
         }
-        $result = $requestData->save();
+        // $result = $requestData->save();
+        $result = $modelObj->save();
         return $result;
     }
 

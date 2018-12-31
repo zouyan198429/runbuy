@@ -70,9 +70,19 @@ class ShopGoodsDBBusiness extends BasePublicDBBusiness
             $saveData['seller_id'] = $seller_id;
         }
 
+        // 是否有图片资源
+        $hasResource = false;
+        $resourceIds = [];
+        if(isset($saveData['resourceIds'])){
+            $hasResource = true;
+            $resourceIds = $saveData['resourceIds'];
+            unset($saveData['resourceIds']);
+        }
+
         DB::beginTransaction();
         try {
             $isModify = false;
+            $operate_staff_id_history = 0;
             if($id > 0){
                 $isModify = true;
                 // 判断权限
@@ -96,10 +106,16 @@ class ShopGoodsDBBusiness extends BasePublicDBBusiness
                 $resultDatas = static::create($saveData);
                 $id = $resultDatas['id'] ?? 0;
             }else{// 修改
-                $saveBoolen = static::saveById($saveData, $id);
+                $modelObj = null;
+                $saveBoolen = static::saveById($saveData, $id, $modelObj);
                 // $resultDatas = static::getInfo($id);
 
             }
+            // 同步修改图片资源关系
+            if($hasResource){
+                static::saveResourceSync($id, $resourceIds, $operate_staff_id, $operate_staff_id_history, []);
+            }
+
             // 修改时，更新版本号
             if($isModify){
                 static::compareHistory($id, 1);

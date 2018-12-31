@@ -124,7 +124,7 @@ class BaseAPIBusiness
             if($total > 0) $pagesize = $total;
         }
         // 处理图片地址
-        // CommonBusiness::resoursceUrl($resultDatas);
+        // Tool::resoursceUrl($resultDatas);
         $totalPage = ceil($total/$pagesize);
 
 //        $data_list = [];
@@ -187,7 +187,7 @@ class BaseAPIBusiness
 
         // $company_id = $controller->company_id;
 
-        static::GetAPIObj($APIObj);
+        // static::GetAPIObj($APIObj);
 
         // 判断权限
         if(($notLog & 2) == 2 ) {
@@ -212,7 +212,8 @@ class BaseAPIBusiness
             $queryParams['whereIn']['id'] = explode(',',$id);
         }
 
-        $resultDatas = $APIObj::ajaxDelApi($model_name, $company_id , $queryParams, $notLog);
+        // $resultDatas = $APIObj::ajaxDelApi($model_name, $company_id , $queryParams, $notLog);
+        $resultDatas = static::delByQuery($company_id, $model_name, $queryParams, $notLog);
         return $resultDatas;
     }
 
@@ -254,9 +255,31 @@ class BaseAPIBusiness
         }else{
             $queryParams['whereIn']['id'] = explode(',',$id);
         }
+        // static::GetAPIObj($APIObj);
+        // $resultDatas = $APIObj::ajaxDelApi($model_name, $company_id , $queryParams, $notLog);
+        $resultDatas = static::delByQuery($company_id, $model_name, $queryParams, $notLog);
+        return $resultDatas;
+    }
+
+
+    /**
+     * 根据条件删除记录
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     *
+     * @param string $company_id 公司id
+     * @param int $id 删除id
+     * @param string $model_name 模型名称 为空，则用对象的属性
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 列表数据
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function delByQuery($company_id, $model_name = '', $queryParams = [], $notLog = 0){
+        if(empty($model_name)) $model_name = static::$model_name;
+
         static::GetAPIObj($APIObj);
         $resultDatas = $APIObj::ajaxDelApi($model_name, $company_id , $queryParams, $notLog);
-
         return $resultDatas;
     }
 

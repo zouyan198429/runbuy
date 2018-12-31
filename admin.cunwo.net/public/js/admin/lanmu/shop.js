@@ -58,6 +58,15 @@ function reset_list_self(is_read_page, ajax_async, reset_total){
     console.log('ajax_async', typeof(ajax_async));
     reset_list(is_read_page, false, reset_total);
     // initList();
+    initPic();
+}
+
+// window.onload = function() {
+//     initPic();
+// };
+function initPic(){
+    baguetteBox.run('.baguetteBoxOne');
+    // baguetteBox.run('.baguetteBoxTwo');
 }
 
 //业务逻辑部分
@@ -92,6 +101,7 @@ var otheraction = {
     document.write("");
     document.write("        <%for(var i = 0; i<data_list.length;i++){");
     document.write("        var item = data_list[i];");
+    document.write("        var resource_list = item.resource_list;");
     //document.write("        var can_modify = false;");
    // document.write("        if( item.issuper==0 ){");
     document.write("        can_modify = true;");
@@ -110,6 +120,15 @@ var otheraction = {
     document.write("            <td><%=item.shop_name%><hr/><%=item.linkman%><\/td>");
     document.write("            <td><%=item.mobile%><hr/><%=item.tel%><\/td>");
     document.write("            <td><%=item.province_name%><%=item.city_name%><%=item.area_name%><%=item.addr%><\/td>");
+    document.write("           <td>");
+    document.write("            <%for(var j = 0; j<resource_list.length;j++){");
+    document.write("                var jitem = resource_list[j];");
+    document.write("                 %>");
+    document.write("               <a href=\"<%=jitem.resource_url%>\">");
+    document.write("                <img  src=\"<%=jitem.resource_url%>\"  style=\"width:100px;\">");
+    document.write("              </a>");
+    document.write("            <%}%>");
+    document.write("           <\/td>");
     document.write("            <td><%=item.type_name%><\/td>");
     document.write("            <td><%=item.labelNnames%><\/td>");
     document.write("            <td><%=item.sales_volume%><hr/><%=item.mon_sales_volume%><\/td>");

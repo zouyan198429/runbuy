@@ -165,7 +165,8 @@ class CityDBBusiness extends BasePublicDBBusiness
                 }
 
             }else{// 修改
-                $saveBoolen = static::saveById($saveData, $id);
+                $modelObj = null;
+                $saveBoolen = static::saveById($saveData, $id,$modelObj);
                 // 更新子级城市所属
                 foreach($childList as $temChildCity) {
                     $childCityId = $temChildCity['id'];

@@ -71,6 +71,7 @@
       <th>城市分站<hr/>城市合伙人</th>
       <th>商家<hr/>店铺</th>
       <th>商品名称</th>
+      <th>图片</th>
       <th>分类<hr/>价格</th>
       <th>排序[降序]</th>
       <th>总销量<hr/>月销量</th>
@@ -79,7 +80,7 @@
       <th>操作</th>
     </tr>
     </thead>
-    <tbody id="data_list">
+    <tbody id="data_list" class=" baguetteBoxOne gallery" >
     </tbody>
   </table>
   <div class="mmfoot">
@@ -117,7 +118,12 @@
       var IMPORT_EXCEL_URL = "{{ url('api/admin/shopGoods/import') }}";//导入EXCEL地址
       var IMPORT_EXCEL_CLASS = "import_file";// 导入EXCEL的file的class
   </script>
-  <script src="{{asset('js/common/list.js')}}"></script>
+
+<link rel="stylesheet" href="{{asset('js/baguetteBox.js/baguetteBox.min.css')}}">
+<script src="{{asset('js/baguetteBox.js/baguetteBox.min.js')}}" async></script>
+{{--<script src="{{asset('js/baguetteBox.js/highlight.min.js')}}" async></script>--}}
+
+<script src="{{asset('js/common/list.js')}}"></script>
   <script src="{{ asset('js/admin/lanmu/shopGoods.js') }}"  type="text/javascript"></script>
 </body>
 </html>

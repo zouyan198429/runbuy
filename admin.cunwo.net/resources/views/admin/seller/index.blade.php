@@ -139,6 +139,7 @@
       var GOODS_LIST_URL = "{{ url('admin/shopGoods') }}"; // 商品管理
       var ORDERS_LIST_URL = "{{ url('admin/order') }}"; // 订单管理
   </script>
+
   <script src="{{asset('js/common/list.js')}}"></script>
   <script src="{{ asset('js/admin/lanmu/seller.js') }}"  type="text/javascript"></script>
 </body>

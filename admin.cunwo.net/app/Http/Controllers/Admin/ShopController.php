@@ -62,12 +62,13 @@ class ShopController extends WorksController
           //   'department_id' => 0,
             'now_seller_state' => 0,
             'seller_id' => $seller_id,
+            'resource_list' => [],
         ];
         $operate = "添加";
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIShopBusiness::getInfoData($request, $this, $id, ['shopSeller', 'labels']);
+            $info = CTAPIShopBusiness::getInfoData($request, $this, $id, ['shopSeller', 'labels', 'siteResources']);
             $intro = $info['intro'] ?? '';
             $info['intro'] = replace_enter_char($intro,2);
             $range_time = '';
@@ -83,6 +84,8 @@ class ShopController extends WorksController
                 $info['now_seller_state'] = $partnerInfo['now_state'] ?? 0;
             }
         }
+
+        // $info['resource_list'] = [];
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         // 状态
         $reDataArr['status'] =  CTAPIShopBusiness::$statusArr;
@@ -183,8 +186,18 @@ class ShopController extends WorksController
         if(!is_array($labelIds) && is_string($labelIds)){// 转为数组
             $labelIds = explode(',',$labelIds);
         }
+
         $label_ids = implode(',', $labelIds);
         if(!empty($label_ids)) $label_ids = ',' . $label_ids . ',';
+
+        // 图片资源
+        $resource_id = CommonRequest::get($request, 'resource_id');
+        if(is_string($resource_id) || is_numeric($resource_id)){
+            $resource_id = explode(',' ,$resource_id);
+        }
+
+        $resource_ids = implode(',', $resource_id);
+        if(!empty($resource_ids)) $resource_ids = ',' . $resource_ids . ',';
 
         $range_time = CommonRequest::get($request, 'range_time');
 
@@ -208,6 +221,8 @@ class ShopController extends WorksController
             // 'admin_username' => $admin_username,
             'label_ids' => $label_ids,// 标签id串(逗号分隔-未尾逗号结束)
             'labelIds' => $labelIds,// 此下标为标签关系
+            'resource_ids' => $resource_ids,// 图片资源id串(逗号分隔-未尾逗号结束)
+            'resourceIds' => $resource_id,// 此下标为图片资源关系
         ];
         // 经营时间
         $timeArr = explode('-',$range_time);
@@ -243,7 +258,7 @@ class ShopController extends WorksController
      */
     public function ajax_alist(Request $request){
         $this->InitParams($request);
-        return  CTAPIShopBusiness::getList($request, $this, 2 + 4, [], ['province', 'city', 'area', 'shopCity', 'shopCityPartner', 'shopSeller', 'shopType', 'labels']);
+        return  CTAPIShopBusiness::getList($request, $this, 2 + 4, [], ['province', 'city', 'area', 'shopCity', 'shopCityPartner', 'shopSeller', 'shopType', 'labels', 'siteResources']);
     }
 
     /**

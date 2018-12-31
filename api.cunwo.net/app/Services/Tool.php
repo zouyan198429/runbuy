@@ -483,6 +483,19 @@ class Tool
     // 数组操作
 
     /**
+     * 一维数组清除空值
+     *
+     * @param array $array
+     * @return array
+     */
+    public static function arrClsEmpty(&$array){
+        foreach($array as $k => $v){
+            if(is_null($v) || trim($v) === '') unset($array[$k]);
+        }
+        return $array;
+    }
+
+    /**
      * 返回以原数组某个值为下标的新数组
      *
      * @param array $array
@@ -1100,5 +1113,105 @@ class Tool
         }
         $params = array_values($params);
         return $modelObj->{$methodName}(...$params);
+    }
+
+    /**
+     * 根据数据表记录[二维]，转换资源url为可以访问的地址
+     *
+     * @param array $reportsList 栏目记录数组 - 二维
+     * @param int $type 多少维  1:一维[默认]；2 二维 --注意是资源的维度
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function resoursceUrl(&$reportsList, $type = 2){
+        foreach($reportsList as $k=>$item){
+            $reportsList[$k] = static::resourceUrl($item,$type);
+        }
+        return $reportsList;
+    }
+
+    /**
+     * 根据数据表记录，转换资源url为可以访问的地址
+     *
+     * @param array $dataList 资源记录数组 - 二维 / 一维
+     * @param int $type 多少维  1:一维[默认]；2 二维 --注意是资源的维度
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function resourceUrl(&$dataList,$type = 2){
+        if($type == 2){
+            if(isset($dataList['site_resources'])){
+                $site_resources = $dataList['site_resources'] ?? [];
+                foreach($site_resources as $k=>$site_resource){
+                    $site_resources[$k]['resource_url'] = url($site_resource['resource_url']);
+                }
+                $dataList['site_resources'] = $site_resources;
+            }
+        }else{
+            if(isset($dataList['resource_url'])){
+                $dataList['resource_url'] = url($dataList['resource_url']);
+            }
+        }
+        return $dataList;
+    }
+
+    /**
+     * 格式化资源数据
+     *
+     * @param array $dataList 资源记录数组 - 二维 / 一维
+     * @param int $type 多少维  1:一维[默认]；2 二维 --注意是资源的维度
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function formatResource($data_list, $type = 2){
+        $reList = [];
+        if($type == 1) $data_list = [$data_list];
+        foreach($data_list as $k => $v){
+            $temArr = [
+                'id' => $v['id'],
+                'resource_name' => $v['resource_name'],
+                'resource_url' => url($v['resource_url']),
+                'created_at' => $v['created_at'],
+            ];
+            array_push($reList, $temArr);
+        }
+        if($type == 1) $reList = $reList[0] ?? [];
+        return $reList;
+    }
+
+    /**
+     * 根据数据表记录，删除本地文件
+     *
+     * @param object $modelObj 当前模型对象
+     * @param array $resources 资源记录数组 - 二维
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function resourceDelFile($resources = []){
+        foreach($resources as $resource){
+            $resource_url = $resource['resource_url'] ?? '';
+            if(empty($resource_url)){
+                continue;
+            }
+            @unlink(public_path($resource_url));// 删除文件
+        }
+    }
+
+    /**
+     * 根据site_resources记录，转换小程序的图片列数组-二维
+     *
+     * @param array $site_resources 资源记录数组 - 二维
+     * @return  array $upload_picture_list 小程序的图片列数组-二维
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getFormatResource($site_resources){
+        $upload_picture_list = [];
+        // $site_resources = $infoData['site_resources'] ?? [];
+        foreach($site_resources as $v){
+            $upload_picture_list[] = [
+                'upload_percent' => 100,
+                'path' => $v['resource_url'] ?? '',
+                'path_server' => $v['resource_url'] ?? '',
+                'resource_id' => $v['id'] ?? 0,
+            ];
+        }
+        //$infoData['upload_picture_list'] = $upload_picture_list;
+        return $upload_picture_list;
     }
 }

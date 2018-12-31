@@ -164,7 +164,8 @@ class CityPartnerDBBusiness extends BasePublicDBBusiness
                 // StaffDBBusiness::create($staffInfo);
                 StaffDBBusiness::replaceById($staffInfo, $company_id, $staffId, $operate_staff_id, $modifAddOprate);
             }else{// 修改
-                $saveBoolen = static::saveById($saveData, $id);
+                $modelObj = null;
+                $saveBoolen = static::saveById($saveData, $id, $modelObj);
                 // $resultDatas = static::getInfo($id);
 
             }

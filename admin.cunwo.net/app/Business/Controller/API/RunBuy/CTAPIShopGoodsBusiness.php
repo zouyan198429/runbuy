@@ -132,6 +132,15 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
             $data_list[$k]['type_name'] = $v['type']['type_name'] ?? '';
             // $data_list[$k]['type_id'] = $v['type']['id'] ?? 0;
             if(isset($data_list[$k]['type'])) unset($data_list[$k]['type']);
+
+            // 资源url
+            $resource_list = [];
+            if(isset($v['site_resources'])){
+                Tool::resourceUrl($v, 2);
+                $resource_list = Tool::formatResource($v['site_resources'], 2);
+                unset($data_list[$k]['site_resources']);
+            }
+            $data_list[$k]['resource_list'] = $resource_list;
         }
         $result['data_list'] = $data_list;
         // 导出功能
@@ -181,6 +190,16 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
             }
         }
         $info['now_shop_state'] = $now_shop_state;
+
+        // 资源url
+        $resource_list = [];
+        if(isset($info['site_resources'])){
+            Tool::resourceUrl($info, 2);
+            $resource_list = Tool::formatResource($info['site_resources'], 2);
+            unset($info['site_resources']);
+        }
+        $info['resource_list'] = $resource_list;
+
         return $info;
     }
 

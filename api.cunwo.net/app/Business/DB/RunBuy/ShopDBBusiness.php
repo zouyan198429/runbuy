@@ -100,6 +100,15 @@ class ShopDBBusiness extends BasePublicDBBusiness
             unset($saveData['labelIds']);
         }
 
+        // 是否有图片资源
+        $hasResource = false;
+        $resourceIds = [];
+        if(isset($saveData['resourceIds'])){
+            $hasResource = true;
+            $resourceIds = $saveData['resourceIds'];
+            unset($saveData['resourceIds']);
+        }
+
         $staffInfo = [];
         if( $id <= 0 ){
             if(!isset($saveData['admin_username']) || !isset($saveData['admin_password'])){
@@ -187,13 +196,10 @@ class ShopDBBusiness extends BasePublicDBBusiness
                 // StaffDBBusiness::create($staffInfo);
                 StaffDBBusiness::replaceById($staffInfo, $company_id, $staffId, $operate_staff_id, $modifAddOprate);
             }else{// 修改
-                $saveBoolen = static::saveById($saveData, $id);
+                $modelObj = null;
+                $saveBoolen = static::saveById($saveData, $id,$modelObj);
                 // $resultDatas = static::getInfo($id);
 
-            }
-
-            if($isModify){
-                static::compareHistory($id, 1);
             }
 
             // 同步修改关系
@@ -201,16 +207,13 @@ class ShopDBBusiness extends BasePublicDBBusiness
                 // 加入company_id字段
                 $syncLabelArr = [];
                 $temArr =  [
-                   // 'company_id' => $company_id,
+                    // 'company_id' => $company_id,
 //                    'operate_staff_id' => $operate_staff_id,
 //                    'operate_staff_id_history' => $operate_staff_id_history,
                 ];
                 // 加入操作人员信息
-                if($operate_staff_id_history <= 0) {
-                    static::addOprate($temArr, $operate_staff_id,$operate_staff_id_history);
-                }else{
-                    $temArr = array_merge($temArr, ['operate_staff_id' => $operate_staff_id, 'operate_staff_id_history' => $operate_staff_id_history]);
-                }
+                static::addOprate($temArr, $operate_staff_id,$operate_staff_id_history);
+
                 foreach($labelIds as $labelId){
                     $syncLabelArr[$labelId] = $temArr;
                 }
@@ -218,6 +221,15 @@ class ShopDBBusiness extends BasePublicDBBusiness
                     'labels' => $syncLabelArr,//标签
                 ];
                 static::sync($id, $syncParams);
+            }
+
+            // 同步修改图片资源关系
+            if($hasResource){
+                static::saveResourceSync($id, $resourceIds, $operate_staff_id, $operate_staff_id_history, []);
+            }
+
+            if($isModify){
+                static::compareHistory($id, 1);
             }
         } catch ( \Exception $e) {
             DB::rollBack();

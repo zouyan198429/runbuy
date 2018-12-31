@@ -2,6 +2,7 @@
 
 namespace App\Services\Request\API;
 
+use App\Services\Tool;
 /**
  *具体业务通用接口类--请求api--公有接口
  *  如果是自己的数据库系统，可以继承此公用方法
@@ -1121,120 +1122,6 @@ class APIBasicRequest
     }
 
     // **************************************************************************************************************************
-    /**
-     * 根据资源id，删除资源及数据表记录
-     *
-     * @param object $modelObj 当前模型对象
-     * @param int $companyId 企业id
-     * @param string $queryParams 条件数组/json字符
-     * @param int $notLog 是否需要登陆 0需要1不需要
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function ResourceDelById($id, $companyId = null, $notLog = 0){
-        $model_name = 'Resource';
-        // 获得数据记录
-        $relations = '';
-        if(is_numeric($companyId) && $companyId > 0){
-            // 判断权限
-            $judgeData = [
-                'company_id' => $companyId,
-            ];
-            $info = static::judgePower($id, $judgeData, $model_name, $companyId, $relations, $notLog);
-        }else{
-            $info = static::getinfoApi($model_name, '', $relations, $companyId , $id, $notLog);
-        }
-
-        if(empty($info)){
-            // throws('资源记录[' . $id . ']不存在!', $this->source);
-            throws('资源记录[' . $id . ']不存在!');
-        }
-        // 删除文件
-        static::resourceDelFile([$info]);
-        //删除记录
-        $queryParams =[// 查询条件参数
-            'where' => [
-                ['id', $id],
-            ]
-        ];
-        return static::ajaxDelApi($model_name, $companyId , $queryParams, $notLog);
-
-    }
-
-    /**
-     * 根据数据表记录，删除本地文件
-     *
-     * @param object $modelObj 当前模型对象
-     * @param array $resources 资源记录数组 - 二维
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function resourceDelFile($resources = []){
-        foreach($resources as $resource){
-            $resource_url = $resource['resource_url'] ?? '';
-            if(empty($resource_url)){
-                continue;
-            }
-            @unlink(public_path($resource_url));// 删除文件
-        }
-    }
-
-    /**
-     * 根据数据表记录[二维]，转换资源url为可以访问的地址
-     *
-     * @param array $reportsList 栏目记录数组 - 二维
-     * @param int $type 多少维  1:一维[默认]；2 二维 --注意是资源的维度
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function resoursceUrl(&$reportsList, $type = 2){
-        foreach($reportsList as $k=>$item){
-            $reportsList[$k] = static::resourceUrl($item,$type);
-        }
-        return $reportsList;
-    }
-
-    /**
-     * 根据数据表记录，转换资源url为可以访问的地址
-     *
-     * @param array $dataList 资源记录数组 - 二维 / 一维
-     * @param int $type 多少维  1:一维[默认]；2 二维 --注意是资源的维度
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function resourceUrl(&$dataList,$type = 2){
-        if($type == 2){
-            if(isset($dataList['site_resources'])){
-                $site_resources = $dataList['site_resources'] ?? [];
-                foreach($site_resources as $k=>$site_resource){
-                    $site_resources[$k]['resource_url'] = url($site_resource['resource_url']);
-                }
-                $dataList['site_resources'] = $site_resources;
-            }
-        }else{
-            if(isset($dataList['resource_url'])){
-                $dataList['resource_url'] = url($dataList['resource_url']);
-            }
-        }
-        return $dataList;
-    }
-    /**
-     * 根据site_resources记录，转换小程序的图片列数组-二维
-     *
-     * @param array $site_resources 资源记录数组 - 二维
-     * @return  array $upload_picture_list 小程序的图片列数组-二维
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function getFormatResource($site_resources){
-        $upload_picture_list = [];
-        // $site_resources = $infoData['site_resources'] ?? [];
-        foreach($site_resources as $v){
-            $upload_picture_list[] = [
-                'upload_percent' => 100,
-                'path' => $v['resource_url'] ?? '',
-                'path_server' => $v['resource_url'] ?? '',
-                'resource_id' => $v['id'] ?? 0,
-            ];
-        }
-        //$infoData['upload_picture_list'] = $upload_picture_list;
-        return $upload_picture_list;
-    }
 
     // 判断权限-----开始
     // 判断权限 ,返回当前记录[可再进行其它判断], 有其它主字段的，可以重新此方法

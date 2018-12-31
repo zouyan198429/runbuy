@@ -202,6 +202,8 @@ function initUploader(upload_id, autoUpload, submit_url, file_data_name, multipa
                 var limitSumCount = fileObj.options.limitSumCount;
                 // 真实需要上传的数量
                 var need_upload_count = parseInt(limitSumCount) - parseInt(checkedCount);
+                if(need_upload_count < 0) need_upload_count = 0;
+                console.log('还需要上传的文件数量', need_upload_count);
                 if(need_upload_count < fileCounts){ // 删除多余的文件对象
                     for (var i = need_upload_count; i < files.length; i++) {
                         fileObj.removeFile(files[i]);// 将文件从文件队列中移除
@@ -209,6 +211,7 @@ function initUploader(upload_id, autoUpload, submit_url, file_data_name, multipa
                     fileObj.showMessage('所有文件数目不能超过' + limitSumCount + '个，如果要上传此文件请先从列表移除文件。', 'warning', 10000);
 
                 }
+                console.log('完成删除文件对象');
                 // 需要的值不等，就改成正确的
                 if(need_upload_count != limitfilecount){
                     console.log('修改可以上传的最大数为', need_upload_count);
