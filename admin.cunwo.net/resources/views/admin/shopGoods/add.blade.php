@@ -90,9 +90,59 @@
                 </td>
             </tr>
             <tr>
+                <th>属性<span class="must">*</span></th>
+                <td>
+                    共 <span class="prop_num">{{ $subject_num or '0' }}</span> 个属性
+                    <button  type="button" class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.selectProp(this)">选择属性</button>
+                    <button  type="button" class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.addSelectProp(this)">新加属性</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"  class="prop_td">
+                    <div class="table-header">
+                        <button  type="button" class="btn btn-danger  btn-xs ace-icon fa fa-trash-o bigger-60"  onclick="otheraction.batchDel(this, '.prop_td', 'tr')">批量删除</button>
+                    </div>
+                    <table class=" table2"  >
+                        <thead>
+                        <tr>
+                            <th style="width: 90px;">
+                                <label class="pos-rel">
+                                    <input type="checkbox" class="ace check_all" value="" onclick="otheraction.seledAll(this,'.table2')">
+                                    <span class="lbl">全选</span>
+                                </label>
+                            </th>
+                            <th>属性</th>
+                            <th>属性值</th>
+                            <th>价格属性</th>
+                            <th>是否必填</th>
+                            <th>是否多选</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody class="data_list prop_list">
+                        </tbody>
+
+                    </table>
+
+                </td>
+            </tr>
+            <tr>
                 <th>价格<span class="must">*</span></th>
                 <td>
-                    <input type="text" class="inp wnormal"  name="price" value="{{ $info['price'] or '' }}" placeholder="请输入价格"  onkeyup="numxs(this) " onafterpaste="numxs(this)"   />
+                    <input type="hidden" name="price_type"  value="{{ $info['price_type'] or '' }}" />
+                    <table class="price_prop_table table2" style="width:350px;display:none;">
+                        <thead>
+                        <tr>
+                            <th>属性值</th>
+                            <th>价格</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody class="data_list_price">
+                        </tbody>
+                    </table>
+
+                    <input type="text" class="inp wnormal" style="display: none;"  name="price" value="{{ $info['price'] or '' }}" placeholder="请输入价格"  onkeyup="numxs(this) " onafterpaste="numxs(this)" />
                 </td>
             </tr>
             <tr>
@@ -127,12 +177,33 @@
     var SELECT_SHOP_URL = "{{ url('admin/shop/select') }}";// 选择店铺地址
     var AJAX_SHOP_SELECTED_URL = "{{ url('api/admin/shop/ajax_selected') }}";// ajax选中店铺地址
 
+
+
+
     var GOODS_TYPE_KV_URL  = "{{url('api/admin/shopGoodsType/ajax_get_kv')}}";// 获得商品分类信息;根据店铺id，获得店铺分类信息
 
     const SELLER_ID = "{{ $info['seller_id'] or -1}}";// 商家默认值
 
     const SHOP_ID = "{{ $info['shop_id'] or -1}}";// 店铺默认值
     const TYPE_ID = "{{ $info['type_id'] or -1}}";// 分类默认值
+
+    var ID_VAL = "{{ $info['id'] or 0 }}";// 当前id值
+    var AJAX_PROP_URL = "{{ url('api/admin/shopGoods/ajax_get_prop') }}";// ajax初始化属性地址
+    var AJAX_UPDATE_PROP_URL = "{{ url('api/admin/shopGoods/ajax_add_prop') }}";// ajax更新属性地址
+    var AJAX_PROP_ADD_URL = "{{ url('api/admin/shopGoods/ajax_add_prop') }}";// ajax添加属性地址
+
+    var ADD_PROP_URL = "{{ url('admin/prop/add/0') }}";// 新加属性地址
+    var SELECT_PROP_URL = "{{ url('admin/prop/select') }}";// 选择属性地址
+    var AJAX_UPDATE_PROP_URL = "{{ url('api/admin/prop/ajax_selected_multi') }}";// ajax更新参考人员地址
+    var AJAX_PROP_SELECTED_URL = "{{ url('api/admin/prop/ajax_selected') }}";// ajax选中属性地址-- 单选
+    var AJAX_PROP_SELECTED_MULTI_URL = "{{ url('api/admin/prop/ajax_selected_multi') }}";// ajax选中属性地址-- 复选
+
+    var DYNAMIC_BAIDU_TEMPLATE = "baidu_template_data_list";//百度模板id
+    var DYNAMIC_TABLE_BODY = "data_list";//数据列表class
+
+    // 价格模板
+    var DYNAMIC_PRICE_BAIDU_TEMPLATE = "baidu_template_price_data_list";//百度模板id
+    var DYNAMIC_PRICE_TABLE_BODY = "data_list_price";//数据列表class
 
 
     // 上传图片变量

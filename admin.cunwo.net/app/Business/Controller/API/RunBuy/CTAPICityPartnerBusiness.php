@@ -184,6 +184,8 @@ class CTAPICityPartnerBusiness extends BasicPublicCTAPIBusiness
                 $now_city_state = 2;
             }
         }
+        if(isset($info['city_partner_city_history'])) unset($info['city_partner_city_history']);
+        if(isset($info['city_partner_city'])) unset($info['city_partner_city']);
         $info['now_city_state'] = $now_city_state;
 
         return $info;

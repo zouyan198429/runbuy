@@ -134,6 +134,8 @@ class CTAPIShopGoodsTypeBusiness extends BasicPublicCTAPIBusiness
                 $now_shop_state = 2;
             }
         }
+        if(isset($info['shop_history'])) unset($info['shop_history']);
+        if(isset($info['shop'])) unset($info['shop']);
         $info['now_shop_state'] = $now_shop_state;
         return $info;
     }

@@ -25,6 +25,11 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
         '2' => '下架',
     ];
 
+    public static $orderProp = [
+        ['key' => 'prop_id', 'sort' => 'asc', 'type' => 'numeric'],
+        ['key' => 'prop_val_id', 'sort' => 'asc', 'type' => 'numeric'],
+    ];
+
     /**
      * 获得列表数据--所有数据
      *
@@ -189,6 +194,8 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
                 $now_shop_state = 2;
             }
         }
+        if(isset($info['shop_history'])) unset($info['shop_history']);
+        if(isset($info['shop'])) unset($info['shop']);
         $info['now_shop_state'] = $now_shop_state;
 
         // 资源url
@@ -530,6 +537,7 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
         $department_list = $parentData['result']['data_list'] ?? [];
         return Tool::formatArrKeyVal($department_list, 'id', 'city_name');
     }
+
     /**
      * 获得列表数据--所有数据
      *
@@ -571,5 +579,33 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
     }
     // ***********通过组织条件获得kv***结束************************************************************
 
+    /**
+     * 获得商品属性数据--根据商品id
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 商品属性数据
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getPropByGoodId(Request $request, Controller $controller, $notLog = 0){
+        $good_id = CommonRequest::getInt($request, 'good_id');
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+        // 调用获得商品及属性数据--根据商品id接口
+        $apiParams = [
+            'company_id' => $company_id,
+            'good_id' => $good_id,
+            'operate_staff_id' => $user_id,
+        ];
+        $info = static::exeDBBusinessMethodCT($request, $controller, '',  'getPropIdsByKey', $apiParams, $company_id, $notLog);
+        // 判断权限
+//        $judgeData = [
+//            // 'company_id' => $company_id,
+//            'id' => $company_id,
+//        ];
+//        static::judgePowerByObj($request, $controller, $info, $judgeData );
+        return $info['propList'] ?? [];
+    }
 
 }

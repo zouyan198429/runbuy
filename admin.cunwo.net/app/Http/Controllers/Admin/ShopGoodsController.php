@@ -52,6 +52,7 @@ class ShopGoodsController extends WorksController
         $shop_id =  CommonRequest::getInt($request, 'shop_id');
         $info = [
             'id'=>$id,
+            'price_type' => 1,
           //   'department_id' => 0,
             'now_shop_state' => 0,
             'shop_id' => $shop_id,
@@ -149,6 +150,8 @@ class ShopGoodsController extends WorksController
         $price = CommonRequest::get($request, 'price');
         $intro = CommonRequest::get($request, 'intro');
         $intro =  replace_enter_char($intro,1);
+        $price_type = CommonRequest::getInt($request, 'price_type');
+        if($price_type == 2) $price = 0;
 
         // 图片资源
         $resource_id = CommonRequest::get($request, 'resource_id');
@@ -158,6 +161,57 @@ class ShopGoodsController extends WorksController
 
         $resource_ids = implode(',', $resource_id);
         if(!empty($resource_ids)) $resource_ids = ',' . $resource_ids . ',';
+
+        // 属性
+        $prop_ids = CommonRequest::get($request, 'prop_ids');// 属性id
+        if(is_string($prop_ids) || !is_array($prop_ids)) $prop_ids = explode(',', $prop_ids);
+
+        $prop_id_historys = CommonRequest::get($request, 'prop_id_historys');// 属性历史id
+        if(is_string($prop_id_historys) || !is_array($prop_id_historys)) $prop_id_historys = explode(',', $prop_id_historys);
+
+        $is_prices = CommonRequest::get($request, 'is_prices');// 是否价格属性 0否/1是
+        if(is_string($is_prices) || !is_array($is_prices)) $is_prices = explode(',', $is_prices);
+
+        $is_multis = CommonRequest::get($request, 'is_multis');// 是否多选属性 0否/1是
+        if(is_string($is_multis) || !is_array($is_multis)) $is_multis = explode(',', $is_multis);
+
+        $is_musts = CommonRequest::get($request, 'is_musts');// 是否必填属性 0否/1是
+        if(is_string($is_musts) || !is_array($is_musts)) $is_musts = explode(',', $is_musts);
+
+        $pv_ids = CommonRequest::get($request, 'pv_ids');// 属性值id串数组 ['1,2','3,4'] 多个用,号分隔
+        if(is_string($pv_ids) || !is_array($pv_ids)) $pv_ids = explode(',', $pv_ids);
+
+
+        // 属性价格
+        $price_pv_id = CommonRequest::get($request, 'price_pv_id');// 属性值id数组
+        if(is_string($price_pv_id) || !is_array($price_pv_id)) $price_pv_id = explode(',', $price_pv_id);
+
+        $price_pv_val = CommonRequest::get($request, 'price_pv_val');// 属性值价格数组
+        if(is_string($price_pv_val) || !is_array($price_pv_val)) $price_pv_val = explode(',', $price_pv_val);
+
+        $pvList = [];// 属性价格数组 ['属性值id' => '属性值价格',....]
+        foreach ($price_pv_id as $k => $pvId){
+            $pvList[$pvId] = $price_pv_val[$k];
+        }
+
+        $propList = [];
+        // $propPriceList = [];
+        // $pCount = count($prop_ids);
+        foreach ($prop_ids as $k => $pId){
+            $temProp = [
+                'is_prices' => $is_prices[$k],
+                'is_multi' => $is_multis[$k],
+                'is_must' => $is_musts[$k],
+                'prop_id' => $pId,
+                // 'sort_num' => $pCount--,
+
+                'pv_ids' => $pv_ids[$k],
+            ];
+            array_push($propList, $temProp);
+            // $isPrices = $is_prices[$k] ?? 0;
+
+        }
+
 
 
         $saveData = [
@@ -169,9 +223,13 @@ class ShopGoodsController extends WorksController
             'goods_name' => $goods_name,
             'sort_num' => $sort_num,
             'price' => $price,
+            'price_type' => $price_type,
             'intro' => $intro,
             'resource_ids' => $resource_ids,// 图片资源id串(逗号分隔-未尾逗号结束)
             'resourceIds' => $resource_id,// 此下标为图片资源关系
+
+            'prop_list' => $propList,// 属性
+            'pv_prices' => $pvList,// 属性价格数组 ['属性值id' => '属性值价格',....]
         ];
 
 //        if($id <= 0) {// 新加;要加入的特别字段
@@ -295,4 +353,18 @@ class ShopGoodsController extends WorksController
 //        $resultDatas = CTAPIShopGoodsBusiness::importByFile($request, $this, $fileName);
 //        return ajaxDataArr(1, $resultDatas, '');
 //    }
+
+    /**
+     * ajax获得属性数据-根据商品id
+     *
+     * @param Request $request
+     * @return mixed
+     * @author liuxin
+     */
+    public function ajax_get_prop(Request $request){
+        $this->InitParams($request);
+        $prop_list = CTAPIShopGoodsBusiness::getPropByGoodId($request, $this);
+        return ajaxDataArr(1, ['data_list' => $prop_list], '');
+    }
+
 }

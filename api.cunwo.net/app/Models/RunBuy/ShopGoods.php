@@ -47,6 +47,46 @@ class ShopGoods extends BasePublicModel
     }
 
     /**
+     * 获取商品的店铺商品属性-二维
+     */
+    public function props()
+    {
+        return $this->hasMany('App\Models\RunBuy\ShopGoodsProps', 'goods_id', 'id');
+    }
+
+    /**
+     * 获取商品的店铺商品价格属性-二维
+     */
+    public function priceProps()
+    {
+        return $this->hasMany('App\Models\RunBuy\ShopGoodsPrices', 'goods_id', 'id');
+    }
+
+    /**
+     * 获取商品的购物车-二维
+     */
+    public function carts()
+    {
+        return $this->hasMany('App\Models\RunBuy\Cart', 'goods_id', 'id');
+    }
+
+    /**
+     * 获取商品的订单商品-二维
+     */
+    public function orderGoods()
+    {
+        return $this->hasMany('App\Models\RunBuy\OrdersGoods', 'goods_id', 'id');
+    }
+
+    /**
+     * 获取商品的订单商品-二维
+     */
+    public function orderDoingGoods()
+    {
+        return $this->hasMany('App\Models\RunBuy\OrdersGoodsDoing', 'goods_id', 'id');
+    }
+
+    /**
      * 获取店铺商品对应的城市分站--一维
      */
     public function city()

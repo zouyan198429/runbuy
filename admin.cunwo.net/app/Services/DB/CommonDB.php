@@ -149,25 +149,40 @@ class CommonDB
                     }
 
                     break;
-                case 'whereNotIn':// 数组 [1, 2, 3]
+                case 'whereNotIn':// 数组 [1, 2, 3] 二维数组 [ [字段名=>[多个字段值]],....]
                     // whereNotIn  子句
                     // ->whereNotIn('id', [1, 2, 3])
+//                    if ( (! empty($param)) && is_array($param)){
+//                        $tbObj = $tbObj->whereNotIn($param);
+//                    }
                     if ( (! empty($param)) && is_array($param)){
-                        $tbObj = $tbObj->whereNotIn($param);
+                        foreach($param as $field => $vals){
+                            $tbObj = $tbObj->whereNotIn($field,$vals);
+                        }
                     }
                     break;
-                case 'whereNull': // 字段字符
+                case 'whereNull': // 字段字符 一维数组 ['字段名1',...]
                     // whereNull 方法验证给定列的值为 NULL
                     // ->whereNull('updated_at')
-                    if ( (! empty($param)) && is_string($param)){
-                        $tbObj = $tbObj->whereNull($param);
+//                    if ( (! empty($param)) && is_string($param)){
+//                        $tbObj = $tbObj->whereNull($param);
+//                    }
+                    if ( (! empty($param)) && is_array($param)){
+                        foreach($param as $field ){
+                            $tbObj = $tbObj->whereNull($field);
+                        }
                     }
                     break;
-                case 'whereNotNull':// 字段字符
+                case 'whereNotNull':// 字段字符  一维数组 ['字段名1',...]
                     // whereNotNull 方法验证给定列的值不是 NULL
                     // ->whereNotNull('updated_at')
-                    if ( (! empty($param)) && is_string($param)){
-                        $tbObj = $tbObj->whereNotNull($param);
+//                    if ( (! empty($param)) && is_string($param)){
+//                        $tbObj = $tbObj->whereNotNull($param);
+//                    }
+                    if ( (! empty($param)) && is_array($param)){
+                        foreach($param as $field ){
+                            $tbObj = $tbObj->whereNotNull($field);
+                        }
                     }
                     break;
                 case 'whereColumn':// 同where -二维数组
@@ -562,6 +577,22 @@ class CommonDB
         self::resolveSqlParams($modelObj, $queryParams);
         $requestData = $modelObj->delete();
         return $requestData;
+    }
+
+    // 根据id，删除记录 id,单条记录或 多条[,号分隔]
+    public static function delByIds(&$modelObj, $id){
+        $queryParams =[// 查询条件参数
+            'where' => [
+                // ['id', $id],
+                // ['company_id', $company_id]
+            ]
+        ];
+        if (strpos($id, ',') === false) { // 单条
+            array_push($queryParams['where'],['id', $id]);
+        }else{
+            $queryParams['whereIn']['id'] = explode(',',$id);
+        }
+        return static::del($modelObj, $queryParams);
     }
 
     // $synces  格式 [ '关系方法名' =>[关系id,...],...可多个....]

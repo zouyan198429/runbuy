@@ -61,6 +61,14 @@ class CityPartner extends BasePublicModel
     }
 
     /**
+     * 获取城市合伙人的属性-二维
+     */
+    public function props()
+    {
+        return $this->hasMany('App\Models\RunBuy\Prop', 'city_partner_id', 'id');
+    }
+
+    /**
      * 获取城市合伙人对应的城市分站--一维
      */
     public function cityPartnerCity()

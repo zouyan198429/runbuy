@@ -86,4 +86,11 @@ class City extends BasePublicModel
         return $this->hasMany('App\Models\RunBuy\ShopGoods', 'city_site_id', 'id');
     }
 
+    /**
+     * 获取城市分站的属性-二维
+     */
+    public function props()
+    {
+        return $this->hasMany('App\Models\RunBuy\Prop', 'city_site_id', 'id');
+    }
 }

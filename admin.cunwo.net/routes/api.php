@@ -147,6 +147,19 @@ Route::post('admin/shopType/ajax_import_staff','Admin\ShopTypeController@ajax_im
 Route::post('admin/shopType/import', 'Admin\ShopTypeController@import');// 导入excel
 Route::post('admin/shopType/ajax_get_ids', 'Admin\ShopTypeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
+//店铺商品属性
+Route::any('admin/prop/ajax_alist', 'Admin\PropController@ajax_alist');//ajax获得列表数据
+Route::post('admin/prop/ajax_del', 'Admin\PropController@ajax_del');// 删除
+Route::any('admin/prop/ajax_save', 'Admin\PropController@ajax_save');// 新加/修改
+Route::post('admin/prop/ajax_get_child', 'Admin\PropController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('admin/prop/ajax_get_areachild', 'Admin\PropController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('admin/prop/ajax_import_staff','Admin\PropController@ajax_import'); // 导入员工
+
+Route::post('admin/prop/import', 'Admin\PropController@import');// 导入excel
+Route::post('admin/prop/ajax_get_ids', 'Admin\PropController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
+Route::any('admin/prop/ajax_selected', 'Admin\PropController@ajax_selected');//ajax选择中记录/更新记录 -单选
+Route::any('admin/prop/ajax_selected_multi', 'Admin\PropController@ajax_selected_multi');//ajax选择中记录/更新记录 -多选
 //店铺
 Route::any('admin/shop/ajax_alist', 'Admin\ShopController@ajax_alist');//ajax获得列表数据
 Route::post('admin/shop/ajax_del', 'Admin\ShopController@ajax_del');// 删除
@@ -167,6 +180,7 @@ Route::post('admin/shopGoods/ajax_save', 'Admin\ShopGoodsController@ajax_save');
 Route::post('admin/shopGoods/ajax_get_child', 'Admin\ShopGoodsController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
 Route::post('admin/shopGoods/ajax_get_areachild', 'Admin\ShopGoodsController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 Route::post('admin/shopGoods/ajax_import_staff','Admin\ShopGoodsController@ajax_import'); // 导入员工
+Route::any('admin/shopGoods/ajax_get_prop', 'Admin\ShopGoodsController@ajax_get_prop');//ajax初始化属性地址-根据商品id
 
 Route::post('admin/shopGoods/import', 'Admin\ShopGoodsController@import');// 导入excel
 Route::post('admin/shopGoods/ajax_get_ids', 'Admin\ShopGoodsController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔

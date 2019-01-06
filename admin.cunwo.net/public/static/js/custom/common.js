@@ -1701,7 +1701,7 @@ function get_list_checked(body_data_id,ele_type,check_type){
         if ( $(this).is(':checked') && (!$(this).prop('disabled'))  && ( (check_type & 1) == 1) ) {
             is_need = true;
         }else{
-            if( (check_type & 2) == 2){
+            if(  !$(this).is(':checked')  && (!$(this).prop('disabled')) &&  (check_type & 2) == 2){
                 is_need = true;
             }
         }

@@ -227,6 +227,8 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
                 $now_seller_state = 2;
             }
         }
+        if(isset($info['shop_seller_history'])) unset($info['shop_seller_history']);
+        if(isset($info['shop_seller'])) unset($info['shop_seller']);
         $info['now_seller_state'] = $now_seller_state;
         // 标签
         // if(isset($info['labels'])){

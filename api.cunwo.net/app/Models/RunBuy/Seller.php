@@ -66,6 +66,14 @@ class Seller extends BasePublicModel
     }
 
     /**
+     * 获取商家的属性-二维
+     */
+    public function props()
+    {
+        return $this->hasMany('App\Models\RunBuy\Prop', 'seller_id', 'id');
+    }
+
+    /**
      * 获取城商家对应的城市分站--一维
      */
     public function sellerCity()

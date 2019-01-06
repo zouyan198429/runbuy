@@ -224,6 +224,23 @@ class BaseDBBusiness
     }
 
     /**
+     * 根据id删除接口
+     *
+     * @param int $ids 删除记录 id,单条记录或 多条[,号分隔]
+     * @param string $Model_name model名称
+     * @param string $queryParams 条件数组/json字符
+     * @return mixed Response
+     * @author zouyan(305463219@qq.com)
+     */
+    public static  function deleteByIds($ids, &$modelObj = null)
+    {
+//        $modelObj = null;
+//        Common::getObjByModelName(static::$model_name, $modelObj);
+        static::getModelObj($modelObj );
+        return CommonDB::delByIds($modelObj, $ids);
+    }
+
+    /**
      * 获得model所有记录-- 查询/所有记录分批获取[推荐],也可以获得总数量
      *
      * @param json/array $queryParams 查询条件  有count下标则是查询数量--是否是查询总数

@@ -258,6 +258,13 @@ Route::get('admin/shopType/add/{id}', 'Admin\ShopTypeController@add');// 添加
 Route::get('admin/shopType/export', 'Admin\ShopTypeController@export');// 导出
 Route::get('admin/shopType/import_template', 'Admin\ShopTypeController@import_template');// 导入模版
 
+// 店铺商品属性
+Route::get('admin/prop', 'Admin\PropController@index');// 列表
+Route::get('admin/prop/add/{id}', 'Admin\PropController@add');// 添加
+Route::get('admin/prop/select', 'Admin\PropController@select');// 选择-弹窗
+Route::get('admin/prop/export', 'Admin\PropController@export');// 导出
+Route::get('admin/prop/import_template', 'Admin\PropController@import_template');// 导入模版
+
 // 店铺
 Route::get('admin/shop', 'Admin\ShopController@index');// 列表
 Route::get('admin/shop/add/{id}', 'Admin\ShopController@add');// 添加

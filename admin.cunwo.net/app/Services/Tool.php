@@ -477,6 +477,20 @@ class Tool
     }
 
     // 数组操作
+    /**
+     * 二维数组中每个一维数组追加指定的一维数组值
+     *
+     * @param array $dataList 源数据 二维数组
+     * @param array $appendArr 需要追加的一维数据 一维数组   ['is_multi' => 0, 'is_must' => 1]
+     * @return array
+     */
+    public static function arrAppendKeys(&$dataList, $appendArr){
+        foreach($dataList as $k => $v){
+            $v = array_merge($v, $appendArr);
+            $dataList[$k] = $v;
+        }
+        return $dataList;
+    }
 
     /**
      * 一维数组清除空值

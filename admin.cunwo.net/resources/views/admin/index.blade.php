@@ -173,6 +173,9 @@
                 <dd>
                   <a lay-href="{{ url('admin/shopGoodsType') }}">商品分类</a>
                 </dd>
+                <dd>
+                  <a lay-href="{{ url('admin/prop') }}">商品属性</a>
+                </dd>
                 {{--<dd>--}}
                   {{--<a lay-href="{{ url('layui/user/administrators/list') }}">商品规格</a>--}}
                 {{--</dd>--}}
