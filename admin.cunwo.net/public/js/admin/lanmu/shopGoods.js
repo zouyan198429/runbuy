@@ -47,6 +47,7 @@ function initPic(){
     document.write("        <%for(var i = 0; i<data_list.length;i++){");
     document.write("        var item = data_list[i];");
     document.write("        var resource_list = item.resource_list;");
+    document.write("        var price_list = item.price_list;");
     //document.write("        var can_modify = false;");
    // document.write("        if( item.issuper==0 ){");
     document.write("        can_modify = true;");
@@ -73,7 +74,14 @@ function initPic(){
     document.write("              </a>");
     document.write("            <%}%>");
     document.write("           <\/td>");
-    document.write("            <td><%=item.type_name%><hr/><%=item.price%><\/td>");
+    document.write("            <td>");
+    document.write("            <%=item.type_name%><hr/>");
+    document.write("            <%for(var j = 0; j<price_list.length;j++){");
+    document.write("                var jitem = price_list[j];");
+    document.write("                 %>");
+    document.write("               <%=jitem.price_name%><%=jitem.price_val%><br\/>");
+    document.write("            <%}%>");
+    document.write("           <\/td>");
     document.write("            <td><%=item.sort_num%><\/td>");
     document.write("            <td><%=item.sales_volume%><hr/><%=item.mon_sales_volume%><\/td>");
     document.write("            <td><%=item.is_hot_text%><hr/><%=item.is_sale_text%><\/td>");

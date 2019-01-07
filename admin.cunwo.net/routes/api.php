@@ -174,7 +174,7 @@ Route::post('admin/shop/ajax_get_ids', 'Admin\ShopController@ajax_get_ids');// �
 Route::any('admin/shop/ajax_selected', 'Admin\ShopController@ajax_selected');//ajax选择中记录/更新记录
 
 //商品
-Route::post('admin/shopGoods/ajax_alist', 'Admin\ShopGoodsController@ajax_alist');//ajax获得列表数据
+Route::any('admin/shopGoods/ajax_alist', 'Admin\ShopGoodsController@ajax_alist');//ajax获得列表数据
 Route::post('admin/shopGoods/ajax_del', 'Admin\ShopGoodsController@ajax_del');// 删除
 Route::post('admin/shopGoods/ajax_save', 'Admin\ShopGoodsController@ajax_save');// 新加/修改
 Route::post('admin/shopGoods/ajax_get_child', 'Admin\ShopGoodsController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]

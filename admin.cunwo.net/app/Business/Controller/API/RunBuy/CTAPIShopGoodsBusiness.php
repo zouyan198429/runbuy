@@ -30,6 +30,10 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
         ['key' => 'prop_val_id', 'sort' => 'asc', 'type' => 'numeric'],
     ];
 
+    public static $pricePropVals = [
+        ['key' => 'sort_num', 'sort' => 'desc', 'type' => 'numeric'],
+        ['key' => 'id', 'sort' => 'asc', 'type' => 'numeric'],
+    ];
     /**
      * 获得列表数据--所有数据
      *
@@ -146,6 +150,26 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
                 unset($data_list[$k]['site_resources']);
             }
             $data_list[$k]['resource_list'] = $resource_list;
+            // 价格处理
+            $priceList = [];
+            $price_type = $v['price_type'] ?? 1;// 是否有价格属性1没有2有
+            if($price_type == 1){
+                array_push($priceList, ['price_id' => 0, 'prop_id' => 0, 'prop_val_id' => 0, 'price_name' => '', 'price_val' => $v['price'] ?? 0]);
+            }
+            // 价格属性
+            $price_props = $v['price_props'] ?? [];
+            if($price_type == 2) {
+                // 排序
+                if(!empty($price_props)) $price_props = Tool::php_multisort($price_props, self::$pricePropVals);
+                foreach ($price_props as $t_v) {
+                    array_push($priceList, ['price_id' => $t_v['id'], 'prop_id' => $t_v['prop_id'], 'prop_val_id' => $t_v['prop_val_id']
+                        , 'price_name' => $t_v['prop_val']['name']['main_name'] ?? ''
+                        , 'price_val' => $t_v['price'] ?? 0
+                    ]);
+                }
+                if(isset($v['price_props'])) unset($data_list[$k]['price_props']);
+            }
+            $data_list[$k]['price_list'] = $priceList;
         }
         $result['data_list'] = $data_list;
         // 导出功能
