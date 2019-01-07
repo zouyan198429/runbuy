@@ -114,6 +114,33 @@
                 {{--</dd>--}}
               </dl>
             </li>
+            <li data-name="set" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="设置" lay-direction="2">
+                <i class="layui-icon layui-icon-set"></i>
+                <cite>设置</cite>
+              </a>
+              <dl class="layui-nav-child">
+                <dd class="layui-nav-itemed">
+                  <a href="javascript:;">系统设置</a>
+                  <dl class="layui-nav-child">
+                    <dd>
+                      <a lay-href="{{ url('admin/shopType') }}">店铺分类</a>
+                    </dd>
+                    <dd>
+                      <a lay-href="{{ url('admin/labels') }}">搜索标签</a>
+                    </dd>
+                    <dd><a lay-href="{{ url('admin/siteIntro') }}">站点介绍</a></dd>
+                  </dl>
+                </dd>
+                <dd class="layui-nav-itemed">
+                  <a href="javascript:;">我的设置</a>
+                  <dl class="layui-nav-child">
+                    <dd><a lay-href="{{ url('admin/info') }}">基本资料</a></dd>
+                    <dd><a lay-href="{{ url('admin/password') }}">修改密码</a></dd>
+                  </dl>
+                </dd>
+              </dl>
+            </li>
             <li data-name="user" class="layui-nav-item">
               <a href="javascript:;" lay-tips="城市管理" lay-direction="2">
                 <i class="layui-icon layui-icon-component"></i>
@@ -126,38 +153,21 @@
                 <dd>
                   <a lay-href="{{ url('admin/cityPartner') }}">城市加盟商</a>
                 </dd>
+                <dd><a lay-href="{{ url('admin/notice') }}">公告</a></dd>
+              </dl>
+            </li>
+
+            <li data-name="user" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="商家管理" lay-direction="2">
+                <i class="layui-icon layui-icon-flag"></i>
+                <cite>商家管理</cite>
+              </a>
+              <dl class="layui-nav-child">
                 <dd>
                   <a lay-href="{{ url('admin/seller') }}">商家</a>
                 </dd>
               </dl>
             </li>
-            <li data-name="user" class="layui-nav-item">
-              <a href="javascript:;" lay-tips="用户" lay-direction="2">
-                <i class="layui-icon layui-icon-user"></i>
-                <cite>用户管理</cite>
-              </a>
-              <dl class="layui-nav-child">
-                <dd>
-                  <a lay-href="{{ url('admin/staff') }}">后台管理员</a>
-                </dd>
-                <dd>
-                  <a lay-href="{{ url('admin/staffPartner') }}">加盟商管理员</a>
-                </dd>
-                <dd>
-                  <a lay-href="{{ url('admin/staffSeller') }}">商家管理员</a>
-                </dd>
-                <dd>
-                  <a lay-href="{{ url('admin/staffRun') }}">跑腿人员</a>
-                </dd>
-                <dd>
-                  <a lay-href="{{ url('admin/staffUser') }}">用户</a>
-                </dd>
-                <dd>
-                  <a lay-href="">常用地址</a>
-                </dd>
-              </dl>
-            </li>
-
             <li data-name="user" class="layui-nav-item">
               <a href="javascript:;" lay-tips="店铺管理" lay-direction="2">
                 <i class="layui-icon layui-icon-template"></i>
@@ -165,11 +175,16 @@
               </a>
               <dl class="layui-nav-child">
                 <dd>
-                  <a lay-href="{{ url('admin/shopType') }}">店铺分类</a>
-                </dd>
-                <dd>
                   <a lay-href="{{ url('admin/shop') }}">店铺管理</a>
                 </dd>
+              </dl>
+            </li>
+            <li data-name="user" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="商品管理" lay-direction="2">
+                <i class="layui-icon layui-icon-app"></i>
+                <cite>商品管理</cite>
+              </a>
+              <dl class="layui-nav-child">
                 <dd>
                   <a lay-href="{{ url('admin/shopGoodsType') }}">商品分类</a>
                 </dd>
@@ -177,19 +192,16 @@
                   <a lay-href="{{ url('admin/prop') }}">商品属性</a>
                 </dd>
                 {{--<dd>--}}
-                  {{--<a lay-href="{{ url('layui/user/administrators/list') }}">商品规格</a>--}}
+                {{--<a lay-href="{{ url('layui/user/administrators/list') }}">商品规格</a>--}}
                 {{--</dd>--}}
                 <dd>
                   <a lay-href="{{ url('admin/shopGoods') }}">商品</a>
-                </dd>
-                <dd>
-                  <a lay-href="{{ url('admin/labels') }}">搜索标签</a>
                 </dd>
               </dl>
             </li>
             <li data-name="user" class="layui-nav-item">
               <a href="javascript:;" lay-tips="订单管理" lay-direction="2">
-                <i class="layui-icon layui-icon-app"></i>
+                <i class="layui-icon layui-icon-cart"></i>
                 <cite>订单管理</cite>
               </a>
               <dl class="layui-nav-child">
@@ -224,25 +236,30 @@
                 </dd>
               </dl>
             </li>
-            <li data-name="set" class="layui-nav-item">
-              <a href="javascript:;" lay-tips="设置" lay-direction="2">
-                <i class="layui-icon layui-icon-set"></i>
-                <cite>设置</cite>
+
+            <li data-name="user" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="用户" lay-direction="2">
+                <i class="layui-icon layui-icon-user"></i>
+                <cite>用户管理</cite>
               </a>
               <dl class="layui-nav-child">
-                <dd class="layui-nav-itemed">
-                  <a href="javascript:;">系统设置</a>
-                  <dl class="layui-nav-child">
-                    <dd><a lay-href="{{ url('admin/notice') }}">公告</a></dd>
-                    <dd><a lay-href="{{ url('admin/siteIntro') }}">站点介绍</a></dd>
-                  </dl>
+                <dd>
+                  <a lay-href="{{ url('admin/staff') }}">后台管理员</a>
                 </dd>
-                <dd class="layui-nav-itemed">
-                  <a href="javascript:;">我的设置</a>
-                  <dl class="layui-nav-child">
-                    <dd><a lay-href="{{ url('admin/info') }}">基本资料</a></dd>
-                    <dd><a lay-href="{{ url('admin/password') }}">修改密码</a></dd>
-                  </dl>
+                <dd>
+                  <a lay-href="{{ url('admin/staffPartner') }}">加盟商管理员</a>
+                </dd>
+                <dd>
+                  <a lay-href="{{ url('admin/staffSeller') }}">商家管理员</a>
+                </dd>
+                <dd>
+                  <a lay-href="{{ url('admin/staffRun') }}">跑腿人员</a>
+                </dd>
+                <dd>
+                  <a lay-href="{{ url('admin/staffUser') }}">用户</a>
+                </dd>
+                <dd>
+                  <a lay-href="">常用地址</a>
                 </dd>
               </dl>
             </li>

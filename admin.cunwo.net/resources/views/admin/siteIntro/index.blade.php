@@ -32,7 +32,7 @@
           {{--@endforeach--}}
         {{--</select>--}}
         <select style="width:80px; height:28px;" name="field">
-          <option value="intro_title">内容标题</option>
+          <option value="title">内容标题</option>
         </select>
         <input type="text" value=""    name="keyword"  placeholder="请输入关键字"/>
         <button class="btn btn-normal search_frm">搜索</button>
@@ -62,6 +62,7 @@
       <th>内容标题</th>
       <th>排序[降序]</th>
       <th>访问量</th>
+      <th>添加人</th>
       <th>添加日期</th>
       <th style="width: 150px;">操作</th>
     </tr>

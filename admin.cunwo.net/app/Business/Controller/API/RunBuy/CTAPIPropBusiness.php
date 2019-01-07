@@ -118,7 +118,7 @@ class CTAPIPropBusiness extends BasicPublicCTAPIBusiness
             if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);
 
             $shop_id = CommonRequest::getInt($request, 'shop_id');
-            if($shop_id > 0 ){// 店铺id,转换为商家id
+            if($seller_id <=0 && $shop_id > 0 ){// 店铺id,转换为商家id
                 $shopInfo = CTAPIShopBusiness::getInfoData($request, $controller, $shop_id);
                 $seller_id = $shopInfo['seller_id'] ?? 0;
                 if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);

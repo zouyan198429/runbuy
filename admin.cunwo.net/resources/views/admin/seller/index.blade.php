@@ -136,6 +136,7 @@
 
       var STAFF_SELLER_LIST_URL = "{{ url('admin/staffSeller') }}"; //帐号管理
       var SHOP_LIST_URL = "{{ url('admin/shop') }}"; // 店铺管理
+      var PROP_LIST_URL = "{{ url('admin/prop') }}"; // 商品属性管理
       var GOODS_LIST_URL = "{{ url('admin/shopGoods') }}"; // 商品管理
       var ORDERS_LIST_URL = "{{ url('admin/order') }}"; // 订单管理
   </script>

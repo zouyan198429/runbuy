@@ -49,6 +49,14 @@ class WorksController extends BaseController
         $this->operate_staff_id = $this->user_id;
         $this->operate_staff_id_history = $this->user_id;
         $this->company_id = $company_id;
+
+
+        $this->admin_type = $userInfo['admin_type'] ?? 0;
+        $this->city_site_id = $userInfo['city_site_id'] ?? 0;
+        $this->city_partner_id = $userInfo['city_partner_id'] ?? 0;
+        $this->seller_id = $userInfo['seller_id'] ?? 0;
+        $this->shop_id = $userInfo['shop_id'] ?? 0;
+
         $real_name = $userInfo['real_name'] ?? '';
         $mobile = $userInfo['mobile'] ?? '';
         if(empty($real_name)){

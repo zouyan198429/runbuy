@@ -38,12 +38,12 @@ class CTAPINoticeBusiness extends BasicPublicCTAPIBusiness
 //                ['company_id', $company_id],
 //                //['mobile', $keyword],
             ],
-//            'select' => [
-//                'id','company_id','position_name','sort_num'
-//                //,'operate_staff_id','operate_staff_id_history'
-//                ,'created_at'
-//            ],
-            'orderBy' => ['id'=>'desc'],// 'sort_num'=>'desc',
+            'select' => [
+                'id','city_site_id','title','resource','volume', 'sort_num'
+                ,'operate_staff_id','operate_staff_id_history'
+                ,'created_at','updated_at'
+            ],
+            'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],//
         ];// 查询条件参数
         if(empty($queryParams)){
             $queryParams = $defaultQueryParams;
@@ -55,6 +55,11 @@ class CTAPINoticeBusiness extends BasicPublicCTAPIBusiness
             // $params = self::formatListParams($request, $controller, $queryParams);
 //            $province_id = CommonRequest::getInt($request, 'province_id');
 //            if($province_id > 0 )  array_push($queryParams['where'], ['city_ids', 'like', '' . $province_id . ',%']);
+
+            $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+            if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+
+
             $field = CommonRequest::get($request, 'field');
             $keyWord = CommonRequest::get($request, 'keyword');
             if (!empty($field) && !empty($keyWord)) {
@@ -78,12 +83,20 @@ class CTAPINoticeBusiness extends BasicPublicCTAPIBusiness
 
         // 格式化数据
         $data_list = $result['data_list'] ?? [];
-//        foreach($data_list as $k => $v){
+        foreach($data_list as $k => $v){
 //            // 公司名称
 //            $data_list[$k]['company_name'] = $v['company_info']['company_name'] ?? '';
 //            if(isset($data_list[$k]['company_info'])) unset($data_list[$k]['company_info']);
-//        }
-//        $result['data_list'] = $data_list;
+            // 添加人
+
+            $data_list[$k]['real_name'] = $v['oprate_staff_history']['real_name'] ?? '';
+            if(isset($data_list[$k]['oprate_staff_history'])) unset($data_list[$k]['oprate_staff_history']);
+            // 城市分站名称
+            $data_list[$k]['city_site_name'] = $v['city']['city_name'] ?? '';
+            // $data_list[$k]['city_site_id'] = $v['city']['id'] ?? 0;
+            if(isset($data_list[$k]['city'])) unset($data_list[$k]['city']);
+        }
+        $result['data_list'] = $data_list;
         // 导出功能
         if($isExport == 1){
 //            $headArr = ['work_num'=>'工号', 'department_name'=>'部门'];
@@ -116,6 +129,23 @@ class CTAPINoticeBusiness extends BasicPublicCTAPIBusiness
 //            'id' => $company_id,
 //        ];
 //        static::judgePowerByObj($request, $controller, $info, $judgeData );
+        // 城市分站
+        $city_name = $info['city_history']['city_name'] ?? '';
+        if(empty($city_name)) $city_name = $info['city']['city_name'] ?? '';
+        $info['city_name'] = $city_name;
+        $now_city_state = 0;// 最新的试题 0没有变化 ;1 已经删除  2 试卷不同
+        if(isset($info['city_history']) && isset($info['city'])){
+            $history_version_num = $info['city_history']['version_num'] ?? '';
+            $version_num = $info['city']['version_num'] ?? '';
+            if(empty($info['city'])){
+                $now_city_state = 1;
+            }elseif($version_num != '' && $history_version_num != $version_num){
+                $now_city_state = 2;
+            }
+        }
+        if(isset($info['city_history'])) unset($info['city_history']);
+        if(isset($info['city'])) unset($info['city']);
+        $info['now_city_state'] = $now_city_state;
         return $info;
     }
 
@@ -173,13 +203,13 @@ class CTAPINoticeBusiness extends BasicPublicCTAPIBusiness
                // ['company_id', $company_id],
 //                ['id', '>', $id],
             ],
-//            'select' => [
-//                'id','company_id','type_name','sort_num'
-//                //,'operate_staff_id','operate_staff_id_history'
-//                ,'created_at'
-//            ],
-//            'orderBy' => ['sort_num'=>'desc','id'=>'desc'],
-            'orderBy' => ['id'=>'asc'],
+            'select' => [
+                'id','city_site_id','title','resource','volume', 'sort_num'
+                ,'operate_staff_id','operate_staff_id_history'
+                ,'created_at','updated_at'
+            ],
+            'orderBy' => ['sort_num'=>'desc','id'=>'desc'],
+//            'orderBy' => ['id'=>'asc'],
             'limit' => $limit,
             'offset' => $offset,
             // 'count'=>'0'

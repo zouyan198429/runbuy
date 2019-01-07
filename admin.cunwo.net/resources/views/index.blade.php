@@ -202,7 +202,7 @@
                 <div class="panel">
                     <div class="panel-body">
                         @foreach ($siteIntro as $info)
-                        <a href="{{ url('sys/help/' . $info['id']) }}"> <i class="icon icon-caret-right"></i> {{ $info['intro_title'] }}</a>
+                        <a href="{{ url('sys/help/' . $info['id']) }}"> <i class="icon icon-caret-right"></i> {{ $info['title'] }}</a>
                         @endforeach
                         <span class="pull-right text-gray">版权所有：{{ $configArr[1]['site_val'] or '' }}</span>
                     </div>

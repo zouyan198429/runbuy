@@ -134,6 +134,8 @@
       const PROVINCE_ID = "{{ $info['province_id'] or 0}}";// 省默认值
       const CITY_ID = "{{ $info['city_id'] or 0 }}";// 市默认值
       const AREA_ID = "{{ $info['area_id'] or 0 }}";// 区默认值
+
+      var NOTICE_LIST_URL = "{{ url('admin/notice') }}"; //城市公告管理
   </script>
   <script src="{{asset('js/common/list.js')}}"></script>
   <script src="{{ asset('js/admin/lanmu/city.js') }}"  type="text/javascript"></script>

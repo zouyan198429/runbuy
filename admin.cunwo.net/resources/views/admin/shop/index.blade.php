@@ -149,6 +149,8 @@
       const AREA_ID = "{{ $info['area_id'] or -1 }}";// 区默认值
 
       var STAFF_SHOP_LIST_URL = "{{ url('admin/staffShop') }}"; //帐号管理
+      var GOODS_TYPE_LIST_URL = "{{ url('admin/shopGoodsType') }}"; // 商品分类管理
+      var PROP_LIST_URL = "{{ url('admin/prop') }}"; // 商品属性管理
       var GOODS_LIST_URL = "{{ url('admin/shopGoods') }}"; // 商品管理
       var ORDERS_LIST_URL = "{{ url('admin/order') }}"; // 订单管理
   </script>

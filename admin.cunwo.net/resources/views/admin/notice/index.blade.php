@@ -24,17 +24,11 @@
     </div>
     <form onsubmit="return false;" class="form-horizontal" role="form" method="post" id="search_frm" action="#">
       <div class="msearch fr">
-
-        {{--<select class="wmini" name="province_id">--}}
-          {{--<option value="">全部</option>--}}
-          {{--@foreach ($province_kv as $k=>$txt)--}}
-            {{--<option value="{{ $k }}"  @if(isset($province_id) && $province_id == $k) selected @endif >{{ $txt }}</option>--}}
-          {{--@endforeach--}}
-        {{--</select>--}}
+        <input type="hidden" name="city_site_id" value="{{ $city_site_id or 0 }}" />
         <select style="width:80px; height:28px;" name="field">
           <th>ID</th>
           <option value="title">标题</option>
-          <option value="resource">来源</option>
+          {{--<option value="resource">来源</option>--}}
         </select>
         <input type="text" value=""    name="keyword"  placeholder="请输入关键字"/>
         <button class="btn btn-normal search_frm">搜索</button>
@@ -60,9 +54,12 @@
           <span class="lbl">全选</span>
         </label>
       </th>
+      <th>ID</th>
+      <th>城市分站</th>
       <th>标题</th>
-      <th>来源</th>
+      <th>排序[降序]</th>
       <th>阅读量</th>
+      <th>添加人</th>
       <th>添加日期</th>
       <th style="width: 150px;">操作</th>
     </tr>
@@ -85,8 +82,8 @@
 
   <script type="text/javascript">
       var OPERATE_TYPE = <?php echo isset($operate_type)?$operate_type:0; ?>;
-      var AUTO_READ_FIRST = true;//自动读取第一页 true:自动读取 false:指定地方读取
-      var LIST_FUNCTION_NAME = "reset_list";// 列表刷新函数名称, 需要列表刷新同步时，使用自定义方法reset_list_self；异步时没有必要自定义
+      var AUTO_READ_FIRST = false;//自动读取第一页 true:自动读取 false:指定地方读取
+      var LIST_FUNCTION_NAME = "reset_list_self";// 列表刷新函数名称, 需要列表刷新同步时，使用自定义方法reset_list_self；异步时没有必要自定义
       var AJAX_URL = "{{ url('api/admin/notice/ajax_alist') }}";//ajax请求的url
       var ADD_URL = "{{ url('admin/notice/add/0') }}"; //添加url
 

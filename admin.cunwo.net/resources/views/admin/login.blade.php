@@ -69,17 +69,15 @@
       </div>
       </form>
     </div>
-    {{--
     <div class="layui-trans layadmin-user-login-footer">
-      
-      <p>© 2018 <a href="http://www.layui.com/" target="_blank">layui.com</a></p>
+
+      {{--<p>© 2018 <a href="http://www.layui.com/" target="_blank">layui.com</a></p>--}}
       <p>
-        <span><a href="http://www.layui.com/admin/#get" target="_blank">获取授权</a></span>
-        <span><a href="http://www.layui.com/admin/pro/" target="_blank">在线演示</a></span>
-        <span><a href="http://www.layui.com/admin/" target="_blank">前往官网</a></span>
+        <span><a href="http://admin.jidiwang.com" target="_blank">大后台</a></span>
+        <span><a href="http://city.jidiwang.com" target="_blank">城市代理商后台</a></span>
+        <span><a href="http://seller.jidiwang.com" target="_blank">商家后台</a></span>
       </p>
     </div>
-    --}}
     {{--
   @verbatim
     <!--<div class="ladmin-user-login-theme">

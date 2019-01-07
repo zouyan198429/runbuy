@@ -21,12 +21,6 @@ class SiteIntroController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        // $info = CTAPISiteIntroBusiness::getInfoData($request, $this, 1, '');
-        // pr($info);
-        // 获得第一级省一维数组[$k=>$v]
-        // $reDataArr['province_kv'] = CTAPISiteIntroBusiness::getCityByPid($request, $this,  0);
-        // $reDataArr['province_kv'] = CTAPISiteIntroBusiness::getChildListKeyVal($request, $this, 0, 1 + 0, 0);
-        // $reDataArr['province_id'] = 0;
         return view('admin.siteIntro.index', $reDataArr);
     }
 
@@ -72,10 +66,49 @@ class SiteIntroController extends WorksController
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         $reDataArr['info'] = $info;
         $reDataArr['operate'] = $operate;
-//        $reDataArr['province_kv'] = CTAPISiteIntroBusiness::getCityByPid($request, $this,  0);
-//        $reDataArr['province_kv'] = CTAPISiteIntroBusiness::getChildListKeyVal($request, $this, 0, 1 + 0, 0);
-//        $reDataArr['province_id'] = 0;
         return view('admin.siteIntro.add', $reDataArr);
+    }
+
+
+    /**
+     * 详情
+     *
+     * @param Request $request
+     * @return mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public function info(Request $request, $id = 0)
+    {
+        $this->InitParams($request);
+
+        $reDataArr = $this->reDataArr;
+
+        // 详情信息
+        $infoDatas = [
+            'id'=>$id,
+        ];
+
+        if ($id > 0) { // 获得详情数据
+            $infoDatas =CTAPISiteIntroBusiness::getInfoData($request, $this, $id, ['oprateStaffHistory']);
+            // 修改点击点
+            $id = $infoDatas['id'] ??  0;
+            $volume = $infoDatas['volume'] ??  0;
+            $saveData = [
+                'volume' => $volume + 1,
+            ];
+            CTAPISiteIntroBusiness::replaceById($request, $this, $saveData, $id, false);
+            $infoDatas['volume'] = $volume + 1;
+        }
+        // $reDataArr = array_merge($reDataArr, $infoDatas);
+        $reDataArr['info'] = $infoDatas;
+
+        // 上一条
+        $preList = CTAPISiteIntroBusiness::getNearList($request, $this, $id, 1, 1, 0, [], '');
+        $reDataArr['preList'] = $preList;
+        // 下一条
+        $nextList = CTAPISiteIntroBusiness::getNearList($request, $this, $id, 2, 1, 0, [], '');
+        $reDataArr['nextList'] = $nextList;
+        return view('manage.notice.info', $reDataArr);
     }
 
 
@@ -91,37 +124,16 @@ class SiteIntroController extends WorksController
         $this->InitParams($request);
         $id = CommonRequest::getInt($request, 'id');
         // CommonRequest::judgeEmptyParams($request, 'id', $id);
-        $work_num = CommonRequest::get($request, 'work_num');
-        $department_id = CommonRequest::getInt($request, 'department_id');
-        $group_id = CommonRequest::getInt($request, 'group_id');
-        $position_id = CommonRequest::getInt($request, 'position_id');
-        $real_name = CommonRequest::get($request, 'real_name');
-        $sex = CommonRequest::getInt($request, 'sex');
-        $mobile = CommonRequest::get($request, 'mobile');
-//        $tel = CommonRequest::get($request, 'tel');
-//        $qq_number = CommonRequest::get($request, 'qq_number');
-        $admin_username = CommonRequest::get($request, 'admin_username');
-        $admin_password = CommonRequest::get($request, 'admin_password');
-        $sure_password = CommonRequest::get($request, 'sure_password');
+        $title = CommonRequest::get($request, 'title');
+        $content = CommonRequest::get($request, 'content');
+        $content = stripslashes($content);
+        $sort_num = CommonRequest::getInt($request, 'sort_num');
 
         $saveData = [
-            'work_num' => $work_num,
-            'department_id' => $department_id,
-            'group_id' => $group_id,
-            'position_id' => $position_id,
-            'real_name' => $real_name,
-            'sex' => $sex,
-            'mobile' => $mobile,
-//            'tel' => $tel,
-//            'qq_number' => $qq_number,
-            'admin_username' => $admin_username,
+            'title' => $title,
+            'content' => $content,
+            'sort_num' => $sort_num,
         ];
-        if($admin_password != '' || $sure_password != ''){
-            if ($admin_password != $sure_password){
-                return ajaxDataArr(0, null, '密码和确定密码不一致！');
-            }
-            $saveData['admin_password'] = $admin_password;
-        }
 
 //        if($id <= 0) {// 新加;要加入的特别字段
 //            $addNewData = [
@@ -142,7 +154,7 @@ class SiteIntroController extends WorksController
      */
     public function ajax_alist(Request $request){
         $this->InitParams($request);
-        return  CTAPISiteIntroBusiness::getList($request, $this, 2 + 4);
+        return  CTAPISiteIntroBusiness::getList($request, $this, 2 + 4, [], ['oprateStaffHistory']);
     }
 
     /**

@@ -37,12 +37,12 @@ class CTAPISiteIntroBusiness extends BasicPublicCTAPIBusiness
 //                ['company_id', $company_id],
 //                //['mobile', $keyword],
             ],
-//            'select' => [
-//                'id','company_id','position_name','sort_num'
-//                //,'operate_staff_id','operate_staff_id_history'
-//                ,'created_at'
-//            ],
-            'orderBy' => ['id'=>'desc'],// 'sort_num'=>'desc',
+            'select' => [
+                'id','title','sort_num','volume'
+                ,'operate_staff_id','operate_staff_id_history'
+                ,'created_at' ,'updated_at'
+            ],
+            'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],//
         ];// 查询条件参数
         if(empty($queryParams)){
             $queryParams = $defaultQueryParams;
@@ -77,12 +77,15 @@ class CTAPISiteIntroBusiness extends BasicPublicCTAPIBusiness
 
         // 格式化数据
         $data_list = $result['data_list'] ?? [];
-//        foreach($data_list as $k => $v){
+        foreach($data_list as $k => $v){
 //            // 公司名称
 //            $data_list[$k]['company_name'] = $v['company_info']['company_name'] ?? '';
 //            if(isset($data_list[$k]['company_info'])) unset($data_list[$k]['company_info']);
-//        }
-//        $result['data_list'] = $data_list;
+            // 添加人
+            $data_list[$k]['real_name'] = $v['oprate_staff_history']['real_name'] ?? '';
+            if(isset($data_list[$k]['oprate_staff_history'])) unset($data_list[$k]['oprate_staff_history']);
+        }
+        $result['data_list'] = $data_list;
         // 导出功能
         if($isExport == 1){
 //            $headArr = ['work_num'=>'工号', 'department_name'=>'部门'];
@@ -172,13 +175,13 @@ class CTAPISiteIntroBusiness extends BasicPublicCTAPIBusiness
               //  ['company_id', $company_id],
 //                ['id', '>', $id],
             ],
-//            'select' => [
-//                'id','company_id','type_name','sort_num'
-//                //,'operate_staff_id','operate_staff_id_history'
-//                ,'created_at'
-//            ],
-//            'orderBy' => ['sort_num'=>'desc','id'=>'desc'],
-            'orderBy' => ['id'=>'asc'],
+            'select' => [
+                'id','title','sort_num','volume'
+                ,'operate_staff_id','operate_staff_id_history'
+                ,'created_at' ,'updated_at'
+            ],
+            'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],
+//            'orderBy' => ['id'=>'asc'],
             'limit' => $limit,
             'offset' => $offset,
             // 'count'=>'0'

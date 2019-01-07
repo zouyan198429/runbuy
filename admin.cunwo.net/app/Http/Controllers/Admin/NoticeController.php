@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Business\Controller\API\RunBuy\CTAPICityBusiness;
 use App\Business\Controller\API\RunBuy\CTAPINoticeBusiness;
 use App\Http\Controllers\WorksController;
 use App\Services\Request\CommonRequest;
@@ -21,12 +22,7 @@ class NoticeController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        // $info = CTAPINoticeBusiness::getInfoData($request, $this, 1, '');
-        // pr($info);
-        // 获得第一级省一维数组[$k=>$v]
-        // $reDataArr['province_kv'] = CTAPINoticeBusiness::getCityByPid($request, $this,  0);
-        // $reDataArr['province_kv'] = CTAPINoticeBusiness::getChildListKeyVal($request, $this, 0, 1 + 0, 0);
-        // $reDataArr['province_id'] = 0;
+        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
         return view('admin.notice.index', $reDataArr);
     }
 
@@ -44,6 +40,7 @@ class NoticeController extends WorksController
 //        $reDataArr['province_kv'] = CTAPINoticeBusiness::getCityByPid($request, $this,  0);
 //        $reDataArr['province_kv'] = CTAPINoticeBusiness::getChildListKeyVal($request, $this, 0, 1 + 0, 0);
 //        $reDataArr['province_id'] = 0;
+//        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
 //        return view('admin.notice.select', $reDataArr);
 //    }
 
@@ -59,25 +56,72 @@ class NoticeController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
+        $city_site_id =  CommonRequest::getInt($request, 'city_site_id');
         $info = [
             'id'=>$id,
           //   'department_id' => 0,
+            'now_city_state' => 0,
+            'city_site_id' => $city_site_id,
         ];
         $operate = "添加";
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPINoticeBusiness::getInfoData($request, $this, $id, '');
+            $info = CTAPINoticeBusiness::getInfoData($request, $this, $id, ['city']);
+        }else{
+            if($city_site_id > 0 ){
+                $cityInfo = CTAPICityBusiness::getInfoHistoryId($request, $this, $city_site_id, []);
+                $info['city_name'] = $cityInfo['city_name'] ?? '';
+                $info['city_site_id_history'] = $cityInfo['history_id'] ?? 0;
+                $info['now_city_state'] = $cityInfo['now_state'] ?? 0;
+            }
         }
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         $reDataArr['info'] = $info;
         $reDataArr['operate'] = $operate;
-//        $reDataArr['province_kv'] = CTAPINoticeBusiness::getCityByPid($request, $this,  0);
-//        $reDataArr['province_kv'] = CTAPINoticeBusiness::getChildListKeyVal($request, $this, 0, 1 + 0, 0);
-//        $reDataArr['province_id'] = 0;
         return view('admin.notice.add', $reDataArr);
     }
 
+    /**
+     * 详情
+     *
+     * @param Request $request
+     * @return mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public function info(Request $request, $id = 0)
+    {
+        $this->InitParams($request);
+
+        $reDataArr = $this->reDataArr;
+
+        // 详情信息
+        $infoDatas = [
+            'id'=>$id,
+        ];
+
+        if ($id > 0) { // 获得详情数据
+            $infoDatas =CTAPINoticeBusiness::getInfoData($request, $this, $id, ['oprateStaffHistory']);
+            // 修改点击点
+            $id = $infoDatas['id'] ??  0;
+            $volume = $infoDatas['volume'] ??  0;
+            $saveData = [
+                'volume' => $volume + 1,
+            ];
+            CTAPINoticeBusiness::replaceById($request, $this, $saveData, $id, false);
+            $infoDatas['volume'] = $volume + 1;
+        }
+        // $reDataArr = array_merge($reDataArr, $infoDatas);
+        $reDataArr['info'] = $infoDatas;
+
+        // 上一条
+        $preList = CTAPINoticeBusiness::getNearList($request, $this, $id, 1, 1, 0, [], '');
+        $reDataArr['preList'] = $preList;
+        // 下一条
+        $nextList = CTAPINoticeBusiness::getNearList($request, $this, $id, 2, 1, 0, [], '');
+        $reDataArr['nextList'] = $nextList;
+        return view('manage.notice.info', $reDataArr);
+    }
 
     /**
      * ajax保存数据
@@ -91,37 +135,21 @@ class NoticeController extends WorksController
         $this->InitParams($request);
         $id = CommonRequest::getInt($request, 'id');
         // CommonRequest::judgeEmptyParams($request, 'id', $id);
-        $work_num = CommonRequest::get($request, 'work_num');
-        $department_id = CommonRequest::getInt($request, 'department_id');
-        $group_id = CommonRequest::getInt($request, 'group_id');
-        $position_id = CommonRequest::getInt($request, 'position_id');
-        $real_name = CommonRequest::get($request, 'real_name');
-        $sex = CommonRequest::getInt($request, 'sex');
-        $mobile = CommonRequest::get($request, 'mobile');
-//        $tel = CommonRequest::get($request, 'tel');
-//        $qq_number = CommonRequest::get($request, 'qq_number');
-        $admin_username = CommonRequest::get($request, 'admin_username');
-        $admin_password = CommonRequest::get($request, 'admin_password');
-        $sure_password = CommonRequest::get($request, 'sure_password');
+        $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+        // $city_site_id_history = CommonRequest::getInt($request, 'city_site_id_history');
+        $title = CommonRequest::get($request, 'title');
+        $resource = CommonRequest::get($request, 'resource');
+        $content = CommonRequest::get($request, 'content');
+        $content = stripslashes($content);
+        $sort_num = CommonRequest::getInt($request, 'sort_num');
 
         $saveData = [
-            'work_num' => $work_num,
-            'department_id' => $department_id,
-            'group_id' => $group_id,
-            'position_id' => $position_id,
-            'real_name' => $real_name,
-            'sex' => $sex,
-            'mobile' => $mobile,
-//            'tel' => $tel,
-//            'qq_number' => $qq_number,
-            'admin_username' => $admin_username,
+            'city_site_id' => $city_site_id,
+            'title' => $title,
+            'resource' => $resource,
+            'content' => $content,
+            'sort_num' => $sort_num,
         ];
-        if($admin_password != '' || $sure_password != ''){
-            if ($admin_password != $sure_password){
-                return ajaxDataArr(0, null, '密码和确定密码不一致！');
-            }
-            $saveData['admin_password'] = $admin_password;
-        }
 
 //        if($id <= 0) {// 新加;要加入的特别字段
 //            $addNewData = [
@@ -142,7 +170,7 @@ class NoticeController extends WorksController
      */
     public function ajax_alist(Request $request){
         $this->InitParams($request);
-        return  CTAPINoticeBusiness::getList($request, $this, 2 + 4);
+        return  CTAPINoticeBusiness::getList($request, $this, 2 + 4, [], [ 'city', 'oprateStaffHistory']);
     }
 
     /**

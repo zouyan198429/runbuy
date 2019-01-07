@@ -53,9 +53,9 @@ class CommonController extends CompController
 //            $configList[$v['id']] = $v;
 //        }
 //        // 获得帮助单条信息
-//        $siteIntro = SiteIntro::select(['id','intro_title','created_at','updated_at'])
+//        $siteIntro = SiteIntro::select(['id','title','created_at','updated_at'])
 //            ->limit(10)
-//            ->orderBy('intro_sort', 'desc')->orderBy('id', 'desc')->get();
+//            ->orderBy('sort_num', 'desc')->orderBy('id', 'desc')->get();
 //
 //        return okArray([
 //            'recordCount' => $recordCount,// 日志总量

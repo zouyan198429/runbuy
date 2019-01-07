@@ -25,6 +25,11 @@ class BaseController extends Controller
     //缓存
     public $cache_sel = 1 + 2;//是否强制不缓存 1:缓存读,读到则直接返回;2缓存数据
 
+    public $admin_type = 0;
+    public $city_site_id = 0;
+    public $city_partner_id = 0;
+    public $seller_id = 0;
+    public $shop_id = 0;
 
     public function InitParams(Request $request)
     {

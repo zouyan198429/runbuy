@@ -47,7 +47,7 @@ class PropController extends WorksController
         $seller_id = CommonRequest::getInt($request, 'seller_id');
         $shop_id =  CommonRequest::getInt($request, 'shop_id');
         $frm = 0;// 来源 0 列表页 1 商品添加页
-        if($shop_id > 0 ) {// 店铺id,转换为商家id
+        if($seller_id <=0 && $shop_id > 0 ) {// 店铺id,转换为商家id
             $frm = 1;
             $shopInfo = CTAPIShopBusiness::getInfoData($request, $this, $shop_id);
             $seller_id = $shopInfo['seller_id'] ?? 0;

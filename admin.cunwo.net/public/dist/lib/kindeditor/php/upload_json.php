@@ -26,11 +26,37 @@ function makeDir($dir, $mode = '0777') {
 
 // 判断是否有权限
 
-session_start(); // 初始化session
-$userInfo = $_SESSION['userInfo']?? [];
+// session_start(); // 初始化session
+if (!session_id()) session_start();
+$redisKey = $_SESSION['loginKey'] ?? '';
+if(empty($redisKey)) {
+    //throws('非法请求！');
+    alert('非法请求!');
+//            if(isAjax()){
+//                ajaxDataArr(0, null, '非法请求！');
+//            }else{
+//                redirect('login');
+//            }
+}
+// 连接redis获得登录信息
+//连接本地的 Redis 服务
+// $redis = new Redis();
+// $redis->connect('127.0.0.1', 6379);
+//echo "Connection to server sucessfully";
+//查看服务是否运行
+//echo "Server is running: " . $redis->ping();
+
+$redis = new Redis();
+$redis->connect('localhost', 6379);
+$redis->auth('ABCabc123456!@#');
+// $redis->set( "test" , "Hello World");
+//echo $redis->get( "test");
+
+// $userInfo = $_SESSION['userInfo']?? [];
+$userInfo = $redis->get($redisKey);//$_SESSION['userInfo']?? [];
 if(empty($userInfo)) {
     //throws('非法请求！');
-    alert('非法请求！');
+    alert('非法请求!!!');
 //            if(isAjax()){
 //                ajaxDataArr(0, null, '非法请求！');
 //            }else{
@@ -44,7 +70,7 @@ $company_id = $userInfo['company_id'] ?? 0;
 // $php_url = dirname($_SERVER['PHP_SELF']) . '/';
 
 //文件保存目录路径
-$save_path = '/data/work/resource/';//$php_path . '../attached/';
+$save_path = '/data/runbuy/resource/';//$php_path . '../attached/';
 //文件保存目录URL
 $save_url = '/resource/';//$php_url . '../attached/';
 
