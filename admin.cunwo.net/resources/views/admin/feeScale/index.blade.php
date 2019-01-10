@@ -20,7 +20,7 @@
 
     @include('common.pageParams')
     <div class="tabbox" >
-      <a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加公告</a>
+      <a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加收费标准</a>
     </div>
     <form onsubmit="return false;" class="form-horizontal" role="form" method="post" id="search_frm" action="#">
       <div class="msearch fr">
@@ -88,7 +88,7 @@
       var ADD_URL = "{{ url('admin/feeScale/add/0') }}"; //添加url
 
       var IFRAME_MODIFY_URL = "{{url('admin/feeScale/add/')}}/";//添加/修改页面地址前缀 + id
-      var IFRAME_MODIFY_URL_TITLE = "公告" ;// 详情弹窗显示提示  [添加/修改] +  栏目/主题
+      var IFRAME_MODIFY_URL_TITLE = "收费标准" ;// 详情弹窗显示提示  [添加/修改] +  栏目/主题
       var IFRAME_MODIFY_CLOSE_OPERATE = 0 ;// 详情弹窗operate_num关闭时的操作0不做任何操作1刷新当前页面2刷新当前列表页面
 
       var SHOW_URL = "{{url('admin/feeScale/info/')}}/";//显示页面地址前缀 + id
