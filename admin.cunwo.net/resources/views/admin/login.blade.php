@@ -76,6 +76,7 @@
         <span><a href="http://admin.jidiwang.com" target="_blank">大后台</a></span>
         <span><a href="http://city.jidiwang.com" target="_blank">城市代理商后台</a></span>
         <span><a href="http://seller.jidiwang.com" target="_blank">商家后台</a></span>
+        <span><a href="http://shop.jidiwang.com" target="_blank">店铺后台</a></span>
       </p>
     </div>
     {{--

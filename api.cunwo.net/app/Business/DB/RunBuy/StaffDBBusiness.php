@@ -58,9 +58,9 @@ class StaffDBBusiness extends BasePublicDBBusiness
         }
 
         // 查询手机号是否已经有企业使用--账号表里查
-        if( isset($saveData['mobile']) && (!empty($saveData['mobile'])) && static::judgeFieldExist($company_id, $id ,"mobile", $saveData['mobile'], [])){
-            throws('手机号已存在！');
-        }
+        // if( isset($saveData['mobile']) && (!empty($saveData['mobile'])) && static::judgeFieldExist($company_id, $id ,"mobile", $saveData['mobile'], [])){
+        //     throws('手机号已存在！');
+        // }
         // 用户名
         if( isset($saveData['admin_username']) && static::judgeFieldExist($company_id, $id ,"admin_username", $saveData['admin_username'], [])){
             throws('用户名已存在！');

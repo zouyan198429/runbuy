@@ -18,7 +18,7 @@
 
     <div class="layadmin-user-login-main">
       <div class="layadmin-user-login-box layadmin-user-login-header">
-        <h2>城市代理商后台</h2>
+        <h2>店铺后台</h2>
         <p>极递网跑腿系统</p>
       </div>
       <form class="am-form" action="#"  method="post"  id="addForm">
@@ -101,8 +101,8 @@
   <script src="{{asset('layui-admin-v1.2.1/src/layuiadmin/layui/layui.all.js')}}"></script>
   @include('public.dynamic_list_foot')
   <script>
-      var LOGIN_URL = "{{ url('api/city/ajax_login') }}";
-      var INDEX_URL = "{{url('city')}}";
+      var LOGIN_URL = "{{ url('api/shop/ajax_login') }}";
+      var INDEX_URL = "{{url('shop')}}";
 
   </script>
   <script src="{{ asset('/js/common/login.js') }}"  type="text/javascript"></script>

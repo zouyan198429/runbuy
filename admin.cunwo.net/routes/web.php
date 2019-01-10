@@ -308,6 +308,13 @@ Route::get('admin/notice/add/{id}', 'Admin\NoticeController@add');// 添加
 Route::get('admin/notice/export', 'Admin\NoticeController@export');// 导出
 Route::get('admin/notice/import_template', 'Admin\NoticeController@import_template');// 导入模版
 
+// 收费标准
+Route::get('admin/feeScale', 'Admin\FeeScaleController@index');// 列表
+Route::get('admin/feeScale/add/{id}', 'Admin\FeeScaleController@add');// 添加
+// Route::get('admin/feeScale/select', 'Admin\FeeScaleController@select');// 选择-弹窗
+Route::get('admin/feeScale/export', 'Admin\FeeScaleController@export');// 导出
+Route::get('admin/feeScale/import_template', 'Admin\FeeScaleController@import_template');// 导入模版
+
 // ----城市代理商
 // City
 Route::get('city/index', 'City\IndexController@index');// 首页
@@ -566,3 +573,132 @@ Route::get('seller/shopGoodsType/import_template', 'Seller\ShopGoodsTypeControll
 //// Route::get('seller/notice/select', 'Seller\NoticeController@select');// 选择-弹窗
 //Route::get('seller/notice/export', 'Seller\NoticeController@export');// 导出
 //Route::get('seller/notice/import_template', 'Seller\NoticeController@import_template');// 导入模版
+
+// ----店铺后台
+// Seller
+Route::get('shop/index', 'Shop\IndexController@index');// 首页
+Route::get('shop', 'Shop\IndexController@index');
+Route::get('shop/login', 'Shop\IndexController@login');//login.html 登录
+Route::get('shop/logout', 'Shop\IndexController@logout');// 注销
+Route::get('shop/password', 'Shop\IndexController@password');//psdmodify.html 个人信息-修改密码
+Route::get('shop/info', 'Shop\IndexController@info');//myinfo.html 个人信息--显示
+
+// 后台--管理员
+//Route::get('shop/staff', 'Shop\StaffController@index');// 列表
+//Route::get('shop/staff/add/{id}', 'Shop\StaffController@add');// 添加
+//// Route::get('shop/staff/select', 'Shop\StaffController@select');// 选择-弹窗
+//Route::get('shop/staff/export', 'Shop\StaffController@export');// 导出
+//Route::get('shop/staff/import_template', 'Shop\StaffController@import_template');// 导入模版
+
+// 加盟商--管理员
+//Route::get('shop/staffPartner', 'Shop\StaffPartnerController@index');// 列表
+//Route::get('shop/staffPartner/add/{id}', 'Shop\StaffPartnerController@add');// 添加
+//// Route::get('shop/staffPartner/select', 'Shop\StaffPartnerController@select');// 选择-弹窗
+//Route::get('shop/staffPartner/export', 'Shop\StaffPartnerController@export');// 导出
+//Route::get('shop/staffPartner/import_template', 'Shop\StaffPartnerController@import_template');// 导入模版
+
+// 商家--管理员
+Route::get('shop/staffSeller', 'Shop\StaffSellerController@index');// 列表
+Route::get('shop/staffSeller/add/{id}', 'Shop\StaffSellerController@add');// 添加
+// Route::get('shop/staffSeller/select', 'Shop\StaffSellerController@select');// 选择-弹窗
+Route::get('shop/staffSeller/export', 'Shop\StaffSellerController@export');// 导出
+Route::get('shop/staffSeller/import_template', 'Shop\StaffSellerController@import_template');// 导入模版
+
+// 店铺--管理员
+Route::get('shop/staffShop', 'Shop\StaffShopController@index');// 列表
+Route::get('shop/staffShop/add/{id}', 'Shop\StaffShopController@add');// 添加
+// Route::get('shop/staffShop/select', 'Shop\StaffShopController@select');// 选择-弹窗
+Route::get('shop/staffShop/export', 'Shop\StaffShopController@export');// 导出
+Route::get('shop/staffShop/import_template', 'Shop\StaffShopController@import_template');// 导入模版
+
+// 跑腿--管理员
+//Route::get('shop/staffRun', 'Shop\StaffRunController@index');// 列表
+//Route::get('shop/staffRun/add/{id}', 'Shop\StaffRunController@add');// 添加
+//// Route::get('shop/staffRun/select', 'Shop\StaffRunController@select');// 选择-弹窗
+//Route::get('shop/staffRun/export', 'Shop\StaffRunController@export');// 导出
+//Route::get('shop/staffRun/import_template', 'Shop\StaffRunController@import_template');// 导入模版
+
+// 用户--管理员
+//Route::get('shop/staffUser', 'Shop\StaffUserController@index');// 列表
+//Route::get('shop/staffUser/add/{id}', 'Shop\StaffUserController@add');// 添加
+//// Route::get('shop/staffUser/select', 'Shop\StaffUserController@select');// 选择-弹窗
+//Route::get('shop/staffUser/export', 'Shop\StaffUserController@export');// 导出
+//Route::get('shop/staffUser/import_template', 'Shop\StaffUserController@import_template');// 导入模版
+
+// 城市
+//Route::get('shop/city', 'Shop\CityController@index');// 列表
+//Route::get('shop/city/add/{id}', 'Shop\CityController@add');// 添加
+//Route::get('shop/city/select', 'Shop\CityController@select');// 选择-弹窗
+//Route::get('shop/city/export', 'Shop\CityController@export');// 导出
+//Route::get('shop/city/import_template', 'Shop\CityController@import_template');// 导入模版
+
+// 代理
+//Route::get('shop/cityPartner', 'Shop\CityPartnerController@index');// 列表
+//Route::get('shop/cityPartner/add/{id}', 'Shop\CityPartnerController@add');// 添加
+//Route::get('shop/cityPartner/select', 'Shop\CityPartnerController@select');// 选择-弹窗
+//Route::get('shop/cityPartner/export', 'Shop\CityPartnerController@export');// 导出
+//Route::get('shop/cityPartner/import_template', 'Shop\CityPartnerController@import_template');// 导入模版
+
+// 商家
+//Route::get('shop/seller', 'Shop\SellerController@index');// 列表
+//Route::get('shop/seller/add/{id}', 'Shop\SellerController@add');// 添加
+//Route::get('shop/seller/select', 'Shop\SellerController@select');// 选择-弹窗
+//Route::get('shop/seller/export', 'Shop\SellerController@export');// 导出
+//Route::get('shop/seller/import_template', 'Shop\SellerController@import_template');// 导入模版
+
+// 店铺分类
+//Route::get('shop/shopType', 'Shop\ShopTypeController@index');// 列表
+//Route::get('shop/shopType/add/{id}', 'Shop\ShopTypeController@add');// 添加
+//// Route::get('shop/shopType/select', 'Shop\ShopTypeController@select');// 选择-弹窗
+//Route::get('shop/shopType/export', 'Shop\ShopTypeController@export');// 导出
+//Route::get('shop/shopType/import_template', 'Shop\ShopTypeController@import_template');// 导入模版
+
+// 店铺商品属性
+Route::get('shop/prop', 'Shop\PropController@index');// 列表
+Route::get('shop/prop/add/{id}', 'Shop\PropController@add');// 添加
+Route::get('shop/prop/select', 'Shop\PropController@select');// 选择-弹窗
+Route::get('shop/prop/export', 'Shop\PropController@export');// 导出
+Route::get('shop/prop/import_template', 'Shop\PropController@import_template');// 导入模版
+
+// 店铺
+//Route::get('shop/shop', 'Shop\ShopController@index');// 列表
+//Route::get('shop/shop/add/{id}', 'Shop\ShopController@add');// 添加
+//Route::get('shop/shop/select', 'Shop\ShopController@select');// 选择-弹窗
+//Route::get('shop/shop/export', 'Shop\ShopController@export');// 导出
+//Route::get('shop/shop/import_template', 'Shop\ShopController@import_template');// 导入模版
+
+// 商品
+Route::get('shop/shopGoods', 'Shop\ShopGoodsController@index');// 列表
+Route::get('shop/shopGoods/add/{id}', 'Shop\ShopGoodsController@add');// 添加
+Route::get('shop/shopGoods/select', 'Shop\ShopGoodsController@select');// 选择-弹窗
+Route::get('shop/shopGoods/export', 'Shop\ShopGoodsController@export');// 导出
+Route::get('shop/shopGoods/import_template', 'Shop\ShopGoodsController@import_template');// 导入模版
+
+// 店铺商品分类[一级分类]
+Route::get('shop/shopGoodsType', 'Shop\ShopGoodsTypeController@index');// 列表
+Route::get('shop/shopGoodsType/add/{id}', 'Shop\ShopGoodsTypeController@add');// 添加
+// Route::get('shop/shopGoodsType/select', 'Shop\ShopGoodsTypeController@select');// 选择-弹窗
+Route::get('shop/shopGoodsType/export', 'Shop\ShopGoodsTypeController@export');// 导出
+Route::get('shop/shopGoodsType/import_template', 'Shop\ShopGoodsTypeController@import_template');// 导入模版
+
+
+// 站点介绍
+//Route::get('shop/siteIntro', 'Shop\SiteIntroController@index');// 列表
+//Route::get('shop/siteIntro/add/{id}', 'Shop\SiteIntroController@add');// 添加
+//// Route::get('shop/siteIntro/select', 'Shop\SiteIntroController@select');// 选择-弹窗
+//Route::get('shop/siteIntro/export', 'Shop\SiteIntroController@export');// 导出
+//Route::get('shop/siteIntro/import_template', 'Shop\SiteIntroController@import_template');// 导入模版
+
+// 标签[一级分类]
+//Route::get('shop/labels', 'Shop\LabelsController@index');// 列表
+//Route::get('shop/labels/add/{id}', 'Shop\LabelsController@add');// 添加
+//// Route::get('shop/labels/select', 'Shop\LabelsController@select');// 选择-弹窗
+//Route::get('shop/labels/export', 'Shop\LabelsController@export');// 导出
+//Route::get('shop/labels/import_template', 'Shop\LabelsController@import_template');// 导入模版
+
+// 公告
+//Route::get('shop/notice', 'Shop\NoticeController@index');// 列表
+//Route::get('shop/notice/add/{id}', 'Shop\NoticeController@add');// 添加
+//// Route::get('shop/notice/select', 'Shop\NoticeController@select');// 选择-弹窗
+//Route::get('shop/notice/export', 'Shop\NoticeController@export');// 导出
+//Route::get('shop/notice/import_template', 'Shop\NoticeController@import_template');// 导入模版
