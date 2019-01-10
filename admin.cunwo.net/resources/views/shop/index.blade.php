@@ -255,8 +255,13 @@
                   <a lay-href="{{ url('shop/staffPartner') }}">加盟商管理员</a>
                 </dd>
                 --}}
+                {{--
                 <dd>
                   <a lay-href="{{ url('shop/staffSeller') }}">商家管理员</a>
+                </dd>
+                --}}
+                <dd>
+                  <a lay-href="{{ url('shop/staffShop') }}">店铺管理员</a>
                 </dd>
                 {{--
                 <dd>

@@ -326,7 +326,7 @@ Route::post('city/staffUser/ajax_get_ids', 'City\StaffUserController@ajax_get_id
 //Route::any('city/city/ajax_alist', 'City\CityController@ajax_alist');//ajax获得列表数据
 //Route::post('city/city/ajax_del', 'City\CityController@ajax_del');// 删除
 //Route::post('city/city/ajax_save', 'City\CityController@ajax_save');// 新加/修改
-//Route::post('city/city/ajax_get_child', 'City\CityController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('city/city/ajax_get_child', 'City\CityController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
 //Route::post('city/city/ajax_get_areachild', 'City\CityController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 //Route::post('city/city/ajax_import_staff','City\CityController@ajax_import'); // 导入员工
 //
@@ -536,7 +536,7 @@ Route::post('seller/staffShop/ajax_get_ids', 'Seller\StaffShopController@ajax_ge
 //Route::any('seller/city/ajax_alist', 'Seller\CityController@ajax_alist');//ajax获得列表数据
 //Route::post('seller/city/ajax_del', 'Seller\CityController@ajax_del');// 删除
 //Route::post('seller/city/ajax_save', 'Seller\CityController@ajax_save');// 新加/修改
-//Route::post('seller/city/ajax_get_child', 'Seller\CityController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('seller/city/ajax_get_child', 'Seller\CityController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
 //Route::post('seller/city/ajax_get_areachild', 'Seller\CityController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 //Route::post('seller/city/ajax_import_staff','Seller\CityController@ajax_import'); // 导入员工
 //
@@ -697,15 +697,15 @@ Route::any('shop/ajax_info_save', 'Shop\IndexController@ajax_info_save');// 修�
 //Route::post('shop/staffPartner/ajax_get_ids', 'Shop\StaffPartnerController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
 //商家--管理员
-Route::any('shop/staffSeller/ajax_alist', 'Shop\StaffSellerController@ajax_alist');//ajax获得列表数据
-Route::post('shop/staffSeller/ajax_del', 'Shop\StaffSellerController@ajax_del');// 删除
-Route::any('shop/staffSeller/ajax_save', 'Shop\StaffSellerController@ajax_save');// 新加/修改
-Route::post('shop/staffSeller/ajax_get_child', 'Shop\StaffSellerController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
-Route::post('shop/staffSeller/ajax_get_areachild', 'Shop\StaffSellerController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
-Route::post('shop/staffSeller/ajax_import_staff','Shop\StaffSellerController@ajax_import'); // 导入员工
-
-Route::post('shop/staffSeller/import', 'Shop\StaffSellerController@import');// 导入excel
-Route::post('shop/staffSeller/ajax_get_ids', 'Shop\StaffSellerController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+//Route::any('shop/staffSeller/ajax_alist', 'Shop\StaffSellerController@ajax_alist');//ajax获得列表数据
+//Route::post('shop/staffSeller/ajax_del', 'Shop\StaffSellerController@ajax_del');// 删除
+//Route::any('shop/staffSeller/ajax_save', 'Shop\StaffSellerController@ajax_save');// 新加/修改
+//Route::post('shop/staffSeller/ajax_get_child', 'Shop\StaffSellerController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+//Route::post('shop/staffSeller/ajax_get_areachild', 'Shop\StaffSellerController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+//Route::post('shop/staffSeller/ajax_import_staff','Shop\StaffSellerController@ajax_import'); // 导入员工
+//
+//Route::post('shop/staffSeller/import', 'Shop\StaffSellerController@import');// 导入excel
+//Route::post('shop/staffSeller/ajax_get_ids', 'Shop\StaffSellerController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
 //店铺--管理员
 Route::any('shop/staffShop/ajax_alist', 'Shop\StaffShopController@ajax_alist');//ajax获得列表数据
@@ -745,7 +745,7 @@ Route::post('shop/staffShop/ajax_get_ids', 'Shop\StaffShopController@ajax_get_id
 //Route::any('shop/city/ajax_alist', 'Shop\CityController@ajax_alist');//ajax获得列表数据
 //Route::post('shop/city/ajax_del', 'Shop\CityController@ajax_del');// 删除
 //Route::post('shop/city/ajax_save', 'Shop\CityController@ajax_save');// 新加/修改
-//Route::post('shop/city/ajax_get_child', 'Shop\CityController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('shop/city/ajax_get_child', 'Shop\CityController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
 //Route::post('shop/city/ajax_get_areachild', 'Shop\CityController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 //Route::post('shop/city/ajax_import_staff','Shop\CityController@ajax_import'); // 导入员工
 //

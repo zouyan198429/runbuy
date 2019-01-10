@@ -598,11 +598,11 @@ Route::get('shop/info', 'Shop\IndexController@info');//myinfo.html 个人信息-
 //Route::get('shop/staffPartner/import_template', 'Shop\StaffPartnerController@import_template');// 导入模版
 
 // 商家--管理员
-Route::get('shop/staffSeller', 'Shop\StaffSellerController@index');// 列表
-Route::get('shop/staffSeller/add/{id}', 'Shop\StaffSellerController@add');// 添加
-// Route::get('shop/staffSeller/select', 'Shop\StaffSellerController@select');// 选择-弹窗
-Route::get('shop/staffSeller/export', 'Shop\StaffSellerController@export');// 导出
-Route::get('shop/staffSeller/import_template', 'Shop\StaffSellerController@import_template');// 导入模版
+//Route::get('shop/staffSeller', 'Shop\StaffSellerController@index');// 列表
+//Route::get('shop/staffSeller/add/{id}', 'Shop\StaffSellerController@add');// 添加
+//// Route::get('shop/staffSeller/select', 'Shop\StaffSellerController@select');// 选择-弹窗
+//Route::get('shop/staffSeller/export', 'Shop\StaffSellerController@export');// 导出
+//Route::get('shop/staffSeller/import_template', 'Shop\StaffSellerController@import_template');// 导入模版
 
 // 店铺--管理员
 Route::get('shop/staffShop', 'Shop\StaffShopController@index');// 列表
