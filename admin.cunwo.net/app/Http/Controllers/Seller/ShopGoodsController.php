@@ -30,9 +30,9 @@ class ShopGoodsController extends WorksController
         $reDataArr['isSale'] =  CTAPIShopGoodsBusiness::$isSaleArr;
         $reDataArr['defaultIsSale'] = -1;// 默认状态
 
-        $reDataArr['city_site_id'] = $this->city_site_id;//  CommonRequest::getInt($request, 'city_site_id');
-        $reDataArr['city_partner_id'] = $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
-        $reDataArr['seller_id'] = $this->seller_id;//   CommonRequest::getInt($request, 'seller_id');
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_partner_id'] =  $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
+        $reDataArr['seller_id'] =  $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
         $reDataArr['shop_id'] =  CommonRequest::getInt($request, 'shop_id');
         return view('seller.shopGoods.index', $reDataArr);
     }
@@ -62,7 +62,7 @@ class ShopGoodsController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIShopGoodsBusiness::getInfoData($request, $this, $id, ['shop', 'siteResources']);
+            $info = CTAPIShopGoodsBusiness::getInfoData($request, $this, $id, [], ['shop', 'siteResources']);
             $intro = $info['intro'] ?? '';
             $info['intro'] = replace_enter_char($intro,2);
         }else{
@@ -104,9 +104,9 @@ class ShopGoodsController extends WorksController
         $reDataArr['isSale'] =  CTAPIShopGoodsBusiness::$isSaleArr;
         $reDataArr['defaultIsSale'] = -1;// 默认状态
 
-        $reDataArr['city_site_id'] = $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
-        $reDataArr['city_partner_id'] = $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
-        $reDataArr['seller_id'] = $this->seller_id;//  CommonRequest::getInt($request, 'seller_id');
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_partner_id'] =  $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
+        $reDataArr['seller_id'] =  $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
         $reDataArr['shop_id'] =  CommonRequest::getInt($request, 'shop_id');
         return view('seller.shopGoods.select', $reDataArr);
     }

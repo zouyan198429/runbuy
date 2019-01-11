@@ -53,10 +53,18 @@ function ajax_form(){
     }
 
     // 所属商家
-    var seller_id = $('input[name=seller_id]').val();
-    var judge_seled = judge_validate(1,'所属商家',seller_id,true,'positive_int','','');
+    // var seller_id = $('input[name=seller_id]').val();
+    // var judge_seled = judge_validate(1,'所属商家',seller_id,true,'positive_int','','');
+    // if(judge_seled != ''){
+    //     layer_alert("请选择所属商家",3,0);
+    //     return false;
+    // }
+
+    // 所属店铺
+    var shop_id = $('input[name=shop_id]').val();
+    var judge_seled = judge_validate(1,'所属店铺',shop_id,true,'positive_int','','');
     if(judge_seled != ''){
-        layer_alert("请选择所属商家",3,0);
+        layer_alert("请选择所属店铺",3,0);
         return false;
     }
 
@@ -132,27 +140,27 @@ function ajax_form(){
 
 //业务逻辑部分
 var otheraction = {
-    selectSeller: function(obj){// 选择商家
+    selectShop: function(obj){// 选择商家
         var recordObj = $(obj);
         //获得表单各name的值
-        var weburl = SELECT_SELLER_URL;
+        var weburl = SELECT_SHOP_URL;
         console.log(weburl);
         // go(SHOW_URL + id);
         // location.href='/pms/Supplier/show?supplier_id='+id;
         // var weburl = SHOW_URL + id;
         // var weburl = '/pms/Supplier/show?supplier_id='+id+"&operate_type=1";
-        var tishi = '选择商家';//"查看供应商";
+        var tishi = '选择店铺';//"查看供应商";
         console.log('weburl', weburl);
         layeriframe(weburl,tishi,900,450,0);
         return false;
     },
-    updateSeller : function(obj){// 商家更新
+    updateShop : function(obj){// 商家更新
         var recordObj = $(obj);
         var index_query = layer.confirm('确定更新当前记录？', {
             btn: ['确定','取消'] //按钮
         }, function(){
-            var seller_id = $('input[name=seller_id]').val();
-            addSeller(seller_id);
+            var shop_id = $('input[name=shop_id]').val();
+            addShop(shop_id);
             layer.close(index_query);
         }, function(){
         });
@@ -160,40 +168,42 @@ var otheraction = {
     },
 };
 
-// 获得选中的商家id 数组
-function getSelectedSellerIds(){
-    var seller_ids = [];
-    var seller_id = $('input[name=seller_id]').val();
-    seller_ids.push(seller_id);
-    console.log('seller_ids' , seller_ids);
-    return seller_ids;
+// 获得选中的店铺id 数组
+function getSelectedShopIds(){
+    var shop_ids = [];
+    var shop_id = $('input[name=shop_id]').val();
+    shop_ids.push(shop_id);
+    console.log('shop_ids' , shop_ids);
+    return shop_ids;
 }
 
 // 取消
-// seller_id 商家id
-function removeSeller(seller_id){
-    var seled_seller_id = $('input[name=seller_id]').val();
-    if(seller_id == seled_seller_id){
+// shop_id 店铺id
+function removeShop(shop_id){
+    var seled_shop_id = $('input[name=shop_id]').val();
+    if(shop_id == seled_shop_id){
         $('input[name=seller_id]').val('');
-        $('input[name=seller_id_history]').val('');
-        $('.seller_name').html('');
-        $('.update_seller').hide();
+
+        $('input[name=shop_id]').val('').change();
+        $('input[name=shop_id_history]').val('');
+        $('.shop_name').html('');
+        $('.update_shop').hide();
     }
 }
 
 // 增加
-// seller_id 商家id, 多个用,号分隔
-function addSeller(seller_id){
-    if(seller_id == '') return ;
+// shop_id 店铺id, 多个用,号分隔
+function addShop(shop_id){
+    if(shop_id == '') return ;
     var data = {};
-    data['id'] = seller_id;
+    data['id'] = shop_id;
     console.log('data', data);
-    console.log('AJAX_SELLER_SELECTED_URL', AJAX_SELLER_SELECTED_URL);
+    console.log('AJAX_SHOP_SELECTED_URL', AJAX_SHOP_SELECTED_URL);
     var layer_index = layer.load();
     $.ajax({
         'async': false,// true,//false:同步;true:异步
         'type' : 'POST',
-        'url' : AJAX_SELLER_SELECTED_URL,
+        'url' : AJAX_SHOP_SELECTED_URL,
         'data' : data,
         'dataType' : 'json',
         'success' : function(ret){
@@ -204,14 +214,16 @@ function addSeller(seller_id){
             }else{//成功
                 var info = ret.result;
                 console.log('info', info);
-                $('input[name=seller_id]').val(info.id);
-                $('input[name=seller_id_history]').val(info.history_id);
-                $('.seller_name').html(info.seller_name);
+                $('input[name=seller_id]').val(info.seller_id);
+
+                $('input[name=shop_id]').val(info.id).change();
+                $('input[name=shop_id_history]').val(info.history_id);
+                $('.shop_name').html(info.shop_name);
                 var now_state = info.now_state;// 最新的 0没有变化 ;1 已经删除  2 试卷不同
                 if(now_state == 2 ){
-                    $('.update_seller').show();
+                    $('.update_shop').show();
                 }else{
-                    $('.update_seller').hide();
+                    $('.update_shop').hide();
                 }
             }
             layer.close(layer_index)//手动关闭

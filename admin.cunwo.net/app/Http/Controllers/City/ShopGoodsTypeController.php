@@ -22,6 +22,8 @@ class ShopGoodsTypeController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_partner_id'] = $this->city_partner_id;//  CommonRequest::getInt($request, 'city_partner_id');
         $reDataArr['seller_id'] =  CommonRequest::getInt($request, 'seller_id');
         $reDataArr['shop_id'] =  CommonRequest::getInt($request, 'shop_id');
         return view('city.shopGoodsType.index', $reDataArr);
@@ -67,7 +69,7 @@ class ShopGoodsTypeController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIShopGoodsTypeBusiness::getInfoData($request, $this, $id, ['shop']);
+            $info = CTAPIShopGoodsTypeBusiness::getInfoData($request, $this, $id, [], ['shop']);
         }else{
             if($shop_id > 0 ){
                 $partnerInfo = CTAPIShopBusiness::getInfoHistoryId($request, $this, $shop_id, []);
@@ -124,7 +126,7 @@ class ShopGoodsTypeController extends WorksController
      */
     public function ajax_alist(Request $request){
         $this->InitParams($request);
-        return  CTAPIShopGoodsTypeBusiness::getList($request, $this, 2 + 4, [], ['seller', 'shop']);
+        return  CTAPIShopGoodsTypeBusiness::getList($request, $this, 2 + 4, [], ['city', 'cityPartner', 'seller', 'shop']);
     }
 
     /**

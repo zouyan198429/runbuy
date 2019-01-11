@@ -20,14 +20,15 @@
         <input type="hidden" name="id" value="{{ $info['id'] or 0 }}"/>
         <table class="table1">
             <tr>
-                <th>所属商家<span class="must">*</span></th>
+                <th>所属店铺<span class="must">*</span></th>
                 <td>
-                    <span class="seller_name">{{ $info['seller_name'] or '' }}</span>
                     <input type="hidden" name="seller_id"  value="{{ $info['seller_id'] or '' }}" />
-                    <input type="hidden" name="seller_id_history"  value="{{ $info['seller_id_history'] or '' }}" />
-                    <button  type="button" @if (isset($frm) && $frm == 1 ) style="display: none;" @endif  class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.selectSeller(this)">选择所属商家</button>
+                    <span class="shop_name">{{ $info['shop_name'] or '' }}</span>
+                    <input type="hidden" name="shop_id"  value="{{ $info['shop_id'] or '' }}" />
+                    <input type="hidden" name="shop_id_history"  value="{{ $info['shop_id_history'] or '' }}" />
+                    <button  type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.selectShop(this)">选择所属店铺</button>
 
-                    <button type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-pencil bigger-60 update_seller" @if(isset($info['now_seller_state']) && in_array($info['now_seller_state'],[0,1])) style="display: none;"  @endif  onclick="otheraction.updateSeller(this)">更新[当前所属商家已更新]</button>
+                    <button type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-pencil bigger-60 update_shop" @if(isset($info['now_shop_state']) && in_array($info['now_shop_state'],[0,1])) style="display: none;"  @endif  onclick="otheraction.updateShop(this)">更新[当前所属店铺已更新]</button>
 
                 </td>
             </tr>
@@ -67,8 +68,12 @@
     var SAVE_URL = "{{ url('api/city/prop/ajax_save') }}";// ajax保存记录地址
     var LIST_URL = "{{url('city/prop')}}";//保存成功后跳转到的地址
 
-    var SELECT_SELLER_URL = "{{ url('city/seller/select') }}";// 选择商家地址
-    var AJAX_SELLER_SELECTED_URL = "{{ url('api/city/seller/ajax_selected') }}";// ajax选中商家地址
+    {{--var SELECT_SELLER_URL = "{{ url('city/seller/select') }}";// 选择商家地址--}}
+    {{--var AJAX_SELLER_SELECTED_URL = "{{ url('api/city/seller/ajax_selected') }}";// ajax选中商家地址--}}
+
+    var SELECT_SHOP_URL = "{{ url('city/shop/select') }}";// 选择店铺地址
+    var AJAX_SHOP_SELECTED_URL = "{{ url('api/city/shop/ajax_selected') }}";// ajax选中店铺地址
+
 
     var FRM = "{{ $frm or 0 }}"
 </script>

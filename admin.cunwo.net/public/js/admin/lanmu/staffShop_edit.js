@@ -96,6 +96,14 @@ function ajax_form(){
         return false;
     }
 
+    // 所属店铺
+    var shop_id = $('input[name=shop_id]').val();
+    var judge_seled = judge_validate(1,'所属店铺',shop_id,true,'positive_int','','');
+    if(judge_seled != ''){
+        layer_alert("请选择所属店铺",3,0);
+        return false;
+    }
+
     // var work_num = $('input[name=work_num]').val();
     // if(!judge_validate(4,'工号',work_num,true,'length',1,30)){
     //     return false;
@@ -260,4 +268,98 @@ function ajax_form(){
         }
     });
     return false;
+}
+
+//业务逻辑部分
+var otheraction = {
+    selectShop: function (obj) {// 选择商家
+        var recordObj = $(obj);
+        //获得表单各name的值
+        var weburl = SELECT_SHOP_URL;
+        console.log(weburl);
+        // go(SHOW_URL + id);
+        // location.href='/pms/Supplier/show?supplier_id='+id;
+        // var weburl = SHOW_URL + id;
+        // var weburl = '/pms/Supplier/show?supplier_id='+id+"&operate_type=1";
+        var tishi = '选择店铺';//"查看供应商";
+        console.log('weburl', weburl);
+        layeriframe(weburl, tishi, 900, 450, 0);
+        return false;
+    },
+    updateShop: function (obj) {// 商家更新
+        var recordObj = $(obj);
+        var index_query = layer.confirm('确定更新当前记录？', {
+            btn: ['确定', '取消'] //按钮
+        }, function () {
+            var shop_id = $('input[name=shop_id]').val();
+            addShop(shop_id);
+            layer.close(index_query);
+        }, function () {
+        });
+        return false;
+    },
+};
+
+
+// 获得选中的店铺id 数组
+function getSelectedShopIds(){
+    var shop_ids = [];
+    var shop_id = $('input[name=shop_id]').val();
+    shop_ids.push(shop_id);
+    console.log('shop_ids' , shop_ids);
+    return shop_ids;
+}
+
+// 取消
+// shop_id 店铺id
+function removeShop(shop_id){
+    var seled_shop_id = $('input[name=shop_id]').val();
+    if(shop_id == seled_shop_id){
+        $('input[name=seller_id]').val('');
+
+        $('input[name=shop_id]').val('').change();
+        $('input[name=shop_id_history]').val('');
+        $('.shop_name').html('');
+        $('.update_shop').hide();
+    }
+}
+
+// 增加
+// shop_id 店铺id, 多个用,号分隔
+function addShop(shop_id){
+    if(shop_id == '') return ;
+    var data = {};
+    data['id'] = shop_id;
+    console.log('data', data);
+    console.log('AJAX_SHOP_SELECTED_URL', AJAX_SHOP_SELECTED_URL);
+    var layer_index = layer.load();
+    $.ajax({
+        'async': false,// true,//false:同步;true:异步
+        'type' : 'POST',
+        'url' : AJAX_SHOP_SELECTED_URL,
+        'data' : data,
+        'dataType' : 'json',
+        'success' : function(ret){
+            console.log('ret',ret);
+            if(!ret.apistatus){//失败
+                //alert('失败');
+                err_alert(ret.errorMsg);
+            }else{//成功
+                var info = ret.result;
+                console.log('info', info);
+                $('input[name=seller_id]').val(info.seller_id);
+
+                $('input[name=shop_id]').val(info.id).change();
+                $('input[name=shop_id_history]').val(info.history_id);
+                $('.shop_name').html(info.shop_name);
+                var now_state = info.now_state;// 最新的 0没有变化 ;1 已经删除  2 试卷不同
+                if(now_state == 2 ){
+                    $('.update_shop').show();
+                }else{
+                    $('.update_shop').hide();
+                }
+            }
+            layer.close(layer_index)//手动关闭
+        }
+    });
 }

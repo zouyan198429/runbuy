@@ -19,17 +19,18 @@
     <form class="am-form am-form-horizontal" method="post"  id="addForm">
         <input type="hidden" name="id" value="{{ $info['id'] or 0 }}"/>
         <table class="table1">
-            {{--<tr>--}}
-                {{--<th>类型<span class="must">*</span></th>--}}
-                {{--<td>--}}
-                    {{--<select class="wnormal" name="admin_type">--}}
-                        {{--<option value="">请选择类型</option>--}}
-                        {{--@foreach ($adminType as $k=>$txt)--}}
-                            {{--<option value="{{ $k }}"  @if(isset($defaultAdminType) && $defaultAdminType == $k) selected @endif >{{ $txt }}</option>--}}
-                        {{--@endforeach--}}
-                    {{--</select>--}}
-                {{--</td>--}}
-            {{--</tr>--}}
+            <tr>
+                <th>所属城市代理<span class="must">*</span></th>
+                <td>
+                    <span class="partner_name">{{ $info['partner_name'] or '' }}</span>
+                    <input type="hidden" name="city_partner_id"  value="{{ $info['city_partner_id'] or '' }}" />
+                    <input type="hidden" name="city_partner_id_history"  value="{{ $info['city_partner_id_history'] or '' }}" />
+                    {{--<button  type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.selectCityPartner(this)">选择所属城市代理</button>--}}
+
+                    {{--<button type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-pencil bigger-60 update_city_partner" @if(isset($info['now_partner_state']) && in_array($info['now_partner_state'],[0,1])) style="display: none;"  @endif  onclick="otheraction.updateCityPartner(this)">更新[当前所属城市代理已更新]</button>--}}
+
+                </td>
+            </tr>
             <tr>
                 <th>姓名<span class="must">*</span></th>
                 <td>
@@ -129,6 +130,9 @@
     const PROVINCE_ID = "{{ $info['province_id'] or -1}}";// 省默认值
     const CITY_ID = "{{ $info['city_id'] or -1 }}";// 市默认值
     const AREA_ID = "{{ $info['area_id'] or -1 }}";// 区默认值
+
+    var SELECT_CITY_PARTNER_URL = "{{ url('shop/cityPartner/select') }}";// 选择城市分站地址
+    var AJAX_CITY_PARTNER_SELECTED_URL = "{{ url('api/shop/cityPartner/ajax_selected') }}";// ajax选中城市分站地址
 </script>
 <script src="{{ asset('/js/shop/lanmu/staffRun_edit.js') }}"  type="text/javascript"></script>
 </body>

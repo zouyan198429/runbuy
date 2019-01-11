@@ -19,17 +19,18 @@
     <form class="am-form am-form-horizontal" method="post"  id="addForm">
         <input type="hidden" name="id" value="{{ $info['id'] or 0 }}"/>
         <table class="table1">
-            {{--<tr>--}}
-                {{--<th>类型<span class="must">*</span></th>--}}
-                {{--<td>--}}
-                    {{--<select class="wnormal" name="admin_type">--}}
-                        {{--<option value="">请选择类型</option>--}}
-                        {{--@foreach ($adminType as $k=>$txt)--}}
-                            {{--<option value="{{ $k }}"  @if(isset($defaultAdminType) && $defaultAdminType == $k) selected @endif >{{ $txt }}</option>--}}
-                        {{--@endforeach--}}
-                    {{--</select>--}}
-                {{--</td>--}}
-            {{--</tr>--}}
+            <tr>
+                <th>所属商家<span class="must">*</span></th>
+                <td>
+                    <span class="seller_name">{{ $info['seller_name'] or '' }}</span>
+                    <input type="hidden" name="seller_id"  value="{{ $info['seller_id'] or '' }}" />
+                    <input type="hidden" name="seller_id_history"  value="{{ $info['seller_id_history'] or '' }}" />
+                    {{--<button  type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.selectSeller(this)">选择所属商家</button>--}}
+
+                    {{--<button type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-pencil bigger-60 update_seller" @if(isset($info['now_seller_state']) && in_array($info['now_seller_state'],[0,1])) style="display: none;"  @endif  onclick="otheraction.updateSeller(this)">更新[当前所属商家已更新]</button>--}}
+
+                </td>
+            </tr>
             <tr>
                 <th>姓名<span class="must">*</span></th>
                 <td>
@@ -129,6 +130,10 @@
     const PROVINCE_ID = "{{ $info['province_id'] or -1}}";// 省默认值
     const CITY_ID = "{{ $info['city_id'] or -1 }}";// 市默认值
     const AREA_ID = "{{ $info['area_id'] or -1 }}";// 区默认值
+
+    var SELECT_SELLER_URL = "{{ url('seller/seller/select') }}";// 选择商家地址
+    var AJAX_SELLER_SELECTED_URL = "{{ url('api/seller/seller/ajax_selected') }}";// ajax选中商家地址
+
 </script>
 <script src="{{ asset('/js/seller/lanmu/staffSeller_edit.js') }}"  type="text/javascript"></script>
 </body>

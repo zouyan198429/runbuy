@@ -44,32 +44,34 @@ class PropController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        $seller_id = CommonRequest::getInt($request, 'seller_id');
-        $shop_id =  CommonRequest::getInt($request, 'shop_id');
-        $frm = 0;// 来源 0 列表页 1 商品添加页
-        if($seller_id <=0 && $shop_id > 0 ) {// 店铺id,转换为商家id
-            $frm = 1;
-            $shopInfo = CTAPIShopBusiness::getInfoData($request, $this, $shop_id);
-            $seller_id = $shopInfo['seller_id'] ?? 0;
-        }
+        $frm = CommonRequest::getInt($request, 'frm');// 来源 0 列表页 1 商品添加页
         $reDataArr['frm'] = $frm;
+        // $seller_id = CommonRequest::getInt($request, 'seller_id');
+        $shop_id =  CommonRequest::getInt($request, 'shop_id');
+//        if($seller_id <=0 && $shop_id > 0 ) {// 店铺id,转换为商家id
+//            $frm = 1;
+//            $shopInfo = CTAPIShopBusiness::getInfoData($request, $this, $shop_id);
+//            $seller_id = $shopInfo['seller_id'] ?? 0;
+//        }
 
         $info = [
             'id'=>$id,
-            'now_seller_state' => 0,
-            'seller_id' => $seller_id,
+//            'now_seller_state' => 0,
+//            'seller_id' => $seller_id,
+            'now_shop_state' => 0,
+            'shop_id' => $shop_id,
         ];
         $operate = "添加";
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIPropBusiness::getInfoData($request, $this, $id, ['propVals.name', 'name', 'seller']);
+            $info = CTAPIPropBusiness::getInfoData($request, $this, $id, [], ['propVals.name', 'name', 'shop']);// , 'seller'
         }else{
-            if($seller_id > 0 ){
-                $partnerInfo = CTAPISellerBusiness::getInfoHistoryId($request, $this, $seller_id, []);
-                $info['seller_name'] = $partnerInfo['seller_name'] ?? '';
-                $info['seller_id_history'] = $partnerInfo['history_id'] ?? 0;
-                $info['now_seller_state'] = $partnerInfo['now_state'] ?? 0;
+            if($shop_id > 0 ){
+                $partnerInfo = CTAPIShopBusiness::getInfoHistoryId($request, $this, $shop_id, []);
+                $info['shop_name'] = $partnerInfo['shop_name'] ?? '';
+                $info['shop_id_history'] = $partnerInfo['history_id'] ?? 0;
+                $info['now_shop_state'] = $partnerInfo['now_state'] ?? 0;
             }
         }
         $reDataArr['operate'] = $operate;
@@ -136,7 +138,8 @@ class PropController extends WorksController
     {
         $this->InitParams($request);
         $id = CommonRequest::getInt($request, 'id');
-        $seller_id = CommonRequest::getInt($request, 'seller_id');
+       //  $seller_id = CommonRequest::getInt($request, 'seller_id');
+        $shop_id = CommonRequest::getInt($request, 'shop_id');
         // $seller_id_history = CommonRequest::getInt($request, 'seller_id_history');
         $main_name = CommonRequest::get($request, 'main_name');
         $sort_num = CommonRequest::getInt($request, 'sort_num');
@@ -164,7 +167,8 @@ class PropController extends WorksController
         }
 
         $saveData = [
-            'seller_id' => $seller_id,
+            // 'seller_id' => $seller_id,
+            'shop_id' => $shop_id,
             'sort_num' => $sort_num,
 
             'main_name' => $main_name,
@@ -190,7 +194,7 @@ class PropController extends WorksController
      */
     public function ajax_alist(Request $request){
         $this->InitParams($request);
-        return  CTAPIPropBusiness::getList($request, $this, 2 + 4, [], ['propVals.name', 'name', 'city', 'cityPartner', 'seller']);
+        return  CTAPIPropBusiness::getList($request, $this, 2 + 4, [], ['propVals.name', 'name', 'city', 'cityPartner', 'seller', 'shop']);
     }
 
     /**

@@ -23,6 +23,15 @@ class CTAPIShopGoodsTypeBusiness extends BasicPublicCTAPIBusiness
      * @param array $extParams 其它扩展参数，
      *    $extParams = [
      *        'useQueryParams' => '是否用来拼接查询条件，true:用[默认];false：不用'
+     *        'sqlParams' => [// 其它sql条件[覆盖式],下面是常用的，其它的也可以
+     *           'where' => '如果有值，则替换where'
+     *           'select' => '如果有值，则替换select'
+     *           'orderBy' => '如果有值，则替换orderBy'
+     *           'whereIn' => '如果有值，则替换whereIn'
+     *           'whereNotIn' => '如果有值，则替换whereNotIn'
+     *           'whereBetween' => '如果有值，则替换whereBetween'
+     *           'whereNotBetween' => '如果有值，则替换whereNotBetween'
+     *       ]
      *   ];
      * @param int $notLog 是否需要登陆 0需要1不需要
      * @return  array 列表数据
@@ -50,10 +59,31 @@ class CTAPIShopGoodsTypeBusiness extends BasicPublicCTAPIBusiness
         $isExport = 0;
 
         $useSearchParams = $extParams['useQueryParams'] ?? true;// 是否用来拼接查询条件，true:用[默认];false：不用
+        // 其它sql条件[覆盖式]
+        $sqlParams = $extParams['sqlParams'] ?? [];
+        $sqlKeys = array_keys($sqlParams);
+        foreach($sqlKeys as $tKey){
+            if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+        }
+
         if($useSearchParams) {
             // $params = self::formatListParams($request, $controller, $queryParams);
 //            $province_id = CommonRequest::getInt($request, 'province_id');
 //            if($province_id > 0 )  array_push($queryParams['where'], ['city_ids', 'like', '' . $province_id . ',%']);
+
+            $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+            if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+
+            $city_partner_id = CommonRequest::getInt($request, 'city_partner_id');
+            if($city_partner_id > 0 )  array_push($queryParams['where'], ['city_partner_id', '=', $city_partner_id]);
+
+            $seller_id = CommonRequest::getInt($request, 'seller_id');
+            if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);
+
+            $shop_id = CommonRequest::getInt($request, 'shop_id');
+            if($shop_id > 0 )  array_push($queryParams['where'], ['shop_id', '=', $shop_id]);
+
+
             $field = CommonRequest::get($request, 'field');
             $keyWord = CommonRequest::get($request, 'keyword');
             if (!empty($field) && !empty($keyWord)) {
@@ -78,6 +108,15 @@ class CTAPIShopGoodsTypeBusiness extends BasicPublicCTAPIBusiness
         // 格式化数据
         $data_list = $result['data_list'] ?? [];
         foreach($data_list as $k => $v){
+            // 城市分站名称
+            $data_list[$k]['site_name'] = $v['city']['city_name'] ?? '';
+            // $data_list[$k]['site_id'] = $v['city']['id'] ?? 0;
+            if(isset($data_list[$k]['city'])) unset($data_list[$k]['city']);
+            // 城市城市合伙人
+            $data_list[$k]['partner_name'] = $v['city_partner']['partner_name'] ?? '';
+            // $data_list[$k]['partner_id'] = $v['city_partner']['id'] ?? 0;
+            if(isset($data_list[$k]['city_partner'])) unset($data_list[$k]['city_partner']);
+
             // 商家
             $data_list[$k]['seller_name'] = $v['seller']['seller_name'] ?? '';
             // $data_list[$k]['seller_id'] = $v['seller']['id'] ?? 0;
@@ -104,16 +143,17 @@ class CTAPIShopGoodsTypeBusiness extends BasicPublicCTAPIBusiness
      * @param Request $request 请求信息
      * @param Controller $controller 控制对象
      * @param int $id id
+     * @param array $selectParams 查询字段参数--一维数组
      * @param mixed $relations 关系
      * @param int $notLog 是否需要登陆 0需要1不需要
      * @return  array 单条数据 - -维数组
      * @author zouyan(305463219@qq.com)
      */
-    public static function getInfoData(Request $request, Controller $controller, $id, $relations = '', $notLog = 0){
+    public static function getInfoData(Request $request, Controller $controller, $id, $selectParams = [], $relations = '', $notLog = 0){
         $company_id = $controller->company_id;
         // $relations = '';
         // $resultDatas = APIRunBuyRequest::getinfoApi(self::$model_name, '', $relations, $company_id , $id);
-        $info = static::getInfoDataBase($request, $controller,'', $id, [], $relations, $notLog);
+        $info = static::getInfoDataBase($request, $controller,'', $id, $selectParams, $relations, $notLog);
         // 判断权限
 //        $judgeData = [
 //            // 'company_id' => $company_id,

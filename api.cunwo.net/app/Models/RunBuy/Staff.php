@@ -105,7 +105,7 @@ class Staff extends BasePublicModel
     /**
      * 获取员工对应的城市分站--一维
      */
-    public function city()
+    public function cityinfo()
     {
         return $this->belongsTo('App\Models\RunBuy\City', 'city_site_id', 'id');
     }

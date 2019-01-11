@@ -23,7 +23,7 @@ class SellerController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        // $info = CTAPISellerBusiness::getInfoData($request, $this, 1, '');
+        // $info = CTAPISellerBusiness::getInfoData($request, $this, 1, [], '');
         // pr($info);
         // 省
         $reDataArr['province_kv'] = CTAPICityBusiness::getCityByPid($request, $this,  0);
@@ -32,8 +32,8 @@ class SellerController extends WorksController
         $reDataArr['status'] =  CTAPISellerBusiness::$statusArr;
         $reDataArr['defaultStatus'] = -1;// 默认状态
 
-        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
-        $reDataArr['city_partner_id'] =  CommonRequest::getInt($request, 'city_partner_id');
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_partner_id'] =  $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         return view('seller.seller.index', $reDataArr);
     }
 
@@ -49,7 +49,7 @@ class SellerController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        $city_partner_id = CommonRequest::getInt($request, 'city_partner_id');
+        $city_partner_id = $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         $info = [
             'id'=>$id,
           //   'department_id' => 0,
@@ -60,7 +60,7 @@ class SellerController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPISellerBusiness::getInfoData($request, $this, $id, ['sellerCityPartner']);
+            $info = CTAPISellerBusiness::getInfoData($request, $this, $id, [], ['sellerCityPartner']);
             $intro = $info['intro'] ?? '';
             $info['intro'] = replace_enter_char($intro,2);
         }else{
@@ -105,8 +105,8 @@ class SellerController extends WorksController
         $reDataArr['status'] =  CTAPISellerBusiness::$statusArr;
         $reDataArr['defaultStatus'] = -1;// 默认状态
 
-        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
-        $reDataArr['city_partner_id'] =  CommonRequest::getInt($request, 'city_partner_id');
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_partner_id'] =  $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         return view('seller.seller.select', $reDataArr);
     }
 
@@ -138,7 +138,7 @@ class SellerController extends WorksController
     {
         $this->InitParams($request);
         $id = CommonRequest::getInt($request, 'id');
-        $city_partner_id = CommonRequest::getInt($request, 'city_partner_id');
+        $city_partner_id = $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         // $city_partner_id_history = CommonRequest::getInt($request, 'city_partner_id_history');
         $seller_name = CommonRequest::get($request, 'seller_name');
         $status = CommonRequest::getInt($request, 'status');

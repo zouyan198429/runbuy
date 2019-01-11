@@ -19,9 +19,9 @@
   <div class="mmhead" id="mywork">
 
     @include('common.pageParams')
-    {{--<div class="tabbox" >--}}
-      {{--<a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加用户</a>--}}
-    {{--</div>--}}
+    <div class="tabbox" >
+      <a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加用户</a>
+    </div>
     <form onsubmit="return false;" class="form-horizontal" role="form" method="post" id="search_frm" action="#">
       <div class="msearch fr" style="width:700px;">
         <input type="hidden" name="admin_type" value="{{ $admin_type or 0 }}" />
@@ -84,17 +84,13 @@
           <span class="lbl">全选</span>
         </label>
       </th>
-      <th>ID</th>
-      <th>用户名</th>
-      <th>类型</th>
-      <th>真实姓名</th>
-      <th>性别</th>
-      <th>电话</th>
-      <th>手机</th>
-      <th>QQ\email\微信</th>
-      <th>地址</th>
-      <th>是否超级帐户</th>
-      <th>状态</th>
+      <th>城市<hr/>城市代理</th>
+      {{--<th>商家<hr/>店铺</th>--}}
+      <th>用户名<hr/>真实姓名</th>
+      <th>类型<hr/>性别</th>
+      <th>电话<hr/>手机</th>
+      <th>QQ\email\微信<hr/>地址</th>
+      <th>是否超级帐户<hr/>状态</th>
       <th>最近登陆</th>
       <th style="width: 150px;">操作</th>
     </tr>

@@ -22,7 +22,7 @@ class StaffController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        // $info = CTAPIStaffBusiness::getInfoData($request, $this, 1, '');
+        // $info = CTAPIStaffBusiness::getInfoData($request, $this, 1, [], '');
         // pr($info);
         // 获得第一级省一维数组[$k=>$v]
         // $reDataArr['province_kv'] = CTAPICityBusiness::getCityByPid($request, $this,  0);
@@ -39,8 +39,8 @@ class StaffController extends WorksController
         $reDataArr['defaultProvince'] = -1;
 
         $reDataArr['admin_type'] =  CommonRequest::getInt($request, 'admin_type');
-        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
-        $reDataArr['city_partner_id'] =  CommonRequest::getInt($request, 'city_partner_id');
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_partner_id'] =  $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         $reDataArr['seller_id'] =  CommonRequest::getInt($request, 'seller_id');
         $reDataArr['shop_id'] =  CommonRequest::getInt($request, 'shop_id');
         return view('city.staff.index', $reDataArr);
@@ -83,7 +83,7 @@ class StaffController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIStaffBusiness::getInfoData($request, $this, $id, '');
+            $info = CTAPIStaffBusiness::getInfoData($request, $this, $id, [], '');
         }
         $reDataArr['adminType'] =  CTAPIStaffBusiness::$adminType;
         $reDataArr['defaultAdminType'] = $info['admin_type'] ?? -1;// 列表页默认状态
@@ -172,7 +172,9 @@ class StaffController extends WorksController
     public function ajax_alist(Request $request){
         $this->InitParams($request);
         $request->merge(['admin_type' => 1]);
-        return  CTAPIStaffBusiness::getList($request, $this, 2 + 4, [], ['province', 'provinceHistory', 'city', 'cityHistory', 'area', 'areaHistory']);
+        return  CTAPIStaffBusiness::getList($request, $this, 2 + 4, [], ['province', 'provinceHistory'
+            , 'city', 'cityHistory', 'area', 'areaHistory'
+            , 'cityinfo' , 'cityPartner', 'seller' , 'shop']);
     }
 
     /**

@@ -21,7 +21,7 @@ class ShopTypeController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        // $info = CTAPIShopTypeBusiness::getInfoData($request, $this, 1, '');
+        // $info = CTAPIShopTypeBusiness::getInfoData($request, $this, 1, [], '');
         // pr($info);
         // 获得第一级省一维数组[$k=>$v]
         // $reDataArr['province_kv'] = CTAPIShopTypeBusiness::getCityByPid($request, $this,  0);
@@ -67,7 +67,7 @@ class ShopTypeController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIShopTypeBusiness::getInfoData($request, $this, $id, '');
+            $info = CTAPIShopTypeBusiness::getInfoData($request, $this, $id, [], '');
         }
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         $reDataArr['info'] = $info;

@@ -93,7 +93,7 @@
       <div class="layui-side layui-side-menu">
         <div class="layui-side-scroll">
           <div class="layui-logo" lay-href="{{ url('layui/home/console') }}">
-            <span>极递网</span>
+            <span>极递网-商家后台</span>
           </div>
           
           <ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
@@ -121,18 +121,20 @@
               </a>
               <dl class="layui-nav-child">
                 {{--
-                <dd class="layui-nav-itemed">
-                  <a href="javascript:;">系统设置</a>
-                  <dl class="layui-nav-child">
-                    <dd>
-                      <a lay-href="{{ url('seller/shopType') }}">店铺分类</a>
-                    </dd>
-                    <dd>
-                      <a lay-href="{{ url('seller/labels') }}">搜索标签</a>
-                    </dd>
-                    <dd><a lay-href="{{ url('seller/siteIntro') }}">站点介绍</a></dd>
-                  </dl>
-                </dd>--}}
+                  <dd class="layui-nav-itemed">
+                    <a href="javascript:;">系统设置</a>
+                    <dl class="layui-nav-child">
+                      <dd>
+                        <a lay-href="{{ url('seller/shopType') }}">店铺分类</a>
+                      </dd>
+                      <dd>
+                        <a lay-href="{{ url('seller/labels') }}">搜索标签</a>
+                      </dd>
+                      <dd><a lay-href="{{ url('seller/siteIntro') }}">站点介绍</a></dd>
+                      <dd><a lay-href="{{ url('seller/feeScale') }}">收费标准</a></dd>
+                    </dl>
+                  </dd>
+                  --}}
                 <dd class="layui-nav-itemed">
                   <a href="javascript:;">我的设置</a>
                   <dl class="layui-nav-child">
@@ -158,6 +160,8 @@
                 <dd><a lay-href="{{ url('seller/notice') }}">公告</a></dd>
               </dl>
             </li>
+            --}}
+            {{--
             <li data-name="user" class="layui-nav-item">
               <a href="javascript:;" lay-tips="商家管理" lay-direction="2">
                 <i class="layui-icon layui-icon-flag"></i>
@@ -255,6 +259,9 @@
                 --}}
                 <dd>
                   <a lay-href="{{ url('seller/staffSeller') }}">商家管理员</a>
+                </dd>
+                <dd>
+                  <a lay-href="{{ url('seller/staffShop') }}">店铺管理员</a>
                 </dd>
                 {{--
                 <dd>

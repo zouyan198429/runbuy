@@ -19,17 +19,19 @@
     <form class="am-form am-form-horizontal" method="post"  id="addForm">
         <input type="hidden" name="id" value="{{ $info['id'] or 0 }}"/>
         <table class="table1">
-            {{--<tr>--}}
-                {{--<th>类型<span class="must">*</span></th>--}}
-                {{--<td>--}}
-                    {{--<select class="wnormal" name="admin_type">--}}
-                        {{--<option value="">请选择类型</option>--}}
-                        {{--@foreach ($adminType as $k=>$txt)--}}
-                            {{--<option value="{{ $k }}"  @if(isset($defaultAdminType) && $defaultAdminType == $k) selected @endif >{{ $txt }}</option>--}}
-                        {{--@endforeach--}}
-                    {{--</select>--}}
-                {{--</td>--}}
-            {{--</tr>--}}
+            <tr>
+                <th>所属店铺<span class="must">*</span></th>
+                <td>
+                    <input type="hidden" name="seller_id"  value="{{ $info['seller_id'] or '' }}" />
+                    <span class="shop_name">{{ $info['shop_name'] or '' }}</span>
+                    <input type="hidden" name="shop_id"  value="{{ $info['shop_id'] or '' }}" />
+                    <input type="hidden" name="shop_id_history"  value="{{ $info['shop_id_history'] or '' }}" />
+                    <button  type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.selectShop(this)">选择所属店铺</button>
+
+                    <button type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-pencil bigger-60 update_shop" @if(isset($info['now_shop_state']) && in_array($info['now_shop_state'],[0,1])) style="display: none;"  @endif  onclick="otheraction.updateShop(this)">更新[当前所属店铺已更新]</button>
+
+                </td>
+            </tr>
             <tr>
                 <th>姓名<span class="must">*</span></th>
                 <td>
@@ -129,6 +131,10 @@
     const PROVINCE_ID = "{{ $info['province_id'] or -1}}";// 省默认值
     const CITY_ID = "{{ $info['city_id'] or -1 }}";// 市默认值
     const AREA_ID = "{{ $info['area_id'] or -1 }}";// 区默认值
+
+    var SELECT_SHOP_URL = "{{ url('seller/shop/select') }}";// 选择店铺地址
+    var AJAX_SHOP_SELECTED_URL = "{{ url('api/seller/shop/ajax_selected') }}";// ajax选中店铺地址
+
 </script>
 <script src="{{ asset('/js/seller/lanmu/staffShop_edit.js') }}"  type="text/javascript"></script>
 </body>

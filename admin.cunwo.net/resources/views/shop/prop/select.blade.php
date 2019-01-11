@@ -60,6 +60,7 @@
       <th>城市分站</th>
       <th>城市合伙人</th>
       <th>商家</th>
+      <th>店铺</th>
       <th>属性名称</th>
       <th>属性值</th>
       <th style="width: 80px;">操作</th>

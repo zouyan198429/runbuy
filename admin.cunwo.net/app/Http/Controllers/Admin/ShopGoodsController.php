@@ -62,7 +62,7 @@ class ShopGoodsController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIShopGoodsBusiness::getInfoData($request, $this, $id, ['shop', 'siteResources']);
+            $info = CTAPIShopGoodsBusiness::getInfoData($request, $this, $id, [], ['shop', 'siteResources']);
             $intro = $info['intro'] ?? '';
             $info['intro'] = replace_enter_char($intro,2);
         }else{

@@ -373,7 +373,7 @@ var otheraction = {
             return false;
         }
         //获得表单各name的值
-        var weburl = ADD_PROP_URL + '?shop_id=' + shop_id;
+        var weburl = ADD_PROP_URL + '?frm=1&shop_id=' + shop_id;
         console.log(weburl);
         // go(SHOW_URL + id);
         // location.href='/pms/Supplier/show?supplier_id='+id;

@@ -61,7 +61,7 @@ class SiteIntroController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPISiteIntroBusiness::getInfoData($request, $this, $id, '');
+            $info = CTAPISiteIntroBusiness::getInfoData($request, $this, $id, [], '');
         }
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         $reDataArr['info'] = $info;
@@ -89,7 +89,7 @@ class SiteIntroController extends WorksController
         ];
 
         if ($id > 0) { // 获得详情数据
-            $infoDatas =CTAPISiteIntroBusiness::getInfoData($request, $this, $id, ['oprateStaffHistory']);
+            $infoDatas =CTAPISiteIntroBusiness::getInfoData($request, $this, $id, [], ['oprateStaffHistory']);
             // 修改点击点
             $id = $infoDatas['id'] ??  0;
             $volume = $infoDatas['volume'] ??  0;

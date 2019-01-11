@@ -92,4 +92,12 @@ class Prop extends BasePublicModel
         return $this->belongsTo('App\Models\RunBuy\Seller', 'seller_id', 'id');
     }
 
+    /**
+     * 获取对应的店铺--一维
+     */
+    public function shop()
+    {
+        return $this->belongsTo('App\Models\RunBuy\Shop', 'shop_id', 'id');
+    }
+
 }

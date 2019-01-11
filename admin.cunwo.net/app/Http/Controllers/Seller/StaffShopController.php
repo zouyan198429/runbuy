@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Business\Controller\API\RunBuy\CTAPICityBusiness;
+use App\Business\Controller\API\RunBuy\CTAPIShopBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIStaffBusiness;
 use App\Http\Controllers\WorksController;
 use App\Services\Request\CommonRequest;
@@ -22,7 +23,7 @@ class StaffShopController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        // $info = CTAPIStaffBusiness::getInfoData($request, $this, 1, '');
+        // $info = CTAPIStaffBusiness::getInfoData($request, $this, 1, [], '');
         // pr($info);
         // 获得第一级省一维数组[$k=>$v]
         // $reDataArr['province_kv'] = CTAPICityBusiness::getCityByPid($request, $this,  0);
@@ -39,9 +40,9 @@ class StaffShopController extends WorksController
         $reDataArr['defaultProvince'] = -1;
 
         $reDataArr['admin_type'] =  CommonRequest::getInt($request, 'admin_type');
-        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
-        $reDataArr['city_partner_id'] =  CommonRequest::getInt($request, 'city_partner_id');
-        $reDataArr['seller_id'] =  CommonRequest::getInt($request, 'seller_id');
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_partner_id'] =  $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
+        $reDataArr['seller_id'] =  $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
         $reDataArr['shop_id'] =  CommonRequest::getInt($request, 'shop_id');
         return view('seller.staffShop.index', $reDataArr);
     }
@@ -75,15 +76,25 @@ class StaffShopController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
+        $shop_id =  CommonRequest::getInt($request, 'shop_id');
         $info = [
             'id'=>$id,
             'admin_type' => 0,
+            'now_shop_state' => 0,
+            'shop_id' => $shop_id,
         ];
         $operate = "添加";
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIStaffBusiness::getInfoData($request, $this, $id, '');
+            $info = CTAPIStaffBusiness::getInfoData($request, $this, $id, [], ['shop']);
+        }else{
+            if($shop_id > 0 ){
+                $partnerInfo = CTAPIShopBusiness::getInfoHistoryId($request, $this, $shop_id, []);
+                $info['shop_name'] = $partnerInfo['shop_name'] ?? '';
+                $info['shop_id_history'] = $partnerInfo['history_id'] ?? 0;
+                $info['now_shop_state'] = $partnerInfo['now_state'] ?? 0;
+            }
         }
         $reDataArr['adminType'] =  CTAPIStaffBusiness::$adminType;
         $reDataArr['defaultAdminType'] = $info['admin_type'] ?? -1;// 列表页默认状态
@@ -108,6 +119,7 @@ class StaffShopController extends WorksController
     {
         $this->InitParams($request);
         $id = CommonRequest::getInt($request, 'id');
+        $shop_id = CommonRequest::getInt($request, 'shop_id');
         // CommonRequest::judgeEmptyParams($request, 'id', $id);
 //        $work_num = CommonRequest::get($request, 'work_num');
 //        $department_id = CommonRequest::getInt($request, 'department_id');
@@ -127,8 +139,14 @@ class StaffShopController extends WorksController
         $admin_password = CommonRequest::get($request, 'admin_password');
         $sure_password = CommonRequest::get($request, 'sure_password');
 
+        $shopInfo = CTAPIShopBusiness::getInfoData($request, $this, $shop_id,['id', 'city_site_id', 'city_partner_id', 'seller_id']);
+
         $saveData = [
             'admin_type' => 16,
+            'city_site_id' => $shopInfo['city_site_id'] ?? 0 ,
+            'city_partner_id' => $shopInfo['city_partner_id'] ?? 0 ,
+            'seller_id' => $shopInfo['seller_id'] ?? 0,
+            'shop_id' => $shop_id,
 //            'work_num' => $work_num,
 //            'department_id' => $department_id,
 //            'group_id' => $group_id,
@@ -172,7 +190,9 @@ class StaffShopController extends WorksController
     public function ajax_alist(Request $request){
         $this->InitParams($request);
         $request->merge(['admin_type' => 16]);
-        return  CTAPIStaffBusiness::getList($request, $this, 2 + 4, [], ['province', 'provinceHistory', 'city', 'cityHistory', 'area', 'areaHistory']);
+        return  CTAPIStaffBusiness::getList($request, $this, 2 + 4, [], ['province', 'provinceHistory'
+            , 'city', 'cityHistory', 'area', 'areaHistory'
+            , 'cityinfo' , 'cityPartner', 'seller' , 'shop']);
     }
 
     /**

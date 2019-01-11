@@ -29,11 +29,20 @@ class ShopGoodsTypeDBBusiness extends BasePublicDBBusiness
         }
 
         // 店铺id,获得 商家id
+        $city_site_id = $saveData['city_site_id'] ?? 0;
+        $city_partner_id = $saveData['city_partner_id'] ?? 0;
         $seller_id = $saveData['seller_id'] ?? 0;
         $shop_id = $saveData['shop_id'] ?? 0;
-        if(is_numeric($shop_id) && $shop_id > 0 && $seller_id <= 0){
-            $shopInfo = ShopDBBusiness::getInfo($shop_id, ['seller_id']);
+        if(is_numeric($shop_id) && $shop_id > 0 && ($city_site_id <= 0 || $city_partner_id <= 0 || $seller_id <= 0)){
+            $shopInfo = ShopDBBusiness::getInfo($shop_id, ['city_site_id', 'city_partner_id', 'seller_id']);
+            // $seller_id = $shopInfo['seller_id'] ?? 0;
+            // $saveData['seller_id'] = $seller_id;
+
+            $city_site_id = $shopInfo['city_site_id'] ?? 0;
+            $city_partner_id = $shopInfo['city_partner_id'] ?? 0;
             $seller_id = $shopInfo['seller_id'] ?? 0;
+            $saveData['city_site_id'] = $city_site_id;
+            $saveData['city_partner_id'] = $city_partner_id;
             $saveData['seller_id'] = $seller_id;
         }
 

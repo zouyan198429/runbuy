@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Business\Controller\API\RunBuy\CTAPICityBusiness;
+use App\Business\Controller\API\RunBuy\CTAPISellerBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIStaffBusiness;
 use App\Http\Controllers\WorksController;
 use App\Services\Request\CommonRequest;
@@ -22,7 +23,7 @@ class StaffSellerController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        // $info = CTAPIStaffBusiness::getInfoData($request, $this, 1, '');
+        // $info = CTAPIStaffBusiness::getInfoData($request, $this, 1, [], '');
         // pr($info);
         // 获得第一级省一维数组[$k=>$v]
         // $reDataArr['province_kv'] = CTAPICityBusiness::getCityByPid($request, $this,  0);
@@ -75,15 +76,25 @@ class StaffSellerController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
+        $seller_id = CommonRequest::getInt($request, 'seller_id');
         $info = [
             'id'=>$id,
             'admin_type' => 0,
+            'now_seller_state' => 0,
+            'seller_id' => $seller_id,
         ];
         $operate = "添加";
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIStaffBusiness::getInfoData($request, $this, $id, '');
+            $info = CTAPIStaffBusiness::getInfoData($request, $this, $id, [], ['seller']);
+        }else{
+            if($seller_id > 0 ){
+                $partnerInfo = CTAPISellerBusiness::getInfoHistoryId($request, $this, $seller_id, []);
+                $info['seller_name'] = $partnerInfo['seller_name'] ?? '';
+                $info['seller_id_history'] = $partnerInfo['history_id'] ?? 0;
+                $info['now_seller_state'] = $partnerInfo['now_state'] ?? 0;
+            }
         }
         $reDataArr['adminType'] =  CTAPIStaffBusiness::$adminType;
         $reDataArr['defaultAdminType'] = $info['admin_type'] ?? -1;// 列表页默认状态
@@ -108,6 +119,7 @@ class StaffSellerController extends WorksController
     {
         $this->InitParams($request);
         $id = CommonRequest::getInt($request, 'id');
+        $seller_id = CommonRequest::getInt($request, 'seller_id');
         // CommonRequest::judgeEmptyParams($request, 'id', $id);
 //        $work_num = CommonRequest::get($request, 'work_num');
 //        $department_id = CommonRequest::getInt($request, 'department_id');
@@ -127,8 +139,13 @@ class StaffSellerController extends WorksController
         $admin_password = CommonRequest::get($request, 'admin_password');
         $sure_password = CommonRequest::get($request, 'sure_password');
 
+        $sellerInfo = CTAPISellerBusiness::getInfoData($request, $this, $seller_id,['id', 'city_site_id', 'city_partner_id']);
+
         $saveData = [
             'admin_type' => 8,
+            'city_site_id' => $sellerInfo['city_site_id'] ?? 0 ,
+            'city_partner_id' => $sellerInfo['city_partner_id'] ?? 0 ,
+            'seller_id' => $seller_id,
 //            'work_num' => $work_num,
 //            'department_id' => $department_id,
 //            'group_id' => $group_id,
@@ -172,7 +189,9 @@ class StaffSellerController extends WorksController
     public function ajax_alist(Request $request){
         $this->InitParams($request);
         $request->merge(['admin_type' => 8]);
-        return  CTAPIStaffBusiness::getList($request, $this, 2 + 4, [], ['province', 'provinceHistory', 'city', 'cityHistory', 'area', 'areaHistory']);
+        return  CTAPIStaffBusiness::getList($request, $this, 2 + 4, [], ['province', 'provinceHistory'
+            , 'city', 'cityHistory', 'area', 'areaHistory'
+            , 'cityinfo' , 'cityPartner', 'seller' , 'shop']);
     }
 
     /**

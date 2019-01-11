@@ -22,7 +22,7 @@ class NoticeController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         return view('seller.notice.index', $reDataArr);
     }
 
@@ -40,7 +40,7 @@ class NoticeController extends WorksController
 //        $reDataArr['province_kv'] = CTAPINoticeBusiness::getCityByPid($request, $this,  0);
 //        $reDataArr['province_kv'] = CTAPINoticeBusiness::getChildListKeyVal($request, $this, 0, 1 + 0, 0);
 //        $reDataArr['province_id'] = 0;
-//        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
+//        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
 //        return view('seller.notice.select', $reDataArr);
 //    }
 
@@ -56,7 +56,7 @@ class NoticeController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        $city_site_id =  CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id = $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         $info = [
             'id'=>$id,
           //   'department_id' => 0,
@@ -67,7 +67,7 @@ class NoticeController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPINoticeBusiness::getInfoData($request, $this, $id, ['city']);
+            $info = CTAPINoticeBusiness::getInfoData($request, $this, $id, [], ['city']);
         }else{
             if($city_site_id > 0 ){
                 $cityInfo = CTAPICityBusiness::getInfoHistoryId($request, $this, $city_site_id, []);
@@ -101,7 +101,7 @@ class NoticeController extends WorksController
         ];
 
         if ($id > 0) { // 获得详情数据
-            $infoDatas =CTAPINoticeBusiness::getInfoData($request, $this, $id, ['oprateStaffHistory']);
+            $infoDatas =CTAPINoticeBusiness::getInfoData($request, $this, $id, [], ['oprateStaffHistory']);
             // 修改点击点
             $id = $infoDatas['id'] ??  0;
             $volume = $infoDatas['volume'] ??  0;
@@ -135,7 +135,7 @@ class NoticeController extends WorksController
         $this->InitParams($request);
         $id = CommonRequest::getInt($request, 'id');
         // CommonRequest::judgeEmptyParams($request, 'id', $id);
-        $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         // $city_site_id_history = CommonRequest::getInt($request, 'city_site_id_history');
         $title = CommonRequest::get($request, 'title');
         $resource = CommonRequest::get($request, 'resource');

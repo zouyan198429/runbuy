@@ -96,6 +96,14 @@ function ajax_form(){
         return false;
     }
 
+    // 所属所属城市代理
+    var city_partner_id = $('input[name=city_partner_id]').val();
+    var judge_seled = judge_validate(1,'所属城市代理',city_partner_id,true,'positive_int','','');
+    if(judge_seled != ''){
+        layer_alert("请选择所属城市代理",3,0);
+        return false;
+    }
+
     // var work_num = $('input[name=work_num]').val();
     // if(!judge_validate(4,'工号',work_num,true,'length',1,30)){
     //     return false;
@@ -260,4 +268,93 @@ function ajax_form(){
         }
     });
     return false;
+}
+
+//业务逻辑部分
+var otheraction = {
+    selectCityPartner: function(obj){// 选择城市代理
+        var recordObj = $(obj);
+        //获得表单各name的值
+        var weburl = SELECT_CITY_PARTNER_URL;
+        console.log(weburl);
+        // go(SHOW_URL + id);
+        // location.href='/pms/Supplier/show?supplier_id='+id;
+        // var weburl = SHOW_URL + id;
+        // var weburl = '/pms/Supplier/show?supplier_id='+id+"&operate_type=1";
+        var tishi = '选择城市代理';//"查看供应商";
+        console.log('weburl', weburl);
+        layeriframe(weburl,tishi,900,450,0);
+        return false;
+    },
+    updateCityPartner : function(obj){// 城市代理更新
+        var recordObj = $(obj);
+        var index_query = layer.confirm('确定更新当前记录？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            var city_partner_id = $('input[name=city_partner_id]').val();
+            addCityPartner(city_partner_id);
+            layer.close(index_query);
+        }, function(){
+        });
+        return false;
+    },
+};
+
+// 获得选中的城市代理id 数组
+function getSelectedCityPartnerIds(){
+    var city_partner_ids = [];
+    var city_partner_id = $('input[name=city_partner_id]').val();
+    city_partner_ids.push(city_partner_id);
+    console.log('city_partner_ids' , city_partner_ids);
+    return city_partner_ids;
+}
+
+// 取消
+// city_partner_id 城市代理id
+function removeCityPartner(city_partner_id){
+    var seled_city_partner_id = $('input[name=city_partner_id]').val();
+    if(city_partner_id == seled_city_partner_id){
+        $('input[name=city_partner_id]').val('');
+        $('input[name=city_partner_id_history]').val('');
+        $('.partner_name').html('');
+        $('.update_city_partner').hide();
+    }
+}
+
+// 增加
+// city_partner_id 城市代理id, 多个用,号分隔
+function addCityPartner(city_partner_id){
+    if(city_partner_id == '') return ;
+    var data = {};
+    data['id'] = city_partner_id;
+    console.log('data', data);
+    console.log('AJAX_CITY_PARTNER_SELECTED_URL', AJAX_CITY_PARTNER_SELECTED_URL);
+    var layer_index = layer.load();
+    $.ajax({
+        'async': false,// true,//false:同步;true:异步
+        'type' : 'POST',
+        'url' : AJAX_CITY_PARTNER_SELECTED_URL,
+        'data' : data,
+        'dataType' : 'json',
+        'success' : function(ret){
+            console.log('ret',ret);
+            if(!ret.apistatus){//失败
+                //alert('失败');
+                err_alert(ret.errorMsg);
+            }else{//成功
+                var info = ret.result;
+                console.log('info', info);
+                $('input[name=city_partner_id]').val(info.id);
+                $('input[name=city_partner_id_history]').val(info.history_id);
+                $('.partner_name').html(info.partner_name);
+                var now_state = info.now_state;// 最新的 0没有变化 ;1 已经删除  2 试卷不同
+                if(now_state == 2 ){
+                    $('.update_city_partner').show();
+                }else{
+                    $('.update_city_partner').hide();
+                }
+            }
+            layer.close(layer_index)//手动关闭
+        }
+    });
 }

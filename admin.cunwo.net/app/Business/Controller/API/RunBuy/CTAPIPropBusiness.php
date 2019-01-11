@@ -79,6 +79,15 @@ class CTAPIPropBusiness extends BasicPublicCTAPIBusiness
      * @param array $extParams 其它扩展参数，
      *    $extParams = [
      *        'useQueryParams' => '是否用来拼接查询条件，true:用[默认];false：不用'
+     *        'sqlParams' => [// 其它sql条件[覆盖式],下面是常用的，其它的也可以
+     *           'where' => '如果有值，则替换where'
+     *           'select' => '如果有值，则替换select'
+     *           'orderBy' => '如果有值，则替换orderBy'
+     *           'whereIn' => '如果有值，则替换whereIn'
+     *           'whereNotIn' => '如果有值，则替换whereNotIn'
+     *           'whereBetween' => '如果有值，则替换whereBetween'
+     *           'whereNotBetween' => '如果有值，则替换whereNotBetween'
+     *       ]
      *   ];
      * @param int $notLog 是否需要登陆 0需要1不需要
      * @return  array 列表数据
@@ -106,6 +115,13 @@ class CTAPIPropBusiness extends BasicPublicCTAPIBusiness
         $isExport = 0;
 
         $useSearchParams = $extParams['useQueryParams'] ?? true;// 是否用来拼接查询条件，true:用[默认];false：不用
+        // 其它sql条件[覆盖式]
+        $sqlParams = $extParams['sqlParams'] ?? [];
+        $sqlKeys = array_keys($sqlParams);
+        foreach($sqlKeys as $tKey){
+            if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+        }
+
         if($useSearchParams) {
             // $params = self::formatListParams($request, $controller, $queryParams);
             $city_site_id = CommonRequest::getInt($request, 'city_site_id');
@@ -117,12 +133,14 @@ class CTAPIPropBusiness extends BasicPublicCTAPIBusiness
             $seller_id = CommonRequest::getInt($request, 'seller_id');
             if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);
 
+//            $shop_id = CommonRequest::getInt($request, 'shop_id');
+//            if($seller_id <=0 && $shop_id > 0 ){// 店铺id,转换为商家id
+//                $shopInfo = CTAPIShopBusiness::getInfoData($request, $controller, $shop_id);
+//                $seller_id = $shopInfo['seller_id'] ?? 0;
+//                if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);
+//            }
             $shop_id = CommonRequest::getInt($request, 'shop_id');
-            if($seller_id <=0 && $shop_id > 0 ){// 店铺id,转换为商家id
-                $shopInfo = CTAPIShopBusiness::getInfoData($request, $controller, $shop_id);
-                $seller_id = $shopInfo['seller_id'] ?? 0;
-                if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);
-            }
+            if($shop_id > 0 )  array_push($queryParams['where'], ['shop_id', '=', $shop_id]);
 
 
             $field = CommonRequest::get($request, 'field');
@@ -178,6 +196,11 @@ class CTAPIPropBusiness extends BasicPublicCTAPIBusiness
             // $data_list[$k]['seller_id'] = $v['seller']['id'] ?? 0;
             if(isset($data_list[$k]['seller'])) unset($data_list[$k]['seller']);
 
+            // 铺店
+            $data_list[$k]['shop_name'] = $v['shop']['shop_name'] ?? '';
+            // $data_list[$k]['shop_id'] = $v['shop']['id'] ?? 0;
+            if(isset($data_list[$k]['shop'])) unset($data_list[$k]['shop']);
+
             // 属性值
             //if(isset($data_list[$k]['prop_vals'])){
             $propVals = $data_list[$k]['prop_vals'] ?? [];
@@ -215,15 +238,16 @@ class CTAPIPropBusiness extends BasicPublicCTAPIBusiness
      * @param Controller $controller 控制对象
      * @param int $id id
      * @param mixed $relations 关系
+     * @param array $selectParams 查询字段参数--一维数组
      * @param int $notLog 是否需要登陆 0需要1不需要
      * @return  array 单条数据 - -维数组
      * @author zouyan(305463219@qq.com)
      */
-    public static function getInfoData(Request $request, Controller $controller, $id, $relations = '', $notLog = 0){
+    public static function getInfoData(Request $request, Controller $controller, $id , $selectParams = [], $relations = '', $notLog = 0){
         $company_id = $controller->company_id;
         // $relations = '';
         // $resultDatas = APIRunBuyRequest::getinfoApi(self::$model_name, '', $relations, $company_id , $id);
-        $info = static::getInfoDataBase($request, $controller,'', $id, [], $relations, $notLog);
+        $info = static::getInfoDataBase($request, $controller,'', $id, $selectParams, $relations, $notLog);
         // 判断权限
 //        $judgeData = [
 //            // 'company_id' => $company_id,
@@ -236,22 +260,40 @@ class CTAPIPropBusiness extends BasicPublicCTAPIBusiness
         if(isset($info['name'])) unset($info['name']);
 
         // 商家
-        $seller_name = $info['seller_history']['seller_name'] ?? '';
-        if(empty($seller_name)) $seller_name = $info['seller']['seller_name'] ?? '';
-        $info['seller_name'] = $seller_name;
-        $now_seller_state = 0;// 最新的商家 0没有变化 ;1 已经删除  2 试卷不同
-        if(isset($info['seller_history']) && isset($info['seller'])){
-            $history_version_num = $info['seller_history']['version_num'] ?? '';
-            $version_num = $info['seller']['version_num'] ?? '';
-            if(empty($info['seller'])){
-                $now_seller_state = 1;
+//        $seller_name = $info['seller_history']['seller_name'] ?? '';
+//        if(empty($seller_name)) $seller_name = $info['seller']['seller_name'] ?? '';
+//        $info['seller_name'] = $seller_name;
+//        $now_seller_state = 0;// 最新的商家 0没有变化 ;1 已经删除  2 试卷不同
+//        if(isset($info['seller_history']) && isset($info['seller'])){
+//            $history_version_num = $info['seller_history']['version_num'] ?? '';
+//            $version_num = $info['seller']['version_num'] ?? '';
+//            if(empty($info['seller'])){
+//                $now_seller_state = 1;
+//            }elseif($version_num != '' && $history_version_num != $version_num){
+//                $now_seller_state = 2;
+//            }
+//        }
+//        if(isset($info['seller_history'])) unset($info['seller_history']);
+//        if(isset($info['seller'])) unset($info['seller']);
+//        $info['now_seller_state'] = $now_seller_state;
+
+        // 店铺
+        $shop_name = $info['shop_history']['shop_name'] ?? '';
+        if(empty($shop_name)) $shop_name = $info['shop']['shop_name'] ?? '';
+        $info['shop_name'] = $shop_name;
+        $now_shop_state = 0;// 最新的商家 0没有变化 ;1 已经删除  2 试卷不同
+        if(isset($info['shop_history']) && isset($info['shop'])){
+            $history_version_num = $info['shop_history']['version_num'] ?? '';
+            $version_num = $info['shop']['version_num'] ?? '';
+            if(empty($info['shop'])){
+                $now_shop_state = 1;
             }elseif($version_num != '' && $history_version_num != $version_num){
-                $now_seller_state = 2;
+                $now_shop_state = 2;
             }
         }
-        if(isset($info['seller_history'])) unset($info['seller_history']);
-        if(isset($info['seller'])) unset($info['seller']);
-        $info['now_seller_state'] = $now_seller_state;
+        if(isset($info['shop_history'])) unset($info['shop_history']);
+        if(isset($info['shop'])) unset($info['shop']);
+        $info['now_shop_state'] = $now_shop_state;
 
         // 属性值
         //if(isset($info['prop_vals'])){

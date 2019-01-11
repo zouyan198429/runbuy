@@ -180,6 +180,7 @@ var otheraction = {
     document.write("            <td><%=item.site_name%><\/td>");
     document.write("            <td><%=item.partner_name%><\/td>");
     document.write("            <td><%=item.seller_name%><\/td>");
+    document.write("            <td><%=item.shop_name%><\/td>");
     document.write("            <td><%=item.main_name%><\/td>");
     document.write("            <td><%=item.propValNnames%><\/td>");
     document.write("            <td>");

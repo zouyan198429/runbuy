@@ -22,7 +22,7 @@ class CityPartnerController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        // $info = CTAPICityPartnerBusiness::getInfoData($request, $this, 1, '');
+        // $info = CTAPICityPartnerBusiness::getInfoData($request, $this, 1, [], '');
         // pr($info);
         // 省
         $reDataArr['province_kv'] = CTAPICityBusiness::getCityByPid($request, $this,  0);
@@ -31,7 +31,7 @@ class CityPartnerController extends WorksController
         $reDataArr['status'] =  CTAPICityPartnerBusiness::$statusArr;
         $reDataArr['defaultStatus'] = -1;// 默认状态
 
-        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         return view('shop.cityPartner.index', $reDataArr);
     }
 
@@ -47,7 +47,7 @@ class CityPartnerController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        $city_site_id =  CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id = $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         $info = [
             'id'=>$id,
           //   'department_id' => 0,
@@ -58,7 +58,7 @@ class CityPartnerController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPICityPartnerBusiness::getInfoData($request, $this, $id, ['cityPartnerCity']);
+            $info = CTAPICityPartnerBusiness::getInfoData($request, $this, $id, [], ['cityPartnerCity']);
             $intro = $info['intro'] ?? '';
             $info['intro'] = replace_enter_char($intro,2);
         }else{
@@ -99,7 +99,7 @@ class CityPartnerController extends WorksController
         // 状态
         $reDataArr['status'] =  CTAPICityPartnerBusiness::$statusArr;
         $reDataArr['defaultStatus'] = -1;// 默认状态
-        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         return view('shop.cityPartner.select', $reDataArr);
     }
 
@@ -131,7 +131,7 @@ class CityPartnerController extends WorksController
     {
         $this->InitParams($request);
         $id = CommonRequest::getInt($request, 'id');
-        $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id = $this->city_site_id;//  CommonRequest::getInt($request, 'city_site_id');
         // $city_site_id_history = CommonRequest::getInt($request, 'city_site_id_history');
         $partner_name = CommonRequest::get($request, 'partner_name');
         $status = CommonRequest::getInt($request, 'status');

@@ -25,9 +25,9 @@
                     <span class="partner_name">{{ $info['partner_name'] or '' }}</span>
                     <input type="hidden" name="city_partner_id"  value="{{ $info['city_partner_id'] or '' }}" />
                     <input type="hidden" name="city_partner_id_history"  value="{{ $info['city_partner_id_history'] or '' }}" />
-                    <button  type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.selectCityPartner(this)">选择所属城市代理</button>
+                    {{--<button  type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.selectCityPartner(this)">选择所属城市代理</button>--}}
 
-                    <button type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-pencil bigger-60 update_city_partner" @if(isset($info['now_partner_state']) && in_array($info['now_partner_state'],[0,1])) style="display: none;"  @endif  onclick="otheraction.updateCityPartner(this)">更新[当前所属城市代理已更新]</button>
+                    {{--<button type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-pencil bigger-60 update_city_partner" @if(isset($info['now_partner_state']) && in_array($info['now_partner_state'],[0,1])) style="display: none;"  @endif  onclick="otheraction.updateCityPartner(this)">更新[当前所属城市代理已更新]</button>--}}
 
                 </td>
             </tr>

@@ -21,7 +21,7 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
        // '2' => '城市分站',
         '4' => '城市代理',
         '8' => '商家',
-       // '16' => '店铺',
+        '16' => '店铺',
         '32' => '快跑人员',
         '64' => '用户',
     ];
@@ -211,6 +211,15 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
      * @param array $extParams 其它扩展参数，
      *    $extParams = [
      *        'useQueryParams' => '是否用来拼接查询条件，true:用[默认];false：不用'
+     *        'sqlParams' => [// 其它sql条件[覆盖式],下面是常用的，其它的也可以
+     *           'where' => '如果有值，则替换where'
+     *           'select' => '如果有值，则替换select'
+     *           'orderBy' => '如果有值，则替换orderBy'
+     *           'whereIn' => '如果有值，则替换whereIn'
+     *           'whereNotIn' => '如果有值，则替换whereNotIn'
+     *           'whereBetween' => '如果有值，则替换whereBetween'
+     *           'whereNotBetween' => '如果有值，则替换whereNotBetween'
+     *       ]
      *   ];
      * @param int $notLog 是否需要登陆 0需要1不需要
      * @return  array 列表数据
@@ -237,6 +246,13 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
         $isExport = 0;
 
         $useSearchParams = $extParams['useQueryParams'] ?? true;// 是否用来拼接查询条件，true:用[默认];false：不用
+        // 其它sql条件[覆盖式]
+        $sqlParams = $extParams['sqlParams'] ?? [];
+        $sqlKeys = array_keys($sqlParams);
+        foreach($sqlKeys as $tKey){
+            if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+        }
+
         if($useSearchParams) {
             // $params = self::formatListParams($request, $controller, $queryParams);
             $admin_type = CommonRequest::getInt($request, 'admin_type');
@@ -323,9 +339,9 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
             if(isset($data_list[$k]['area'])) unset($data_list[$k]['area']);
             if(isset($data_list[$k]['area_history'])) unset($data_list[$k]['area_history']);
             // 城市分站名称
-            $data_list[$k]['site_name'] = $v['city']['city_name'] ?? '';
-            // $data_list[$k]['site_id'] = $v['city']['id'] ?? 0;
-            if(isset($data_list[$k]['city'])) unset($data_list[$k]['city']);
+            $data_list[$k]['site_name'] = $v['cityinfo']['city_name'] ?? '';
+            // $data_list[$k]['site_id'] = $v['cityinfo']['id'] ?? 0;
+            if(isset($data_list[$k]['cityinfo'])) unset($data_list[$k]['cityinfo']);
             // 城市城市合伙人
             $data_list[$k]['partner_name'] = $v['city_partner']['partner_name'] ?? '';
             // $data_list[$k]['partner_id'] = $v['city_partner']['id'] ?? 0;
@@ -356,21 +372,73 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
      * @param Request $request 请求信息
      * @param Controller $controller 控制对象
      * @param int $id id
+     * @param array $selectParams 查询字段参数--一维数组
      * @param mixed $relations 关系
      * @return  array 单条数据 - -维数组
      * @author zouyan(305463219@qq.com)
      */
-    public static function getInfoData(Request $request, Controller $controller, $id, $relations = ''){
+    public static function getInfoData(Request $request, Controller $controller, $id, $selectParams = [], $relations = '', $notLog = 0){
         $company_id = $controller->company_id;
         // $relations = '';
-        // $resultDatas = APIRunBuyRequest::getinfoApi(self::$model_name, '', $relations, $company_id , $id);
-        $resultDatas = static::getInfoDataBase($request, $controller,'', $id, [], $relations);
+        // $info = APIRunBuyRequest::getinfoApi(self::$model_name, '', $relations, $company_id , $id);
+        $info = static::getInfoDataBase($request, $controller,'', $id, $selectParams, $relations, $notLog);
         // 判断权限
 //        $judgeData = [
 //            'company_id' => $company_id,
 //        ];
-//        static::judgePowerByObj($request, $controller, $resultDatas, $judgeData );
-        return $resultDatas;
+//        static::judgePowerByObj($request, $controller, $info, $judgeData );
+        // 城市代理
+        $partner_name = $info['city_partner_history']['partner_name'] ?? '';
+        if(empty($partner_name)) $partner_name = $info['city_partner']['partner_name'] ?? '';
+        $info['partner_name'] = $partner_name;
+        $now_partner_state = 0;// 最新的城市代理 0没有变化 ;1 已经删除  2 试卷不同
+        if(isset($info['city_partner_history']) && isset($info['city_partner'])){
+            $history_version_num = $info['city_partner_history']['version_num'] ?? '';
+            $version_num = $info['city_partner']['version_num'] ?? '';
+            if(empty($info['city_partner'])){
+                $now_partner_state = 1;
+            }elseif($version_num != '' && $history_version_num != $version_num){
+                $now_partner_state = 2;
+            }
+        }
+        if(isset($info['city_partner_history'])) unset($info['city_partner_history']);
+        if(isset($info['city_partner'])) unset($info['city_partner']);
+        $info['now_partner_state'] = $now_partner_state;
+        // 商家
+        $seller_name = $info['seller_history']['seller_name'] ?? '';
+        if(empty($seller_name)) $seller_name = $info['seller']['seller_name'] ?? '';
+        $info['seller_name'] = $seller_name;
+        $now_seller_state = 0;// 最新的商家 0没有变化 ;1 已经删除  2 试卷不同
+        if(isset($info['seller_history']) && isset($info['seller'])){
+            $history_version_num = $info['seller_history']['version_num'] ?? '';
+            $version_num = $info['seller']['version_num'] ?? '';
+            if(empty($info['seller'])){
+                $now_seller_state = 1;
+            }elseif($version_num != '' && $history_version_num != $version_num){
+                $now_seller_state = 2;
+            }
+        }
+        if(isset($info['seller_history'])) unset($info['seller_history']);
+        if(isset($info['seller'])) unset($info['seller']);
+        $info['now_seller_state'] = $now_seller_state;
+        // 店铺
+        $shop_name = $info['shop_history']['shop_name'] ?? '';
+        if(empty($shop_name)) $shop_name = $info['shop']['shop_name'] ?? '';
+        $info['shop_name'] = $shop_name;
+        $now_shop_state = 0;// 最新的商家 0没有变化 ;1 已经删除  2 试卷不同
+        if(isset($info['shop_history']) && isset($info['shop'])){
+            $history_version_num = $info['shop_history']['version_num'] ?? '';
+            $version_num = $info['shop']['version_num'] ?? '';
+            if(empty($info['shop'])){
+                $now_shop_state = 1;
+            }elseif($version_num != '' && $history_version_num != $version_num){
+                $now_shop_state = 2;
+            }
+        }
+        if(isset($info['shop_history'])) unset($info['shop_history']);
+        if(isset($info['shop'])) unset($info['shop']);
+        $info['now_shop_state'] = $now_shop_state;
+        return $info;
     }
 
     /**

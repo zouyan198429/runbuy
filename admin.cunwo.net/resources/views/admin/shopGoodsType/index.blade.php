@@ -24,6 +24,8 @@
     </div>
     <form onsubmit="return false;" class="form-horizontal" role="form" method="post" id="search_frm" action="#">
       <div class="msearch fr">
+        <input type="hidden" name="city_site_id" value="{{ $city_site_id or 0 }}" />
+        <input type="hidden" name="city_partner_id" value="{{ $city_partner_id or 0 }}" />
         <input type="hidden" name="seller_id" value="{{ $seller_id or 0 }}" />
         <input type="hidden" name="shop_id" value="{{ $shop_id or 0 }}" />
         <select style="width:80px; height:28px;" name="field">
@@ -54,6 +56,8 @@
         </label>
       </th>
       <th>ID</th>
+      <th>城市分站</th>
+      <th>城市合伙人</th>
       <th>商家</th>
       <th>店铺</th>
       <th>类型名称</th>

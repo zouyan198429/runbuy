@@ -38,7 +38,7 @@ class ShopController extends WorksController
         $reDataArr['labels_kv'] = CTAPILabelsBusiness::getListKV($request, $this);
         $reDataArr['defaultLabel'] = -1;// 默认
 
-        $reDataArr['city_site_id'] = $this->city_site_id;//  CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         $reDataArr['city_partner_id'] =  $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         $reDataArr['seller_id'] =  CommonRequest::getInt($request, 'seller_id');
         return view('city.shop.index', $reDataArr);
@@ -68,7 +68,7 @@ class ShopController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIShopBusiness::getInfoData($request, $this, $id, ['shopSeller', 'labels', 'siteResources']);
+            $info = CTAPIShopBusiness::getInfoData($request, $this, $id, [], ['shopSeller', 'labels', 'siteResources']);
             $intro = $info['intro'] ?? '';
             $info['intro'] = replace_enter_char($intro,2);
             $range_time = '';
