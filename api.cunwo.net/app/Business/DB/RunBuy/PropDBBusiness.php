@@ -59,7 +59,7 @@ class PropDBBusiness extends BasePublicDBBusiness
         $propVals = $saveData['prop_vals'] ?? [];
         if(empty($propVals)  ) throws('属性值不能为空！');
         if(isset($saveData['prop_vals']))  unset($saveData['prop_vals']);
-
+        $propVals = array_unique($propVals);
         // 商家id,获得 城市代理id 、城市分站id
 //        $city_site_id = $saveData['city_site_id'] ?? 0;
 //        $city_partner_id = $saveData['city_partner_id'] ?? 0;
