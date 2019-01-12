@@ -588,7 +588,7 @@ function goodsPrice(){
             var pv_id = temObj.val();
             check_price_pv_ids.push(pv_id);
             if($('.price_prop_val_' + pv_id).length > 0) return ;//实现continue功能  已经存在价格
-            var pv_obj = {'id' : pv_id, 'main_name' : temObj.data('names'), 'price' : ''};
+            var pv_obj = {'id' : pv_id, 'main_name' : temObj.data('names'), 'price' : '', 'selected' : 1};
             price_pv_data.push(pv_obj);
         });
         console.log('check_price_pv_ids' , check_price_pv_ids);
@@ -892,6 +892,7 @@ function addProp( prop_id){
     document.write("<script type=\"text\/template\"  id=\"baidu_template_price_data_list\">");
     document.write("    <%for(var i = 0; i<data_list.length;i++){");
     document.write("    var item = data_list[i];");
+    document.write("    if(item.selected != 1) continue;");
     document.write("    %>");
     document.write("    <tr data-prop_id=\"<%=item.id%>\"   data-prop_name=\"<%=item.main_name%>\" class=\"price_prop_val_<%=item.id%>\">");
     document.write("        <td>");
