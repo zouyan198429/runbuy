@@ -79,15 +79,15 @@ var otheraction = {
         layuiGoIframe(href, text);
         return false;
     },
-    goodsType: function(obj, seller_id, shop_id, text){// 商品分类管理
+    goodsType: function(obj, city_site_id, city_partner_id, seller_id, shop_id, text){// 商品分类管理
         var obj = $(obj);
-        var href = GOODS_TYPE_LIST_URL + '?seller_id=' + seller_id + '&shop_id=' + shop_id;//
+        var href = GOODS_TYPE_LIST_URL + '?city_site_id=' + city_site_id + '&city_partner_id=' + city_partner_id + '&seller_id=' + seller_id + '&shop_id=' + shop_id;//
         layuiGoIframe(href, text);
         return false;
     },
-    props: function(obj, city_site_id, city_partner_id, seller_id, text){// 商品属性管理 , shop_id
+    props: function(obj, city_site_id, city_partner_id, seller_id, shop_id, text){// 商品属性管理 , shop_id
         var obj = $(obj);
-        var href = PROP_LIST_URL + '?city_site_id=' + city_site_id + '&city_partner_id=' + city_partner_id + '&seller_id=' + seller_id ;// + '&shop_id=' + shop_id
+        var href = PROP_LIST_URL + '?city_site_id=' + city_site_id + '&city_partner_id=' + city_partner_id + '&seller_id=' + seller_id  + '&shop_id=' + shop_id;// + '&shop_id=' + shop_id
         layuiGoIframe(href, text);
         return false;
     },
@@ -166,10 +166,10 @@ var otheraction = {
     document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.staffShop(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.seller_id%>,<%=item.id%>,'<%=item.shop_name%>-帐号管理')\">");
     document.write("                    <i class=\"ace-icon fa fa-user-circle-o bigger-60\"> 帐号管理<\/i>");
     document.write("                <\/a>");
-    document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.goodsType(this,<%=item.seller_id%>,<%=item.id%>,'<%=item.shop_name%>-商品分类管理')\">");
+    document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.goodsType(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.seller_id%>,<%=item.id%>,'<%=item.shop_name%>-商品分类管理')\">");
     document.write("                    <i class=\"ace-icon fa fa-cubes bigger-60\"> 商品分类管理<\/i>");
     document.write("                <\/a>");
-    document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.props(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.seller_id%>,'<%=item.seller_name%>-商品属性管理')\">");
+    document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.props(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.seller_id%>,<%=item.id%>,'<%=item.seller_name%>-商品属性管理')\">");
     document.write("                    <i class=\"ace-icon fa fa-cube bigger-60\"> 商品属性管理<\/i>");
     document.write("                <\/a>");
     document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.goods(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.seller_id%>,<%=item.id%>,'<%=item.shop_name%>-商品管理')\">");
