@@ -661,11 +661,11 @@ Route::get('shop/prop/export', 'Shop\PropController@export');// 导出
 Route::get('shop/prop/import_template', 'Shop\PropController@import_template');// 导入模版
 
 // 店铺
-//Route::get('shop/shop', 'Shop\ShopController@index');// 列表
-//Route::get('shop/shop/add/{id}', 'Shop\ShopController@add');// 添加
-//Route::get('shop/shop/select', 'Shop\ShopController@select');// 选择-弹窗
-//Route::get('shop/shop/export', 'Shop\ShopController@export');// 导出
-//Route::get('shop/shop/import_template', 'Shop\ShopController@import_template');// 导入模版
+Route::get('shop/shop', 'Shop\ShopController@index');// 列表
+Route::get('shop/shop/add/{id}', 'Shop\ShopController@add');// 添加
+Route::get('shop/shop/select', 'Shop\ShopController@select');// 选择-弹窗
+Route::get('shop/shop/export', 'Shop\ShopController@export');// 导出
+Route::get('shop/shop/import_template', 'Shop\ShopController@import_template');// 导入模版
 
 // 商品
 Route::get('shop/shopGoods', 'Shop\ShopGoodsController@index');// 列表

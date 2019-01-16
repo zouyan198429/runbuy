@@ -174,7 +174,6 @@
               </dl>
             </li>
             --}}
-            {{--
             <li data-name="user" class="layui-nav-item">
               <a href="javascript:;" lay-tips="店铺管理" lay-direction="2">
                 <i class="layui-icon layui-icon-template"></i>
@@ -186,7 +185,6 @@
                 </dd>
               </dl>
             </li>
-            --}}
             <li data-name="user" class="layui-nav-item">
               <a href="javascript:;" lay-tips="商品管理" lay-direction="2">
                 <i class="layui-icon layui-icon-app"></i>

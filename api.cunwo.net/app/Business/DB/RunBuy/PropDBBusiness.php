@@ -474,7 +474,7 @@ class PropDBBusiness extends BasePublicDBBusiness
             if(isset($v['name'])) unset($v['name']);
             $selected_pv_ids = $formatProp[$v['prop_id']]['selected_pv_ids'] ?? [];
             $v['selected'] = 0;
-            if(in_array($v['id'], $selected_pv_ids)) $v['selected'] = 1;
+            if(in_array($v['id'], $selected_pv_ids) || empty($selected_pv_ids)) $v['selected'] = 1;
             // 价格
             $v['price'] = $formatPV[$v['id']]['price'] ?? 0;
             $formatProp[$v['prop_id']]['pv_list'][] = $v;

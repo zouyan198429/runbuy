@@ -76,10 +76,10 @@ class ShopGoodsController extends WorksController
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         // 热销
         $reDataArr['isHot'] =  CTAPIShopGoodsBusiness::$isHotArr;
-        $reDataArr['defaultIsHot'] = $info['is_hot'] ?? -1;// 默认状态
+        $reDataArr['defaultIsHot'] = $info['is_hot'] ?? 1;// 默认状态
         // 是否上架
         $reDataArr['isSale'] =  CTAPIShopGoodsBusiness::$isSaleArr;
-        $reDataArr['defaultIsSale'] = $info['is_sale'] ?? -1;// 默认状态
+        $reDataArr['defaultIsSale'] = $info['is_sale'] ?? 1;// 默认状态
         $reDataArr['info'] = $info;
         $reDataArr['operate'] = $operate;
         return view('admin.shopGoods.add', $reDataArr);

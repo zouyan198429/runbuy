@@ -41,6 +41,7 @@ class ShopController extends WorksController
         $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         $reDataArr['city_partner_id'] =  $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         $reDataArr['seller_id'] =  $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
+        $reDataArr['shop_id'] =  $this->shop_id;// CommonRequest::getInt($request, 'shop_id');
         return view('shop.shop.index', $reDataArr);
     }
 
@@ -57,6 +58,8 @@ class ShopController extends WorksController
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
         $seller_id = $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
+
+        $id =  $this->shop_id;// CommonRequest::getInt($request, 'shop_id');
         $info = [
             'id'=>$id,
           //   'department_id' => 0,
@@ -131,6 +134,7 @@ class ShopController extends WorksController
         $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         $reDataArr['city_partner_id'] =  $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         $reDataArr['seller_id'] =  $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
+        $reDataArr['shop_id'] =  $this->shop_id;// CommonRequest::getInt($request, 'shop_id');
         return view('shop.shop.select', $reDataArr);
     }
 
@@ -146,6 +150,7 @@ class ShopController extends WorksController
     {
         $this->InitParams($request);
         $id = CommonRequest::getInt($request, 'id');
+        $id =  $this->shop_id;// CommonRequest::getInt($request, 'shop_id');
         $info = CTAPIShopBusiness::getInfoHistoryId($request, $this, $id, []);
         return ajaxDataArr(1, $info, '');
 
@@ -162,6 +167,7 @@ class ShopController extends WorksController
     {
         $this->InitParams($request);
         $id = CommonRequest::getInt($request, 'id');
+        $id =  $this->shop_id;// CommonRequest::getInt($request, 'shop_id');
         $seller_id = $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
         // $seller_id_history = CommonRequest::getInt($request, 'seller_id_history');
         $shop_type_id = CommonRequest::getInt($request, 'shop_type_id');
@@ -258,6 +264,7 @@ class ShopController extends WorksController
      */
     public function ajax_alist(Request $request){
         $this->InitParams($request);
+        $request->merge(['ids' => $this->shop_id]);
         return  CTAPIShopBusiness::getList($request, $this, 2 + 4, [], ['province', 'city', 'area', 'shopCity', 'shopCityPartner', 'shopSeller', 'shopType', 'labels', 'siteResources']);
     }
 

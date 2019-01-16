@@ -19,11 +19,12 @@
   <div class="mmhead" id="mywork">
 
     @include('common.pageParams')
-    <div class="tabbox" >
-      <a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加店铺</a>
-    </div>
+    {{--<div class="tabbox" >--}}
+      {{--<a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加店铺</a>--}}
+    {{--</div>--}}
     <form onsubmit="return false;" class="form-horizontal" role="form" method="post" id="search_frm" action="#">
-      <div class="msearch fr" style="width:700px;">
+      <div class="msearch fr" style="width:700px; display:none;">
+        <input type="hidden" name="ids" value="{{ $shop_id or 0 }}" />
         <input type="hidden" name="city_site_id" value="{{ $city_site_id or 0 }}" />
         <input type="hidden" name="city_partner_id" value="{{ $city_partner_id or 0 }}" />
         <input type="hidden" name="seller_id" value="{{ $seller_id or 0 }}" />

@@ -802,17 +802,17 @@ Route::post('shop/prop/ajax_get_ids', 'Shop\PropController@ajax_get_ids');// 获
 Route::any('shop/prop/ajax_selected', 'Shop\PropController@ajax_selected');//ajax选择中记录/更新记录 -单选
 Route::any('shop/prop/ajax_selected_multi', 'Shop\PropController@ajax_selected_multi');//ajax选择中记录/更新记录 -多选
 //店铺
-//Route::any('shop/shop/ajax_alist', 'Shop\ShopController@ajax_alist');//ajax获得列表数据
-//Route::post('shop/shop/ajax_del', 'Shop\ShopController@ajax_del');// 删除
-//Route::any('shop/shop/ajax_save', 'Shop\ShopController@ajax_save');// 新加/修改
-//Route::post('shop/shop/ajax_get_child', 'Shop\ShopController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
-//Route::post('shop/shop/ajax_get_areachild', 'Shop\ShopController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
-//Route::post('shop/shop/ajax_import_staff','Shop\ShopController@ajax_import'); // 导入员工
-//
-//Route::post('shop/shop/import', 'Shop\ShopController@import');// 导入excel
-//Route::post('shop/shop/ajax_get_ids', 'Shop\ShopController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
-//
-//Route::any('shop/shop/ajax_selected', 'Shop\ShopController@ajax_selected');//ajax选择中记录/更新记录
+Route::any('shop/shop/ajax_alist', 'Shop\ShopController@ajax_alist');//ajax获得列表数据
+Route::post('shop/shop/ajax_del', 'Shop\ShopController@ajax_del');// 删除
+Route::any('shop/shop/ajax_save', 'Shop\ShopController@ajax_save');// 新加/修改
+Route::post('shop/shop/ajax_get_child', 'Shop\ShopController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('shop/shop/ajax_get_areachild', 'Shop\ShopController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('shop/shop/ajax_import_staff','Shop\ShopController@ajax_import'); // 导入员工
+
+Route::post('shop/shop/import', 'Shop\ShopController@import');// 导入excel
+Route::post('shop/shop/ajax_get_ids', 'Shop\ShopController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
+Route::any('shop/shop/ajax_selected', 'Shop\ShopController@ajax_selected');//ajax选择中记录/更新记录
 
 //商品
 Route::any('shop/shopGoods/ajax_alist', 'Shop\ShopGoodsController@ajax_alist');//ajax获得列表数据
