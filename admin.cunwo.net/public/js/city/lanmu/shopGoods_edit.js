@@ -823,6 +823,15 @@ function addProp( prop_id){
                 // 解析数据
                 initAnswer('prop_td', data_list, 2);
                 autoCountPropNum();
+                // 处理选默认选择中
+                for(var k = 0; k < prop_list.length; k++) {
+                    var propItem = prop_list[k];
+                    var trObj = $('#prop_tr_' + propItem.id);
+                    var pvObj = trObj.find('.pv_selected');
+                    var pvIds = get_list_checked(pvObj,3,1);
+                    console.log('pvIds',pvIds);
+                    trObj.find('input[name="pv_ids[]"]').val(pvIds);
+                }
             }
             layer.close(layer_index)//手动关闭
         }
@@ -840,7 +849,7 @@ function addProp( prop_id){
     document.write("    var now_prop = item.now_prop;");
     document.write("    can_modify = true;");
     document.write("    %>");
-    document.write("    <tr  data-prop_name=\"<%=item.main_name%>\" >");
+    document.write("    <tr  data-prop_name=\"<%=item.main_name%>\"   id=\"prop_tr_<%=item.id%>\">");
     document.write("        <td>");
     document.write("            <label class=\"pos-rel\">");
     document.write("                <input onclick=\"otheraction.seledSingle(this , \'.table2\')\" type=\"checkbox\" class=\"ace check_item\" value=\"<%=item.id%>\">");
