@@ -8,6 +8,7 @@ use App\Services\Request\API\HttpRequest;
 use App\Services\Tool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Lvht\GeoHash;
 
 class IndexController extends WorksController
 {
@@ -20,6 +21,20 @@ class IndexController extends WorksController
      */
     public function test(Request $request)
     {
+        $lng = 117.031689;
+        $lat = 36.65396;
+        // $hash = GeoHash::encode($lng,$lat);// wwe0x0euu12
+        // vd($hash);
+        // $nearHash  = GeoHash::expand('wwe0x0');// 附近8个
+        // pr($nearHash);
+        // $point = GeoHash::decode('wwe0x0');
+        // pr($point);
+        // $hash = geohash_encode($lat, $lng, 12);// wwe0x0euu12h
+        // vd($hash);
+        // $nearHash  = geohash_neighbors('wwe0x0');
+        // pr($nearHash);
+        // $point = geohash_decode('wwe0x0');
+        // pr($point);
         return view('test');
     }
 

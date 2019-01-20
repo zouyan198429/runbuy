@@ -134,7 +134,7 @@ class IndexController extends WorksController
         // $this->InitParams($request);
         CTAPIStaffBusiness::loginOut($request, $this);
         $reDataArr = $this->reDataArr;
-        return redirect('admin/login');
+        return redirect('city/login');
     }
 
     /**

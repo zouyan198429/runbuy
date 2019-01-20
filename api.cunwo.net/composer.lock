@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b1fd1b8e2ddaf90d8c915be78be84cf",
+    "content-hash": "2edad1da3e6754c499edc085c2e9dbac",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -738,6 +738,47 @@
                 "storage"
             ],
             "time": "2018-05-07T08:44:23+00:00"
+        },
+        {
+            "name": "lvht/geohash",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lvht/geohash.git",
+                "reference": "bbba3e1b487f0ec2e5e666c1bc9d1d4277990a29"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lvht/geohash/zipball/bbba3e1b487f0ec2e5e666c1bc9d1d4277990a29",
+                "reference": "bbba3e1b487f0ec2e5e666c1bc9d1d4277990a29",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Lvht\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "吕海涛",
+                    "email": "git@lvht.net",
+                    "homepage": "https://github.com/lvht"
+                }
+            ],
+            "description": "geohash like python-geohash",
+            "homepage": "http://github.com/lvht/geohash",
+            "keywords": [
+                "geohash"
+            ],
+            "time": "2017-08-24T11:05:30+00:00"
         },
         {
             "name": "monolog/monolog",

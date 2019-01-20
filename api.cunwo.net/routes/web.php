@@ -11,6 +11,9 @@
 |
 */
 
+Route::get('/test/geoHash', 'TestController@geoHash');// 测试
+Route::get('/test/h3', 'TestController@h3');// 测试
+
 Route::get('/', function () {
     return view('welcome');
 });
