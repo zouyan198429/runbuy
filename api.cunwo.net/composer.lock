@@ -4,8 +4,53 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2edad1da3e6754c499edc085c2e9dbac",
+    "content-hash": "9b6b5167233e810e4accccb63adcb600",
     "packages": [
+        {
+            "name": "billy-poon/coordtransform",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/billy-poon/coordtransform.git",
+                "reference": "2f4454dae3a3515e33bbe3885490581f0ce29e6a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/billy-poon/coordtransform/zipball/2f4454dae3a3515e33bbe3885490581f0ce29e6a",
+                "reference": "2f4454dae3a3515e33bbe3885490581f0ce29e6a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "coordtransform\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Billy Poon",
+                    "email": "panqbi@yeah.net",
+                    "homepage": "https://github.com/billy-poon"
+                }
+            ],
+            "description": "一个提供了百度坐标（BD09）、国测局坐标（火星坐标，GCJ02）、和WGS84坐标系之间的转换的工具模块。移植自：https://github.com/wandergis/coordtransform/",
+            "homepage": "https://github.com/billy-poon/coordtransform",
+            "keywords": [
+                "bd09",
+                "coordinate",
+                "gcj02",
+                "transform",
+                "wgs84"
+            ],
+            "time": "2018-08-21T17:33:38+00:00"
+        },
         {
             "name": "dnoegel/php-xdg-base-dir",
             "version": "0.1",
@@ -910,6 +955,33 @@
                 "time"
             ],
             "time": "2018-03-19T15:50:49+00:00"
+        },
+        {
+            "name": "nicklasw/s2-geometry-library-php",
+            "version": "v2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/NicklasWallgren/s2-geometry-library-php.git",
+                "reference": "a657efe66018b1ed1b7b67899712b0ae6de1f600"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/NicklasWallgren/s2-geometry-library-php/zipball/a657efe66018b1ed1b7b67899712b0ae6de1f600",
+                "reference": "a657efe66018b1ed1b7b67899712b0ae6de1f600",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Fork - Port of s2-geometry-library-java into PHP",
+            "time": "2016-08-31T10:17:06+00:00"
         },
         {
             "name": "nikic/php-parser",

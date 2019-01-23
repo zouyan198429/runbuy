@@ -11,8 +11,14 @@ use App\Business\DB\RunBuy\LrChinaCityDBBusiness;
 // use App\Models\LrChinaCity;
 use App\Services\GetPingYing;
 use App\Services\Map\Map;
+use App\Services\Map\S2;
 use App\Services\pyClass;
 use Illuminate\Http\Request;
+use S2\S2Cap;
+use S2\S2CellId;
+use S2\S2LatLng;
+use S2\S2LatLngRect;
+use S2\SmokeTest;
 
 class TestController extends CompController
 {
@@ -74,8 +80,8 @@ class TestController extends CompController
      */
     public function h3(Request $request)
     {
-        $lat = 57.3615593;// 纬度
-        $log = -122.0553238;// 经度
+        $lat = 40.689167;// 纬度
+        $log = -74.044444;// 经度
         echo '<br/> geoToH3: <br/>';
         $index = geoToH3($lat,$log,10);
 //        var_dump($index);
@@ -83,6 +89,7 @@ class TestController extends CompController
         // $index = h3ToLong($index);
         // pr(h3ToString($index),false);
 
+        // pr(h3ToLong($index),false);
         // var_dump($index, h3ToLong($index));
        // echo '<br/> h3ToGeo: <br/>';
 //        var_dump(h3ToGeo($index));
@@ -229,5 +236,73 @@ class TestController extends CompController
         echo '<br/> maxUncompactSize: <br/>';
 //        var_dump(maxUncompactSize($compacts, 2));
         pr(maxUncompactSize($compacts, 2),false);
+    }
+
+    /**
+     * google s2
+     *
+     * @param Request $request
+     * @return mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public function s2(Request $request)
+    {
+//        var_dump(cpp_ext_test(1234, 42.33, "jjj"));
+//        var_dump(cpp_ext_test2(["abc", "456"], false));
+//        var_dump(myClass::test());
+//        $o = new myClass;
+//        $o->pset();
+//        var_dump($o);
+//        var_dump($o->pget());
+
+        //2.1 计算地球上两个点之间的距离
+//        $lat = 22.629164;
+//        $lgt =114.025514 ;
+//        $earthDistance = S2::getDistance($lat, $lgt, $lat, $lgt);
+//        pr($earthDistance, false); //输出距离为0
+
+//        //s2LatLng.getDistance() //可以用于计算两点之间的弧度距离
+//        $lat1 = 22.629364;
+//        $lng1 = 114.025914;
+//        $lat2 = 22.623408;
+//        $lng2 = 114.027745;
+//        // 2.2 计算地球上某个点是否在矩形区域内
+//        //  String[] split = "114.025914,22.629364".split(",");
+//        // String[] coord = "114.027745,22.623408".split(",");
+//        $rect = new S2LatLngRect(S2LatLng::fromDegrees($lat1,$lng1),S2LatLng::fromDegrees($lat2,$lng2));
+//        // S2RegionCoverer coverer = new S2RegionCoverer();
+//        //设置cell
+//        //        coverer.setMinLevel(8);
+//        //        coverer.setMaxLevel(15);
+//       //        coverer.setMaxCells(500);
+//       //        S2CellUnion covering = coverer.getCovering(rect);
+//
+//        $lat = 22.629164;
+//        $lgt =114.026514 ;
+//        $s2LatLng = S2LatLng::fromDegrees($lat, $lgt);
+//        $contains = $rect->contains($s2LatLng);//->toPoint()
+//        vd($contains, false);
+
+//        2.3 计算点是否在在圆形区域内
+//         $lng = 112.030500;
+//         $lat = 27.970271;
+//         $capHeight = 600.5; //半径
+//         $s2LatLng= S2LatLng::fromDegrees($lng, $lat);
+//         $cap = S2Cap.fromAxisHeight($s2LatLng->toPoint(),$capHeight);
+//
+//	  double lat2 = 22.629164;
+//	  double lgt2 =114.025514 ;
+//	  S2LatLng s2LatLng = S2LatLng.fromDegrees(lat2, lng2);
+//	  boolean contains = cap.contains(s2LatLng.toPoint());
+//	  System.out.println(contains);
+
+        //$aaa = S2CellId::fromLatLng(S2LatLng::fromRadians($lat, $log))->toLatLng();
+        // echo ip2long('255.255.255.255');
+        // die;
+//        $lat = 22.629164;
+//        $log =-114.025514 ;
+//        $s2cellid = S2CellId::fromLatLng(S2LatLng::fromDegrees($lat, $log));// ->toLatLng();
+//        pr($s2cellid);
+
     }
 }
