@@ -43,6 +43,10 @@ class BaseController extends Controller
             config('public.sessionKey'), config('public.sessionRedisTye'));
     }
     // 保存
+    //  -  如果是小程序，注意 $preKey 值为0， $this->save_session 设置为false
+    //  -  如果是浏览器后台，注意 $preKey 值为1， $this->save_session 设置为 true
+    // $userInfo 需要缓存的数据
+    // $preKey  1 后台 ; 0 小程序
     public function setUserInfo($userInfo = '',$preKey = -1){
         //$preKey 为 -1,则根据 $this->save_session 来处理
         if($preKey == -1){
@@ -50,6 +54,9 @@ class BaseController extends Controller
         }else{
             $pre = config('public.sessionValPre') . ((int) $preKey ) . '_';
         }
+
+        if(is_array($userInfo)) $userInfo['modifyTime'] = time();// 当前缓存的时间
+
         $redisKey = Tool::setLoginSession($pre, $userInfo,
             $this->save_session, config('public.sessionKey'),
             config('public.sessionExpire'), config('public.sessionRedisTye'));

@@ -63,7 +63,8 @@ class CTAPIShopTypeBusiness extends BasicPublicCTAPIBusiness
         $sqlParams = $extParams['sqlParams'] ?? [];
         $sqlKeys = array_keys($sqlParams);
         foreach($sqlKeys as $tKey){
-            if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+            // if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+            if(isset($sqlParams[$tKey]) )  $queryParams[$tKey] = $sqlParams[$tKey];
         }
 
         if($useSearchParams) {
@@ -93,12 +94,20 @@ class CTAPIShopTypeBusiness extends BasicPublicCTAPIBusiness
 
         // 格式化数据
         $data_list = $result['data_list'] ?? [];
-//        foreach($data_list as $k => $v){
+        foreach($data_list as $k => $v){
 //            // 公司名称
 //            $data_list[$k]['company_name'] = $v['company_info']['company_name'] ?? '';
 //            if(isset($data_list[$k]['company_info'])) unset($data_list[$k]['company_info']);
-//        }
-//        $result['data_list'] = $data_list;
+            // 资源url
+            $resource_list = [];
+            if(isset($v['site_resources'])){
+                Tool::resourceUrl($v, 2);
+                $resource_list = Tool::formatResource($v['site_resources'], 2);
+                unset($data_list[$k]['site_resources']);
+            }
+            $data_list[$k]['resource_list'] = $resource_list;
+        }
+        $result['data_list'] = $data_list;
         // 导出功能
         if($isExport == 1){
 //            $headArr = ['work_num'=>'工号', 'department_name'=>'部门'];
@@ -132,6 +141,14 @@ class CTAPIShopTypeBusiness extends BasicPublicCTAPIBusiness
 //            'id' => $company_id,
 //        ];
 //        static::judgePowerByObj($request, $controller, $info, $judgeData );
+        // 资源url
+        $resource_list = [];
+        if(isset($info['site_resources'])){
+            Tool::resourceUrl($info, 2);
+            $resource_list = Tool::formatResource($info['site_resources'], 2);
+            unset($info['site_resources']);
+        }
+        $info['resource_list'] = $resource_list;
         return $info;
     }
 
@@ -281,25 +298,40 @@ class CTAPIShopTypeBusiness extends BasicPublicCTAPIBusiness
      */
     public static function replaceById(Request $request, Controller $controller, $saveData, &$id, $modifAddOprate = false, $notLog = 0){
         $company_id = $controller->company_id;
-        if($id > 0){
-            // 判断权限
-//            $judgeData = [
-//                'company_id' => $company_id,
-//            ];
-//            $relations = '';
-//            static::judgePower($request, $controller, $id, $judgeData, '', $company_id, $relations, $notLog);
-            if($modifAddOprate) static::addOprate($request, $controller, $saveData);
-
-        }else {// 新加;要加入的特别字段
-            $addNewData = [
-               // 'company_id' => $company_id,
-            ];
-            $saveData = array_merge($saveData, $addNewData);
-            // 加入操作人员信息
-            static::addOprate($request, $controller, $saveData);
+        $user_id = $controller->user_id;
+        if(isset($saveData['type_name']) && empty($saveData['type_name'])  ){
+            throws('类型名称不能为空！');
         }
-        // 新加或修改
-        return static::replaceByIdBase($request, $controller, '', $saveData, $id, $notLog);
+
+        // 调用新加或修改接口
+        $apiParams = [
+            'saveData' => $saveData,
+            'company_id' => $company_id,
+            'id' => $id,
+            'operate_staff_id' => $user_id,
+            'modifAddOprate' => 0,
+        ];
+        $id = static::exeDBBusinessMethodCT($request, $controller, '',  'replaceById', $apiParams, $company_id, $notLog);
+        return $id;
+//        if($id > 0){
+//            // 判断权限
+////            $judgeData = [
+////                'company_id' => $company_id,
+////            ];
+////            $relations = '';
+////            static::judgePower($request, $controller, $id, $judgeData, '', $company_id, $relations, $notLog);
+//            if($modifAddOprate) static::addOprate($request, $controller, $saveData);
+//
+//        }else {// 新加;要加入的特别字段
+//            $addNewData = [
+//               // 'company_id' => $company_id,
+//            ];
+//            $saveData = array_merge($saveData, $addNewData);
+//            // 加入操作人员信息
+//            static::addOprate($request, $controller, $saveData);
+//        }
+//        // 新加或修改
+//        return static::replaceByIdBase($request, $controller, '', $saveData, $id, $notLog);
     }
 
     // ***********导入***开始************************************************************

@@ -89,18 +89,15 @@
           <span class="lbl">全选</span>
         </label>
       </th>
-      <th>ID</th>
       <th>城市分站<hr/>城市合伙人<hr/>商家</th>
       <th>店铺名称<hr/>联系人</th>
       <th>手机<hr/>电话</th>
-      <th>所在地址</th>
-      <th>图片</th>
-      <th>分类</th>
-      <th>标签</th>
+      <th>所在地址<hr/>经纬度<hr/>图片</th>
+      <th>分类<hr/>标签</th>
       <th>总销量<hr/>月销量</th>
       <th>营业开始时间<hr/>营业结束时间<hr/>更新时间</th>
       <th>综合排序<hr/>人均</th>
-      <th>介绍</th>
+      {{--<th>介绍</th>--}}
       <th style="width: 150px;">操作</th>
     </tr>
     </thead>

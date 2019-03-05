@@ -59,7 +59,7 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
 //                //,'operate_staff_id','operate_staff_id_history'
 //                ,'created_at'
 //            ],
-            'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],
+            'orderBy' => ['sort_num'=>'desc', 'mon_sales_volume'=>'desc', 'id'=>'desc'],
         ];// 查询条件参数
         if(empty($queryParams)){
             $queryParams = $defaultQueryParams;
@@ -71,7 +71,8 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
         $sqlParams = $extParams['sqlParams'] ?? [];
         $sqlKeys = array_keys($sqlParams);
         foreach($sqlKeys as $tKey){
-            if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+            // if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+            if(isset($sqlParams[$tKey]) )  $queryParams[$tKey] = $sqlParams[$tKey];
         }
 
         if($useSearchParams) {
@@ -93,6 +94,9 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
 
             $status = CommonRequest::get($request, 'status');
             if(is_numeric($status) )  array_push($queryParams['where'], ['status', '=', $status]);
+
+            $status_business = CommonRequest::get($request, 'status_business');// ['id', '&' , '16=16'],
+            if(is_numeric($status_business) )  array_push($queryParams['where'], ['status_business', '&', $status_business . ' > 0']);
 
             $province_id = CommonRequest::getInt($request, 'province_id');
             if($province_id > 0 )  array_push($queryParams['where'], ['province_id', '=', $province_id]);
@@ -256,6 +260,11 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
             if(isset($info['labels'])) unset($info['labels']);
         // }
 
+        // 分类
+        $info['type_name'] = $info['shop_type']['type_name'] ?? '';
+        // $info['type_id'] = $info['shop_type']['id'] ?? 0;
+        if(isset($info['shop_type'])) unset($info['shop_type']);
+
         // 资源url
         $resource_list = [];
         if(isset($info['site_resources'])){
@@ -396,7 +405,6 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
         $company_id = $controller->company_id;
         // $id = CommonRequest::getInt($request, 'id');
         return static::delAjaxBase($request, $controller, '', $notLog);
-
     }
 
 

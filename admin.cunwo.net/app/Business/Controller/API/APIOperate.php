@@ -68,6 +68,7 @@ class APIOperate
      * @param Controller $controller 控制对象
      * @param string $model_name 模型名称 为空，则用对象的属性
      * @param string $queryParams 条件数组/json字符
+     *
      * @param string $relations 关系数组/json字符
      * @param int $oprateBit 操作类型位 1:获得所有的; 2 分页获取[同时有1和2，2优先]；4 返回分页html翻页代码
      * @param int $notLog 是否需要登陆 0需要1不需要
@@ -85,6 +86,14 @@ class APIOperate
     public static function getBaseListData(Request $request, Controller $controller, $model_name = '', $queryParams = '',$relations = '', $oprateBit = 2 + 4,  $notLog = 0){
         $company_id = $controller->company_id;
         // 获得翻页的三个关键参数
+        /*
+        翻页的三个关键参数
+        [
+            'page' => $page,// 当前页,如果不正确默认第一页
+            'pagesize' => $pagesize,// 每页显示数量,取值1 -- 100 条之间,默认15条
+            'total' => $total,// 总记录数,优化方案：传0传重新获取总数，如果传了，则不会再获取，而是用传的，减软数据库压力;=-5:只统计条件记录数量，不返回数据
+        ]
+         */
         $pageParams = CommonRequest::getPageParams($request);
         // 获得对象
         static::requestGetObj($request, $controller,$modelObj);

@@ -137,7 +137,7 @@ Route::post('admin/seller/ajax_get_ids', 'Admin\SellerController@ajax_get_ids');
 
 Route::any('admin/seller/ajax_selected', 'Admin\SellerController@ajax_selected');//ajax选择中记录/更新记录
 //店铺分类
-Route::post('admin/shopType/ajax_alist', 'Admin\ShopTypeController@ajax_alist');//ajax获得列表数据
+Route::any('admin/shopType/ajax_alist', 'Admin\ShopTypeController@ajax_alist');//ajax获得列表数据
 Route::post('admin/shopType/ajax_del', 'Admin\ShopTypeController@ajax_del');// 删除
 Route::post('admin/shopType/ajax_save', 'Admin\ShopTypeController@ajax_save');// 新加/修改
 Route::post('admin/shopType/ajax_get_child', 'Admin\ShopTypeController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
@@ -872,6 +872,97 @@ Route::post('shop/shopGoodsType/ajax_get_ids', 'Shop\ShopGoodsTypeController@aja
 //Route::post('shop/notice/import', 'Shop\NoticeController@import');// 导入excel
 //Route::post('shop/notice/ajax_get_ids', 'Shop\NoticeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
+// 微信相关的
+// 一定是 Route::any, 因为微信服务端认证的时候是 GET, 接收用户消息时是 POST ！
+Route::any('wx/wechat', 'WX\WeChatController@index');
+Route::any('wx/jssdkconfig', 'WX\WeChatController@getJSSDKConfig');
+
+Route::any('wx/test', 'WX\WeChatController@test');
+// oauth
+Route::any('wx/profile', 'WX\WeChatController@profile');// 需要授权才能访问的页面
+Route::any('wx/callback', 'WX\WeChatController@callback');// 授权回调页
+
+// 小程序相关的
+Route::any('miniProgram/test', 'WX\MiniProgramController@test');// 测试
+Route::any('miniProgram/login', 'WX\MiniProgramController@ajax_login');// 登陆
+
+// 平台相关的
+// Route::any('platForm/getLabels', 'WX\platFormController@getLabels');// 获得店铺标签--有分页
+// Route::any('platForm/getAllLabel', 'WX\platFormController@getAllLabel');// 获得店铺标签--所有的
+// Route::any('platForm/getShopTypes', 'WX\platFormController@getShopTypes');// 获得店铺分类--有分页
+// Route::any('platForm/getAllShopType', 'WX\platFormController@getAllShopType');// 获得店铺分类--所有的
+// Route::any('platForm/getNotes', 'WX\platFormController@getNotes');// 获得公告--有分页
+// Route::any('platForm/getNoteInfo', 'WX\platFormController@getNoteInfo');// 根据id获得公告详情
+Route::any('platForm/feeScale', 'WX\platFormController@feeScale');// 根据城市id,获得收费标准
+
+//公告
+Route::any('notice/ajax_alist', 'WX\NoticeController@ajax_alist');//ajax获得列表数据
+Route::any('notice/ajax_info/{id}', 'WX\NoticeController@ajax_info');//ajax获得详情数据
+Route::any('notice/ajax_infoByCityId/{city_id}', 'WX\NoticeController@ajax_infoByCityId');//ajax获得详情数据--根据城市id
+
+// 搜索标签
+Route::any('labels/ajax_alist', 'WX\LabelsController@ajax_alist');//ajax获得列表数据
+Route::any('labels/ajax_info/{id}', 'WX\LabelsController@ajax_info');//ajax获得详情数据
+
+// 店铺分类
+Route::any('shopType/ajax_alist', 'WX\ShopTypeController@ajax_alist');//ajax获得列表数据
+Route::any('shopType/ajax_info/{id}', 'WX\ShopTypeController@ajax_info');//ajax获得详情数据
+
+//站点介绍
+Route::any('siteIntro/ajax_alist', 'WX\SiteIntroController@ajax_alist');//ajax获得列表数据
+Route::any('siteIntro/ajax_info/{id}', 'WX\SiteIntroController@ajax_info');//ajax获得详情数据
+
+//收费标准
+Route::any('feeScale/ajax_alist', 'WX\FeeScaleController@ajax_alist');//ajax获得列表数据
+Route::any('feeScale/ajax_info/{id}', 'WX\FeeScaleController@ajax_info');//ajax获得详情数据
+Route::any('feeScale/ajax_infoByCityId/{city_id}', 'WX\FeeScaleController@ajax_infoByCityId');//ajax获得详情数据--根据城市id
+
+
+// 帮助相关的
+// Route::any('help/siteIntroList', 'WX\HelpController@siteIntroList');// 获得站点介绍列表--所有
+// Route::any('help/siteIntroInfo', 'WX\HelpController@siteIntroInfo');// 获得站点介绍详情
+
+
+// 城市相关的
+Route::any('city/getNearCity', 'WX\CityController@getNearCity');// 根据经纬度坐标，获得最近的城市信息
+Route::any('city/getCitys', 'WX\CityController@getCitys');// 获得所有的城市信息
+
+// 店铺相关的
+Route::any('shop/ajax_alist', 'WX\ShopController@ajax_alist');//ajax获得列表数据
+Route::any('shop/ajax_info/{id}', 'WX\ShopController@ajax_info');//ajax获得详情数据
+
+// 商品相关的
+// Route::any('goods/list', 'WX\GoodsController@list');// 根据店铺id，分类id获取店铺的商品信息--有分页
+Route::any('shopGoods/ajax_alist', 'WX\ShopGoodsController@ajax_alist');//ajax获得列表数据
+// Route::any('shopGoods/ajax_info/{id}', 'WX\ShopGoodsController@ajax_info');//ajax获得详情数据
+
+// 商品分类相关的
+Route::any('shopGoodsType/ajax_alist', 'WX\ShopGoodsTypeController@ajax_alist');//ajax获得列表数据
+
+// 购物车相关的
+Route::any('cart/addGood', 'WX\CartController@addGood');// 添加单个商品到购物车，已有的，数量+n
+// Route::any('cart/addGoodCount', 'WX\CartController@addGoodCount');// 修改商品数量
+Route::any('cart/getGoods', 'WX\CartController@getGoods');//获得当前用户所有的购物车商品，按商户分组
+Route::any('cart/removeGood', 'WX\CartController@removeGood');//  移除商品
+Route::any('cart/empty', 'WX\CartController@empty');// 清空用户的购物车
+// 收货地址
+Route::any('address/add', 'WX\AddressController@add');// 添加 收货地址
+Route::any('address/list', 'WX\AddressController@list');// 列表 收货地址--有分页
+Route::any('address/modify', 'WX\AddressController@modify');// 修改 收货地址
+Route::any('address/del', 'WX\AddressController@del');// 删除 收货地址
+
+// 订单相关的
+Route::any('order/create', 'WX\OrderController@create');// 生成订单
+Route::any('order/cancel', 'WX\OrderController@cancel');// 订单作废
+Route::any('order/chState', 'WX\OrderController@chState');// 更新订单状态
+Route::any('order/getList', 'WX\OrderController@getList');// 订单--列表--有分页
+Route::any('order/getInfo', 'WX\OrderController@getInfo');// 订单详情
+
+// 订单支付相关的
+Route::any('orderPay/pay', 'WX\OrderPayController@pay');// 订单付款
+Route::any('orderPay/refund', 'WX\OrderPayController@refund');// 订单退款
+Route::any('orderPay/bond', 'WX\OrderPayController@bond');// 支付保证金
+Route::any('orderPay/recharge', 'WX\OrderPayController@recharge');// 充值
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

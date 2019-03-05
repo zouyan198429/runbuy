@@ -135,6 +135,8 @@ class StaffRunController extends WorksController
         $city_id = CommonRequest::getInt($request, 'city_id');
         $area_id = CommonRequest::getInt($request, 'area_id');
         $addr = CommonRequest::get($request, 'addr');
+        $latitude = CommonRequest::get($request, 'latitude');
+        $longitude = CommonRequest::get($request, 'longitude');
         $admin_username = CommonRequest::get($request, 'admin_username');
         $admin_password = CommonRequest::get($request, 'admin_password');
         $sure_password = CommonRequest::get($request, 'sure_password');
@@ -150,6 +152,7 @@ class StaffRunController extends WorksController
 //            'position_id' => $position_id,
             'real_name' => $real_name,
             'sex' => $sex,
+            'gender' => $sex,
             'account_status' => $account_status,
             'mobile' => $mobile,
             'tel' => $tel,
@@ -158,6 +161,8 @@ class StaffRunController extends WorksController
             'city_id' => $city_id,
             'area_id' => $area_id,
             'addr' => $addr,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
             'admin_username' => $admin_username,
         ];
         if($admin_password != '' || $sure_password != ''){

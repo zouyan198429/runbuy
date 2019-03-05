@@ -19,11 +19,11 @@
   <div class="mmhead" id="mywork">
 
     @include('common.pageParams')
-    <div class="tabbox" >
+    <div class="tabbox"  style="display: none;">
       <a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加收费标准</a>
     </div>
     <form onsubmit="return false;" class="form-horizontal" role="form" method="post" id="search_frm" action="#">
-      <div class="msearch fr">
+      <div class="msearch fr" style="display: none;">
         <input type="hidden" name="city_site_id" value="{{ $city_site_id or 0 }}" />
         <select style="width:80px; height:28px;" name="field">
           <th>ID</th>
@@ -56,9 +56,9 @@
       </th>
       <th>ID</th>
       <th>城市分站</th>
-      <th>标题</th>
+      {{--<th>标题</th>--}}
       <th>排序[降序]</th>
-      <th>阅读量</th>
+      {{--<th>阅读量</th>--}}
       <th>添加人</th>
       <th>添加日期</th>
       <th style="width: 150px;">操作</th>

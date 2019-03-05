@@ -22,6 +22,11 @@ function pr($s, $exit = true)
 
 function throws($message, $code = -1)
 {
+    $controller = request()->route()->getController();// 获得当前控制器对象
+    // $action = request()->route()->getAction();// action 数组
+    // $actionName = request()->route()->getActionName();// App\Http\Controllers\WX\MiniProgramController@test
+    $source = $controller->source ?? '';
+    if($code == -1 && is_numeric($source)) $code = $source;
     throw new \App\Exceptions\ExportException($message, $code);
 }
 
@@ -37,11 +42,14 @@ function isNotJson($str){
  */
 function isAjax()
 {
-    if (isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) == "xmlhttprequest") {
+    $returnErrType = request()->header('returnErrType', 0);// 错误回返类型 1 json ; 0 非json
+    \Illuminate\Support\Facades\Log::info('微信日志-hearder参数returnErrType:',[$returnErrType]);
+    if(!is_numeric($returnErrType)) $returnErrType = 0;
+    if ( (isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) == "xmlhttprequest") || $returnErrType == 1 ) {
         return true;
     } else {
         return false;
-    };
+    }
 }
 
 /**

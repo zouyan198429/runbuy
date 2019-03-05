@@ -20,7 +20,7 @@
           <div class="layui-card-header">设置我的资料</div>
           <div class="layui-card-body" pad15>
 
-            <form method="post"  id="addForm">
+            <form method="post"  id="addForm" style="border: 1px solid #ff7f50">
             <div class="layui-form" lay-filter="">
               <div class="layui-form-item">
                 <label class="layui-form-label">我的角色</label>

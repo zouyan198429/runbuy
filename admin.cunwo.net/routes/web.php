@@ -187,6 +187,9 @@ Route::get('admin/login', 'Admin\IndexController@login');//login.html 登录
 Route::get('admin/logout', 'Admin\IndexController@logout');// 注销
 Route::get('admin/password', 'Admin\IndexController@password');//psdmodify.html 个人信息-修改密码
 Route::get('admin/info', 'Admin\IndexController@info');//myinfo.html 个人信息--显示
+// 腾讯地图
+Route::get('admin/qqMaps/latLngSelect', 'Admin\QQMapsController@latLngSelect');// 经纬度选择
+
 
 // 后台--管理员
 Route::get('admin/staff', 'Admin\StaffController@index');// 列表
@@ -323,6 +326,8 @@ Route::get('city/login', 'City\IndexController@login');//login.html 登录
 Route::get('city/logout', 'City\IndexController@logout');// 注销
 Route::get('city/password', 'City\IndexController@password');//psdmodify.html 个人信息-修改密码
 Route::get('city/info', 'City\IndexController@info');//myinfo.html 个人信息--显示
+// 腾讯地图
+Route::get('city/qqMaps/latLngSelect', 'City\QQMapsController@latLngSelect');// 经纬度选择
 
 // 后台--管理员
 //Route::get('city/staff', 'City\StaffController@index');// 列表
@@ -453,6 +458,8 @@ Route::get('seller/login', 'Seller\IndexController@login');//login.html 登录
 Route::get('seller/logout', 'Seller\IndexController@logout');// 注销
 Route::get('seller/password', 'Seller\IndexController@password');//psdmodify.html 个人信息-修改密码
 Route::get('seller/info', 'Seller\IndexController@info');//myinfo.html 个人信息--显示
+// 腾讯地图
+Route::get('seller/qqMaps/latLngSelect', 'Seller\QQMapsController@latLngSelect');// 经纬度选择
 
 // 后台--管理员
 //Route::get('seller/staff', 'Seller\StaffController@index');// 列表
@@ -582,6 +589,8 @@ Route::get('shop/login', 'Shop\IndexController@login');//login.html 登录
 Route::get('shop/logout', 'Shop\IndexController@logout');// 注销
 Route::get('shop/password', 'Shop\IndexController@password');//psdmodify.html 个人信息-修改密码
 Route::get('shop/info', 'Shop\IndexController@info');//myinfo.html 个人信息--显示
+// 腾讯地图
+Route::get('shop/qqMaps/latLngSelect', 'Shop\QQMapsController@latLngSelect');// 经纬度选择
 
 // 后台--管理员
 //Route::get('shop/staff', 'Shop\StaffController@index');// 列表

@@ -89,7 +89,7 @@ class CommonRequest
         $page = self::getInt($request, 'page');
         if ( (! is_numeric($page)) || $page<=0 ){ $page = 1; }
 
-        // 每页显示的数量,取值1 -- 100 条之间,默认20条
+        // 每页显示的数量,取值1 -- 100 条之间,默认15条
         $pagesize = self::getInt($request, 'pagesize');
         //if ( (! is_numeric($pagesize)) || $pagesize <= 0 || $pagesize > 100 ){ $pagesize = 15; }
         if ( (! is_numeric($pagesize)) || $pagesize <= 0 || $pagesize > 10000 ){ $pagesize = 15; }

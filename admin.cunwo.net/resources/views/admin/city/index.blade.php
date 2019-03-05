@@ -78,7 +78,7 @@
         </label>
       </th>
       <th>ID</th>
-      <th>所属</th>
+      <th>所属<hr/>经纬度</th>
       <th>名称</th>
       <th>城市代码</th>
       <th>拼音简写</th>
@@ -136,6 +136,7 @@
       const AREA_ID = "{{ $info['area_id'] or 0 }}";// 区默认值
 
       var NOTICE_LIST_URL = "{{ url('admin/notice') }}"; //城市公告管理
+      var FEESCALE_MODIFY_URL = "{{ url('admin/feeScale/add/') }}/"; //收费标准管理
   </script>
   <script src="{{asset('js/common/list.js')}}"></script>
   <script src="{{ asset('js/admin/lanmu/city.js') }}"  type="text/javascript"></script>

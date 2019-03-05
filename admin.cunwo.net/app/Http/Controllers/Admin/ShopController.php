@@ -175,6 +175,8 @@ class ShopController extends WorksController
         $city_id = CommonRequest::getInt($request, 'city_id');
         $area_id = CommonRequest::getInt($request, 'area_id');
         $addr = CommonRequest::get($request, 'addr');
+        $latitude = CommonRequest::get($request, 'latitude');
+        $longitude = CommonRequest::get($request, 'longitude');
         $admin_username = CommonRequest::get($request, 'admin_username');
         $admin_password = CommonRequest::get($request, 'admin_password');
         $sure_password = CommonRequest::get($request, 'sure_password');
@@ -217,6 +219,8 @@ class ShopController extends WorksController
             'city_id' => $city_id,
             'area_id' => $area_id,
             'addr' => $addr,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
             'intro' => $intro,
             // 'admin_username' => $admin_username,
             'label_ids' => $label_ids,// 标签id串(逗号分隔-未尾逗号结束)

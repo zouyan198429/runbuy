@@ -16,6 +16,6 @@ class FeeScale extends BasePublicModel
      */
     public function city()
     {
-        return $this->belongsTo('App\Models\RunBuy\City', 'city_site_id', 'id');
+        return $this->belongsTo('App\Models\RunBuy\City', 'city_site_id', 'id')->withDefault();
     }
 }

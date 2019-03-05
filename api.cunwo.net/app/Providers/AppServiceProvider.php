@@ -35,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
 //            'company_pro_unit'         => 'App\Models\CompanyProUnit',    // 公司生产单元
             'shop'                 => 'App\Models\RunBuy\Shop',           // 店铺图片
             'shop_goods'             => 'App\Models\RunBuy\ShopGoods',       // 商品图片
+            'shop_type'             => 'App\Models\RunBuy\ShopType',       // 店铺分类
         ]);
 
         DB::listen(function ($query) {

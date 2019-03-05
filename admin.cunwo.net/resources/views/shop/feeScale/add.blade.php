@@ -27,13 +27,13 @@
                     <span class="city_name">{{ $info['city_name'] or '' }}</span>
                     <input type="hidden" name="city_site_id"  value="{{ $info['city_site_id'] or '' }}" />
                     <input type="hidden" name="city_site_id_history"  value="{{ $info['city_site_id_history'] or '' }}" />
-                    <button  type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.selectCity(this)">选择所属分站</button>
+                    {{--<button  type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.selectCity(this)">选择所属分站</button>--}}
 
-                    <button type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-pencil bigger-60 update_city" @if(isset($info['now_city_state']) && in_array($info['now_city_state'],[0,1])) style="display: none;"  @endif  onclick="otheraction.updateCity(this)">更新[当前所属城市已更新]</button>
+                    {{--<button type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-pencil bigger-60 update_city" @if(isset($info['now_city_state']) && in_array($info['now_city_state'],[0,1])) style="display: none;"  @endif  onclick="otheraction.updateCity(this)">更新[当前所属城市已更新]</button>--}}
 
                 </td>
             </tr>
-            <tr>
+            <tr style="display: none;">
                 <th>标题<span class="must">*</span></th>
                 <td>
                     <input type="text" class="inp wnormal"  name="title" value="{{ $info['title'] or '' }}" placeholder="请输入标题" />
@@ -47,7 +47,7 @@
                     <p class="tip">根据客户描述，进行记录或备注。</p>--}}
                 </td>
             </tr>
-            <tr>
+            <tr style="display: none;">
                 <th>排序[降序]<span class="must"></span></th>
                 <td>
                     <input type="text" class="inp wnormal"  name="sort_num" value="{{ $info['sort_num'] or '' }}" placeholder="请输入排序"  onkeyup="isnum(this) " onafterpaste="isnum(this)"  />

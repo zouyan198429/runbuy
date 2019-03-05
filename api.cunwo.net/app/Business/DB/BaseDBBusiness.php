@@ -614,10 +614,11 @@ class BaseDBBusiness
         [$fieldName,$fieldVal],
         // ['admin_type',self::$admin_type],
         ]
-     * @return  boolean 单条数据 - -维数组
+     * @param int $reType 返回类型 1:布尔型 2:当前存在的记录 [没有，则为空数组[]]
+     * @return  mixed boolean/array 单条数据 - -维数组
      * @author zouyan(305463219@qq.com)
      */
-    public static function judgeFieldExist($company_id, $id, $fieldName, $fieldVal, $otherWhere = []){
+    public static function judgeFieldExist($company_id, $id, $fieldName, $fieldVal, $otherWhere = [], $reType = 1){
         // $company_id = $controller->company_id;
         $queryParams = [
             'where' => [
@@ -636,8 +637,10 @@ class BaseDBBusiness
         $infoData = static::getInfoByQuery(1, $queryParams, []);
         // if(is_object($infoData))  $infoData = $infoData->toArray();
         if(empty($infoData)){//  || count($infoData)<=0
+            if(($reType & 2) ==2) return [];
             return false;
         }
+        if(($reType & 2) ==2) return $infoData;
         return true;
     }
 

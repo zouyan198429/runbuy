@@ -69,12 +69,12 @@ class CityPartnerDBBusiness extends BasePublicDBBusiness
         }
 
         // 查询手机号是否已经有企业使用--账号表里查
-//        if( $id <= 0 && isset($saveData['mobile']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"mobile", $saveData['mobile'], [])){
+//        if( $id <= 0 && isset($saveData['mobile']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"mobile", $saveData['mobile'], [], 1)){
 //            throws('手机号已存在！');
 //        }
 
         // 用户名
-        if( $id <= 0 && isset($saveData['admin_username']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"admin_username", $saveData['admin_username'], [])){
+        if( $id <= 0 && isset($saveData['admin_username']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"admin_username", $saveData['admin_username'], [], 1)){
             throws('用户名已存在！');
         }
 
@@ -104,7 +104,7 @@ class CityPartnerDBBusiness extends BasePublicDBBusiness
                 'operate_staff_id' => $operate_staff_id,
            ];
            // 电话已存在，则为空
-            if( isset($saveData['mobile']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"mobile", $saveData['mobile'], [])){
+            if( isset($saveData['mobile']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"mobile", $saveData['mobile'], [], 1)){
                 $staffInfo['mobile'] = '';
 //                throws('手机号已存在！');
             }

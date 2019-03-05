@@ -250,7 +250,8 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
         $sqlParams = $extParams['sqlParams'] ?? [];
         $sqlKeys = array_keys($sqlParams);
         foreach($sqlKeys as $tKey){
-            if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+            // if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+            if(isset($sqlParams[$tKey]) )  $queryParams[$tKey] = $sqlParams[$tKey];
         }
 
         if($useSearchParams) {
@@ -619,7 +620,9 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
             'operate_staff_id' => $user_id,
             'modifAddOprate' => 0,
         ];
-        $saveData = static::exeDBBusinessMethodCT($request, $controller, '',  'replaceById', $apiParams, $company_id, $notLog);
+        $methodName = 'replaceById';
+        if(isset($saveData['mini_openid']))  $methodName = 'replaceByIdWX';
+        $saveData = static::exeDBBusinessMethodCT($request, $controller, '',  $methodName, $apiParams, $company_id, $notLog);
         /*
         // 查询手机号是否已经有企业使用--账号表里查
         if( isset($saveData['mobile']) && self::judgeFieldExist($request, $controller, $id ,"mobile", $saveData['mobile'], $notLog)){
@@ -689,7 +692,7 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
 
         // 更新登陆缓存
         $redisKey = ( is_null($controller->redisKey) || empty($controller->redisKey) ) ? '' : $controller->redisKey;
-        if($controller->user_id == $id){
+        if($id > 0 && $controller->user_id == $id){
             $userInfo = $controller->user_info;
             $userInfo = array_merge($userInfo, $saveData);
             if (!empty($redisKey)) $controller->delUserInfo();// 是小程序，则先删除登陆缓存

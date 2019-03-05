@@ -91,6 +91,15 @@
                 </td>
             </tr>
             <tr>
+                <th>经纬度<span class="must"></span></th>
+                <td>
+                    <span class="latlngtxt">{{ $info['latitude'] or '纬度' }}，{{ $info['longitude'] or '经度' }}</span>
+                    <input type="hidden" name="latitude"  value="{{ $info['latitude'] or '' }}" />
+                    <input type="hidden" name="longitude"  value="{{ $info['longitude'] or '' }}" />
+                    <button  type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.selectLatLng(this)">选择经纬度</button>
+                </td>
+            </tr>
+            <tr>
                 <th>用户名<span class="must">*</span></th>
                 <td>
                     <input type="text" class="inp wnormal"  name="admin_username" value="{{ $info['admin_username'] or '' }}" placeholder="请输入用户名"/>
@@ -124,6 +133,8 @@
 <script type="text/javascript">
     var SAVE_URL = "{{ url('api/seller/staffShop/ajax_save') }}";// ajax保存记录地址
     var LIST_URL = "{{url('seller/staffShop')}}";//保存成功后跳转到的地址
+
+    var SELECT_LATLNG_URL = "{{url('seller/qqMaps/latLngSelect')}}";//选择经纬度的地址
 
     var PROVINCE_CHILD_URL  = "{{url('api/seller/city/ajax_get_child')}}";// 获得地区子区域信息
     var CITY_CHILD_URL  = "{{url('api/seller/city/ajax_get_child')}}";// 获得地区子区域信息

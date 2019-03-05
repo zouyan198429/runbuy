@@ -393,12 +393,16 @@ class CommonDB
      */
     public static function getList(&$modelObj,$queryParams,$relations){
 
-        // 查询条件
-        self::resolveSqlParams($modelObj, $queryParams);
-        $requestData = $modelObj->get();
-        // 查询关系参数
-        self::resolveRelations($requestData, $relations);
-        // $requestData->load($relations);
+        if(isset($queryParams['count']) ){// 查询总数
+            $requestData = self::resolveSqlParams($modelObj, $queryParams);
+        }else{
+            // 查询条件
+            self::resolveSqlParams($modelObj, $queryParams);
+            $requestData = $modelObj->get();
+            // 查询关系参数
+            self::resolveRelations($requestData, $relations);
+            // $requestData->load($relations);
+        }
         return $requestData;
     }
 

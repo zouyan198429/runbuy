@@ -812,7 +812,7 @@ class Tool
      *                        32 结束日期 不能大于 >  当前日；64 结束日期 不能等于 =  当前日；128 结束日期 不能小于 <  当前日
      *                        256 开始日期 不能大于 >  结束日期；512 开始日期 不能等于 =  结束日期；1024 开始日期 不能小于 <  结束日期
      * @param string $errDo 错误处理方式 1 throws 2直接返回错误
-     * @param string $nowTime 比较日期 格式 Y-m-d,默认为当前日期 Y-m-d
+     * @param string $nowTime 比较日期 格式 Y-m-d,默认为当前日期 Y-m-d; 需要时分秒时，可以传 date('Y-m-d H:i:s')
      * @param string $dateName 日期(默认); 时间
      * @return boolean 结果 true通过判断; sting 具体错误 ； throws 错误
      * @author zouyan(305463219@qq.com)
@@ -1054,6 +1054,7 @@ class Tool
         }
         return $result;
     }
+
 
     // 判断参数
     public static function judgeInitParams($paramName, $pramVal)

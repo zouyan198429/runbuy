@@ -2,6 +2,9 @@
 // 城市[三级分类]
 namespace App\Business\DB\RunBuy;
 
+use App\Services\Map\Map;
+use App\Services\Map\S2;
+use App\Services\Tool;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -59,6 +62,25 @@ class CityDBBusiness extends BasePublicDBBusiness
 
         if(isset($saveData['code']) && empty($saveData['code'])  ){
             throws('城市代码不能为空！');
+        }
+
+        // 如果有经纬度信息
+        if(isset($saveData['latitude'])){
+            $is_city_site = $saveData['is_city_site'] ?? ''; // 是否城市分站0不是1是
+            $latitude = $saveData['latitude'] ?? ''; // 纬度
+            $longitude = $saveData['longitude'] ?? ''; // 经度
+            if( $is_city_site == 1 && ( $latitude == '' || $longitude == '' || ($latitude == '0' && $longitude == '0') ) ){
+                throws('经纬度不能为空！');
+            }
+            $hashs = Map::getGeoHashs($latitude, $longitude);
+            $saveData['geohash'] = $hashs[0] ?? '';
+            $saveData['geohash3'] = $hashs[3] ?? '';
+            $saveData['geohash4'] = $hashs[4] ?? '';
+            $saveData['geohash5'] = $hashs[5] ?? '';
+            if(!is_numeric($latitude)) $latitude = 0;
+            if(!is_numeric($longitude)) $longitude = 0;
+            $saveData['lat'] = $latitude;
+            $saveData['lng'] = $longitude;
         }
 
         $parent_id = 0;
@@ -188,5 +210,99 @@ class CityDBBusiness extends BasePublicDBBusiness
         }
         DB::commit();
         return $id;
+    }
+    /**
+     * 根据id新加或修改单条数据-id 为0 新加，返回新的对象数组[-维],  > 0 ：修改对应的记录，返回true
+     *
+     * @param array $params 参数数组
+     * @param int  $company_id 企业id
+     * @param int  $reType 返回类型 1 最近的一个城市[一维数组] 2 所有城市 [二维数组]
+     * @param int  $formatType  所有城市 返回时，数据格式 1 直接返回 2 所有城市 [二维数组--小程序城市切换页] 4 所有城市 [二维数组--sort_num升序] 8 所有城市 [二维数组--字母升序]
+     * @param int $operate_staff_id 操作人id
+     * @return  array ，
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getNearCityByLatLong($params, $company_id, $reType = 1, $formatType = 1, $operate_staff_id = 0)
+    {
+
+        if (isset($params['latitude']) && empty($params['latitude'])) {
+            throws('纬度不能为空！');
+        }
+
+        if (isset($params['longitude']) && empty($params['longitude'])) {
+            throws('经度不能为空！');
+        }
+        $latitude = $params['latitude'];
+        $longitude = $params['longitude'];
+        // 获得所有城市
+        // 获得属性值
+        $queryParams = [
+            'where' => [
+                 ['is_city_site', '=' , 1],
+                // ['main_name', 'like', '' . $main_name . '%'],
+                // ['id', '&' , '16=16'],
+            ],
+            'select' => [
+                'id', 'parent_id', 'city_ids', 'city_name', 'code', 'head', 'initial', 'sort_num', 'longitude', 'latitude', 'is_city_site', 'city_type'
+            ],
+            // 'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],
+        ];
+        $cityListObj = static::getList($queryParams,[]);
+        $cityList = $cityListObj->toArray();
+        $distanceOrder = '';
+        if( ($reType & 1) == 1 || ($formatType & 2) == 2) $distanceOrder = 'asc';
+        Map::resolveDistance($cityList, $latitude, $longitude, $distanceOrder, 'latitude', 'longitude', '');
+
+        if( ($reType & 1) == 1 ) return $cityList[0] ?? [];
+        if( ($formatType & 4) == 4 ) {// 4 所有城市 [二维数组--sort_num升序]
+            $orderDistance = [
+                ['key' => 'sort_num', 'sort' => 'asc', 'type' => 'numeric'],
+                ['key' => 'id', 'sort' => 'desc', 'type' => 'numeric'],
+            ];
+            if (!empty($cityList)) {
+                $cityList = Tool::php_multisort($cityList, $orderDistance);
+                $cityList = array_values($cityList);
+            }
+        }
+        if( ($formatType & 1) == 1 || ($formatType & 4) == 4  ) return $cityList;
+
+        if( ($formatType & 2) == 2 || ($formatType & 8) == 8){// 按字母排序
+            $nearCity = [];
+            if( ($formatType & 2) == 2 ) $nearCity = $cityList[0] ?? [];// 最近的城市
+            $orderDistance = [
+                ['key' => 'initial', 'sort' => 'asc', 'type' => 'string'],
+                ['key' => 'head', 'sort' => 'asc', 'type' => 'string'],
+            ];
+            if(!empty($cityList)) {
+                $cityList = Tool::php_multisort($cityList, $orderDistance);
+                $cityList = array_values($cityList);
+            }
+            if( ($formatType & 8) == 8) return $cityList;
+
+            $searchLetter = array_values(array_unique(array_column($cityList, 'initial')));
+            $resultArr = [
+                'nearCity' => $nearCity,
+                'searchLetter' => $searchLetter,// ["A", "B", "C", "D", "E", "F", "G", "H","J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "W", "X", "Y", "Z"]
+                'cityList' => [],// ['initial'=> "A" ,'cityInfo' => [ ['id' => 1, 'parent_id' => 0, 'city_name' => '北京', 'code' => '110100', 'head' => 'BJ', 'initial' => 'B', 'distance' => 943260, 'distanceStr' => '943.26km'] ]]
+                'hotcityList' => [],// 热门城市 [{ cityCode: 110000, city: '北京市' }]
+            ];
+            // 整理城市和热门城市
+            $cityLetterArr = [];
+            $cityHot = [];
+            foreach($cityList as $k => $v){
+                $initial = $v['initial'] ?? '';
+                $cityType = $v['city_type'] ?? '';// 类型0普通1热门城市
+                // if(isset($v['longitude'])) unset($v['longitude']);
+                // if(isset($v['latitude'])) unset($v['latitude']);
+                if($cityType == 1) array_push($cityHot, $v); // 热门城市
+                $cityLetterArr[$initial]['initial'] = $initial;
+                $cityLetterArr[$initial]['cityInfo'][] = $v;
+            }
+            $resultArr['cityList'] = array_values($cityLetterArr);
+            $resultArr['hotcityList'] = $cityHot;
+            $cityList = $resultArr;
+        }
+        return $cityList;
+
     }
 }

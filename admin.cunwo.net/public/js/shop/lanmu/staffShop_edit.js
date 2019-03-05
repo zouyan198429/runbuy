@@ -199,6 +199,18 @@ function ajax_form(){
         return false;
     }
 
+    // 纬度
+    var latitude = $('input[name=latitude]').val();
+    var judge_latitude =  judge_validate(1,'纬度',latitude,false,'double','','');
+    // 经度
+    var longitude = $('input[name=longitude]').val();
+    var judge_longitude =  judge_validate(1,'经度',longitude,false,'double','','');
+    if(judge_latitude != '' || judge_longitude != ''){
+        layer_alert("请选择经纬度",3,0);
+        //err_alert('<font color="#000000">' + judge_seled + '</font>');
+        return false;
+    }
+
     var admin_username = $('input[name=admin_username]').val();
     if(!judge_validate(4,'用户名',admin_username,true,'length',6,20)){
         return false;
@@ -298,7 +310,29 @@ var otheraction = {
         });
         return false;
     },
+    selectLatLng: function(obj){// 选择经纬度
+        var recordObj = $(obj);
+        //获得表单各name的值
+        var weburl = SELECT_LATLNG_URL;
+        weburl += '?frm=1&lat=' +$('input[name=latitude]').val() + '&lng=' + $('input[name=longitude]').val();
+        console.log(weburl);
+        // go(SHOW_URL + id);
+        // location.href='/pms/Supplier/show?supplier_id='+id;
+        // var weburl = SHOW_URL + id;
+        // var weburl = '/pms/Supplier/show?supplier_id='+id+"&operate_type=1";
+        var tishi = '选择经纬度';//"查看供应商";
+        console.log('weburlLatLng', weburl);
+        layeriframe(weburl,tishi,900,450,0);
+        return false;
+    },
 };
+
+// 选择经纬度
+function latLngSelected(Lat, Lng) {
+    $('input[name=latitude]').val(Lat);
+    $('input[name=longitude]').val(Lng);
+    $('.latlngtxt').html(Lat + ',' + Lng);
+}
 
 
 // 获得选中的店铺id 数组

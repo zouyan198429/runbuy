@@ -85,7 +85,8 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
         $sqlParams = $extParams['sqlParams'] ?? [];
         $sqlKeys = array_keys($sqlParams);
         foreach($sqlKeys as $tKey){
-            if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+            // if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+            if(isset($sqlParams[$tKey]) )  $queryParams[$tKey] = $sqlParams[$tKey];
         }
 
         if($useSearchParams) {

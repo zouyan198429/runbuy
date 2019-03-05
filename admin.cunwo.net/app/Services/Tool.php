@@ -380,7 +380,6 @@ class Tool
     }
 
     // 保存session
-
     /**
      * 保存redis值-json/序列化保存
      * @param string 必填 $pre 前缀
@@ -407,14 +406,16 @@ class Tool
         $key = null;// 键名
         $pre = '';// 前缀
         $need_save_key = false; // 是否需要重新获得key
-        if($save_session){
+
+        if($save_session){// 使用seesion
             if (!session_id()) session_start();
-            $key = $_SESSION[$session_key] ?? '';
+            $key = $_SESSION[$session_key] ?? '';// session 中的key
             if(empty($key)){
                 $key = null;
                 $need_save_key = true;
             }
         }
+
         // 没有key则加前缀
         if(empty($key)){
             $pre = $key_pre;
@@ -422,7 +423,7 @@ class Tool
 
         $redisKey = self::setRedis($pre, $key, $value, $expire , $operate); // 1天
 
-        // key有变化
+        // 重新保存session , 用session 且 key有变化
         if($save_session && $need_save_key){
             if (!session_id()) session_start();
             $_SESSION[$session_key] = $redisKey;
@@ -809,7 +810,7 @@ class Tool
      *                        32 结束日期 不能大于 >  当前日；64 结束日期 不能等于 =  当前日；128 结束日期 不能小于 <  当前日
      *                        256 开始日期 不能大于 >  结束日期；512 开始日期 不能等于 =  结束日期；1024 开始日期 不能小于 <  结束日期
      * @param string $errDo 错误处理方式 1 throws 2直接返回错误
-     * @param string $nowTime 比较日期 格式 Y-m-d,默认为当前日期 Y-m-d
+     * @param string $nowTime 比较日期 格式 Y-m-d,默认为当前日期 Y-m-d  ; 需要时分秒时，可以传 date('Y-m-d H:i:s')
      * @param string $dateName 日期(默认); 时间
      * @return boolean 结果 true通过判断; sting 具体错误 ； throws 错误
      * @author zouyan(305463219@qq.com)

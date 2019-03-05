@@ -2,6 +2,7 @@
 // 店铺
 namespace App\Business\DB\RunBuy;
 
+use App\Services\Map\Map;
 use Illuminate\Support\Facades\DB;
 /**
  *
@@ -67,13 +68,31 @@ class ShopDBBusiness extends BasePublicDBBusiness
             throws('用户名不能为空！');
         }
 
+        // 如果有经纬度信息
+        if(isset($saveData['latitude'])){
+            $latitude = $saveData['latitude'] ?? ''; // 纬度
+            $longitude = $saveData['longitude'] ?? ''; // 经度
+            if($latitude == '' || $longitude == '' || ($latitude == '0' && $longitude == '0') ){
+                throws('经纬度不能为空！');
+            }
+            $hashs = Map::getGeoHashs($latitude, $longitude);
+            $saveData['geohash'] = $hashs[0] ?? '';
+            $saveData['geohash3'] = $hashs[3] ?? '';
+            $saveData['geohash4'] = $hashs[4] ?? '';
+            $saveData['geohash5'] = $hashs[5] ?? '';
+            if(!is_numeric($latitude)) $latitude = 0;
+            if(!is_numeric($longitude)) $longitude = 0;
+            $saveData['lat'] = $latitude;
+            $saveData['lng'] = $longitude;
+        }
+
         // 查询手机号是否已经有企业使用--账号表里查
-//        if( $id <= 0 && isset($saveData['mobile']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"mobile", $saveData['mobile'], [])){
+//        if( $id <= 0 && isset($saveData['mobile']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"mobile", $saveData['mobile'], [], 1)){
 //            throws('手机号已存在！');
 //        }
 
         // 用户名
-        if( $id <= 0 && isset($saveData['admin_username']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"admin_username", $saveData['admin_username'], [])){
+        if( $id <= 0 && isset($saveData['admin_username']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"admin_username", $saveData['admin_username'], [], 1)){
             throws('用户名已存在！');
         }
 
@@ -135,7 +154,7 @@ class ShopDBBusiness extends BasePublicDBBusiness
                 'operate_staff_id' => $operate_staff_id,
             ];
             // 电话已存在，则为空
-            if( isset($saveData['mobile']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"mobile", $saveData['mobile'], [])){
+            if( isset($saveData['mobile']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"mobile", $saveData['mobile'], [], 1)){
                 $staffInfo['mobile'] = '';
 //                throws('手机号已存在！');
             }

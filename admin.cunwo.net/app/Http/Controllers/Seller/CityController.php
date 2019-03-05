@@ -140,6 +140,8 @@ class CityController extends WorksController
         $code = CommonRequest::get($request, 'code');
         $is_city_site = CommonRequest::getInt($request, 'is_city_site');
         $city_type = CommonRequest::getInt($request, 'city_type');
+        $latitude = CommonRequest::get($request, 'latitude');
+        $longitude = CommonRequest::get($request, 'longitude');
         $sort_num = CommonRequest::getInt($request, 'sort_num');
 
         $saveData = [
@@ -147,6 +149,8 @@ class CityController extends WorksController
             'code' => $code,
             'is_city_site' => $is_city_site,
             'city_type' => $city_type,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
             'sort_num' => $sort_num,
 
             'province_id' => $province_id,
@@ -173,7 +177,7 @@ class CityController extends WorksController
      */
     public function ajax_alist(Request $request){
         $this->InitParams($request);
-        return  CTAPICityBusiness::getList($request, $this, 2 + 4);
+        return  CTAPICityBusiness::getList($request, $this, 2 + 4, [], ['feescale']);
     }
 
     /**

@@ -75,7 +75,8 @@ class CTAPICityBusiness extends BasicPublicCTAPIBusiness
         $sqlParams = $extParams['sqlParams'] ?? [];
         $sqlKeys = array_keys($sqlParams);
         foreach($sqlKeys as $tKey){
-            if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+            // if(isset($sqlParams[$tKey]) && !empty($sqlParams[$tKey]))  $queryParams[$tKey] = $sqlParams[$tKey];
+            if(isset($sqlParams[$tKey]) )  $queryParams[$tKey] = $sqlParams[$tKey];
         }
 
         if($useSearchParams) {
@@ -167,6 +168,10 @@ class CTAPICityBusiness extends BasicPublicCTAPIBusiness
                 if(isset($parentCitys[$t_pid]))  array_push($temCitys, $parentCitys[$t_pid]);
             }
             $data_list[$k]['cityPath'] = implode(' -> ', $temCitys);
+            // 收费标准
+            if(isset($v['feescale']) || is_null($v['feescale']) ){
+                $data_list[$k]['feescale_id'] = $v['feescale']['id'] ?? 0;
+            }
 //            // 公司名称
 //            $data_list[$k]['company_name'] = $v['company_info']['company_name'] ?? '';
 //            if(isset($data_list[$k]['company_info'])) unset($data_list[$k]['company_info']);
@@ -578,4 +583,46 @@ class CTAPICityBusiness extends BasicPublicCTAPIBusiness
     }
     // ***********通过组织条件获得kv***结束************************************************************
 
-}
+    /**
+     * 根据经纬度坐标，获得最近的城市信息
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param array $params 参数数组
+         [
+            'latitude',// 纬度
+            'longitude',// 经度
+        ]
+     * @param int  $reType 返回类型 1 最近的一个城市[一维数组] 2 所有城市
+     * @param int  $formatType  所有城市 返回时，数据格式 1 直接返回 2 所有城市 [二维数组--小程序城市切换页] 4 所有城市 [二维数组--sort_num升序] 8 所有城市 [二维数组--字母升序]
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 单条数据 - -维数组 为0 新加，返回新的对象数组[-维],  > 0 ：修改对应的记录，返回true
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getNearCityByLatLong(Request $request, Controller $controller, $params, $reType = 1, $formatType = 1, $notLog = 0)
+    {
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+
+        if (isset($params['latitude']) && empty($params['latitude'])) {
+            throws('纬度不能为空！');
+        }
+
+        if (isset($params['longitude']) && empty($params['longitude'])) {
+            throws('经度不能为空！');
+        }
+
+        // 调用新加或修改接口
+        $apiParams = [
+            'params' => $params,
+            'company_id' => $company_id,
+            'reType' => $reType,
+            'formatType' => $formatType,
+            'operate_staff_id' => $user_id,
+        ];
+        $methodName = 'getNearCityByLatLong';
+        $result = static::exeDBBusinessMethodCT($request, $controller, '', $methodName, $apiParams, $company_id, $notLog);
+
+        return $result;
+    }
+ }

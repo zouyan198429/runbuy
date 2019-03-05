@@ -98,7 +98,12 @@ function reset_list_self(is_read_page, ajax_async, reset_total){
     document.write("            <td><%=item.admin_username%><hr/><%=item.real_name%><\/td>");
     document.write("            <td><%=item.admin_type_text%><hr/><%=item.sex_text%><\/td>");
     document.write("            <td><%=item.tel%><hr/><%=item.mobile%><\/td>");
-    document.write("            <td><%=item.qq_number%><hr/><%=item.province_name%><%=item.city_name%><%=item.area_name%><%=item.addr%><\/td>");
+    // document.write("            <td><%=item.qq_number%><hr/><%=item.province_name%><%=item.city_name%><%=item.area_name%><%=item.addr%><\/td>");
+    document.write("           <td>");
+    document.write("            <%=item.qq_number%>");
+    document.write("            <hr/><%=item.province_name%><%=item.city_name%><%=item.area_name%><%=item.addr%>");
+    document.write("            <hr/><%=item.longitude%><br/><%=item.latitude%>");
+    document.write("           <\/td>");
     document.write("            <td><%=item.issuper_text%><hr/><%=item.account_status_text%><\/td>");
     document.write("            <td><%=item.lastlogintime%><\/td>");
     document.write("            <td>");

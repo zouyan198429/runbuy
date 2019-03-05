@@ -175,6 +175,7 @@ class IndexController extends WorksController
             'mobile' => $mobile,
             'real_name' => $real_name,
             'sex' => $sex,
+            'gender' => $sex,
             'tel' => $tel,
             'qq_number' => $qq_number,
         ];

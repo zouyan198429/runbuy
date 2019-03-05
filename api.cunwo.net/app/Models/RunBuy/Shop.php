@@ -19,8 +19,16 @@ class Shop extends BasePublicModel
         '4' => '冻结',
     ];
 
+    // status_business 经营状态  1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]
+    public $statusBusinessArr = [
+        '1' => '营业中',
+        '2' => '歇业中',
+        '4' => '停业中',
+        '8' => '关业中',
+    ];
+
     // 表里没有的字段
-    protected $appends = ['status_text'];
+    protected $appends = ['status_text', 'status_business_text'];
 
     /**
      * 获取状态文字
@@ -30,6 +38,16 @@ class Shop extends BasePublicModel
     public function getStatusTextAttribute()
     {
         return $this->statusArr[$this->status] ?? '';
+    }
+
+    /**
+     * 获取状态文字
+     *
+     * @return string
+     */
+    public function getStatusBusinessTextAttribute()
+    {
+        return $this->statusBusinessArr[$this->status_business] ?? '';
     }
 
     // 多对多

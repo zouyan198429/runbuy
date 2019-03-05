@@ -62,12 +62,13 @@ class ShopTypeController extends WorksController
         $info = [
             'id'=>$id,
           //   'department_id' => 0,
+            'resource_list' => [],
         ];
         $operate = "添加";
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIShopTypeBusiness::getInfoData($request, $this, $id, [], '');
+            $info = CTAPIShopTypeBusiness::getInfoData($request, $this, $id, [], [ 'siteResources']);
         }
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         $reDataArr['info'] = $info;
@@ -94,9 +95,21 @@ class ShopTypeController extends WorksController
         $type_name = CommonRequest::get($request, 'type_name');
         $sort_num = CommonRequest::getInt($request, 'sort_num');
 
+        // 图片资源
+        $resource_id = CommonRequest::get($request, 'resource_id');
+        if(is_string($resource_id) || is_numeric($resource_id)){
+            $resource_id = explode(',' ,$resource_id);
+        }
+
+        $resource_ids = implode(',', $resource_id);
+        if(!empty($resource_ids)) $resource_ids = ',' . $resource_ids . ',';
+
+
         $saveData = [
             'type_name' => $type_name,
             'sort_num' => $sort_num,
+            'resource_ids' => $resource_ids,// 图片资源id串(逗号分隔-未尾逗号结束)
+            'resourceIds' => $resource_id,// 此下标为图片资源关系
         ];
 
 //        if($id <= 0) {// 新加;要加入的特别字段
@@ -118,7 +131,7 @@ class ShopTypeController extends WorksController
      */
     public function ajax_alist(Request $request){
         $this->InitParams($request);
-        return  CTAPIShopTypeBusiness::getList($request, $this, 2 + 4);
+        return  CTAPIShopTypeBusiness::getList($request, $this, 2 + 4, [], ['siteResources']);
     }
 
     /**

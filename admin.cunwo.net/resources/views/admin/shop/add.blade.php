@@ -138,6 +138,15 @@
                 <input type="text" class="inp wnormal"  style="width:600px;"  name="addr" value="{{ $info['addr'] or '' }}" placeholder="请输入地址"/>
             </td>
             </tr>
+            <tr>
+                <th>经纬度<span class="must">*</span></th>
+                <td>
+                    <span class="latlngtxt">{{ $info['latitude'] or '纬度' }}，{{ $info['longitude'] or '经度' }}</span>
+                    <input type="hidden" name="latitude"  value="{{ $info['latitude'] or '' }}" />
+                    <input type="hidden" name="longitude"  value="{{ $info['longitude'] or '' }}" />
+                    <button  type="button"  class="btn btn-danger  btn-xs ace-icon fa fa-plus-circle bigger-60"  onclick="otheraction.selectLatLng(this)">选择经纬度</button>
+                </td>
+            </tr>
             @if( isset($info['id']) && $info['id'] <= 0 )
                 <tr>
                     <th>用户名<span class="must">*</span></th>
@@ -181,6 +190,8 @@
     var SAVE_URL = "{{ url('api/admin/shop/ajax_save') }}";// ajax保存记录地址
     var LIST_URL = "{{url('admin/shop')}}";//保存成功后跳转到的地址
 
+    var SELECT_LATLNG_URL = "{{url('admin/qqMaps/latLngSelect')}}";//选择经纬度的地址
+
     var PROVINCE_CHILD_URL  = "{{url('api/admin/city/ajax_get_child')}}";// 获得地区子区域信息
     var CITY_CHILD_URL  = "{{url('api/admin/city/ajax_get_child')}}";// 获得地区子区域信息
 
@@ -200,7 +211,7 @@
     var PIC_DEL_URL = "{{ url('api/admin/upload/ajax_del') }}";// 删除图片url
     var MULTIPART_PARAMS = {pro_unit_id:'0'};// 附加参数	函数或对象，默认 {}
     var LIMIT_FILES_COUNT = 1;//   限制文件上传数目	false（默认）或数字
-    var MULTI_SELECTION = false//  是否可用一次选取多个文件	默认 true false
+    var MULTI_SELECTION = false;//  是否可用一次选取多个文件	默认 true false
     var FLASH_SWF_URL = "{{asset('dist/lib/uploader/Moxie.swf') }}";// flash 上传组件地址  默认为 lib/uploader/Moxie.swf
     var SILVERLIGHT_XAP_URL = "{{asset('dist/lib/uploader/Moxie.xap') }}";// silverlight_xap_url silverlight 上传组件地址  默认为 lib/uploader/Moxie.xap  请确保在文件上传页面能够通过此地址访问到此文件。
     var SELF_UPLOAD = true;//  是否自己触发上传 TRUE/1自己触发上传方法 FALSE/0控制上传按钮

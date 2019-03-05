@@ -93,4 +93,13 @@ class City extends BasePublicModel
     {
         return $this->hasMany('App\Models\RunBuy\Prop', 'city_site_id', 'id');
     }
+
+    /**
+     * 获取关联到的收费标准---一维
+     */
+    public function feescale()
+    {
+        return $this->hasOne('App\Models\RunBuy\FeeScale', 'city_site_id', 'id');
+    }
+
 }

@@ -19,7 +19,7 @@
   <div class="mmhead" id="mywork">
 
     @include('common.pageParams')
-    <div class="tabbox" >
+    <div class="tabbox"  style="display:none;" >
       <a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加用户</a>
     </div>
     <form onsubmit="return false;" class="form-horizontal" role="form" method="post" id="search_frm" action="#">
@@ -89,7 +89,7 @@
       <th>用户名<hr/>真实姓名</th>
       <th>类型<hr/>性别</th>
       <th>电话<hr/>手机</th>
-      <th>QQ\email\微信<hr/>地址</th>
+      <th>QQ\email\微信<hr/>地址<hr/>经纬度</th>
       <th>是否超级帐户<hr/>状态</th>
       <th>最近登陆</th>
       <th style="width: 150px;">操作</th>

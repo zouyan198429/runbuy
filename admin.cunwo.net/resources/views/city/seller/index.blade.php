@@ -76,15 +76,15 @@
           <span class="lbl">全选</span>
         </label>
       </th>
-      <th>ID</th>
+      {{--<th>ID</th>--}}
       <th>城市分站</th>
       <th>城市代理</th>
       <th>商户名称</th>
       <th>联系人</th>
       <th>手机</th>
       <th>电话</th>
-      <th>所在地址</th>
-      <th>介绍</th>
+      <th>所在地址<hr/>经纬度</th>
+      {{--<th>介绍</th>--}}
       <th>状态</th>
       <th style="width: 150px;">操作</th>
     </tr>

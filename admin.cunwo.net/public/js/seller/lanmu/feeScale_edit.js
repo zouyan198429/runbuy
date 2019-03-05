@@ -68,10 +68,10 @@ function ajax_form(){
         return false;
     }
 
-    var title = $('input[name=title]').val();
-    if(!judge_validate(4,'标题',title,true,'length',1,50)){
-        return false;
-    }
+    // var title = $('input[name=title]').val();
+    // if(!judge_validate(4,'标题',title,true,'length',1,50)){
+    //     return false;
+    // }
 
     var content = $('textarea[name=content]').val();
     if(!judge_validate(4,'内容',content,true,'length',3,1005000)){

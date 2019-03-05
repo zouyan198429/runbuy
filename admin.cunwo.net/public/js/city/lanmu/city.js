@@ -68,6 +68,29 @@ var otheraction = {
         layuiGoIframe(href, text);
         return false;
     },
+    feeScale: function(obj, id, city_site_id, text){// 收费标准管理
+        var obj = $(obj);
+        //获得表单各name的值
+        var data = get_frm_values(SURE_FRM_IDS);// {} parent.get_frm_values(SURE_FRM_IDS)
+        console.log(FEESCALE_MODIFY_URL);
+        console.log(data);
+        data.city_site_id = city_site_id;
+        var url_params = get_url_param(data);// parent.get_url_param(data)
+        var weburl = FEESCALE_MODIFY_URL + id + '?' + url_params;
+        console.log(weburl);
+        // go(SHOW_URL + id);
+        // location.href='/pms/Supplier/show?supplier_id='+id;
+        // var weburl = SHOW_URL + id;
+        // var weburl = '/pms/Supplier/show?supplier_id='+id+"&operate_type=1";
+        var tishi = text;//"添加/修改供应商";
+        var operateText = "添加";
+        if(id > 0){
+            operateText = "修改";
+        }
+        tishi = operateText + tishi;
+        layeriframe(weburl,tishi,950,600,IFRAME_MODIFY_CLOSE_OPERATE);
+        return false;
+    },
 };
 (function() {
     document.write("");
@@ -91,7 +114,11 @@ var otheraction = {
     document.write("                <\/label>");
     document.write("            <\/td>");
     document.write("            <td><%=item.id%><\/td>");
-    document.write("            <td><%=item.cityPath%><\/td>");
+    // document.write("            <td><%=item.cityPath%><\/td>");
+    document.write("           <td>");
+    document.write("            <%=item.cityPath%>");
+    document.write("            <hr/><%=item.longitude%><br/><%=item.latitude%>");
+    document.write("           <\/td>");
     document.write("            <td><%=item.city_name%><\/td>");
     document.write("            <td><%=item.code%><\/td>");
     document.write("            <td><%=item.head%><\/td>");
@@ -117,6 +144,9 @@ var otheraction = {
     document.write("                <%if(  item.is_city_site == 1){%>");
     document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.notice(this,<%=item.id%>,'<%=item.city_name%>-公告管理')\">");
     document.write("                    <i class=\"ace-icon fa fa-sticky-note-o bigger-60\"> 公告管理<\/i>");
+    document.write("                <\/a>");
+    document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.feeScale(this,<%=item.feescale_id%>,<%=item.id%>,'<%=item.city_name%>-收费标准')\">");
+    document.write("                    <i class=\"ace-icon fa fa-handshake-o bigger-60\"> 收费标准<\/i>");
     document.write("                <\/a>");
     document.write("                <%}%>");
     document.write("            <\/td>");
