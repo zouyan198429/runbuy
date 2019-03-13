@@ -304,6 +304,14 @@ Route::get('admin/labels/add/{id}', 'Admin\LabelsController@add');// 添加
 Route::get('admin/labels/export', 'Admin\LabelsController@export');// 导出
 Route::get('admin/labels/import_template', 'Admin\LabelsController@import_template');// 导入模版
 
+// 地址
+Route::get('admin/commonAddr', 'Admin\CommonAddrController@index');// 列表
+Route::get('admin/commonAddr/add/{id}', 'Admin\CommonAddrController@add');// 添加
+// Route::get('admin/commonAddr/select', 'Admin\CommonAddrController@select');// 选择-弹窗
+Route::get('admin/commonAddr/export', 'Admin\CommonAddrController@export');// 导出
+Route::get('admin/commonAddr/import_template', 'Admin\CommonAddrController@import_template');// 导入模版
+
+
 // 公告
 Route::get('admin/notice', 'Admin\NoticeController@index');// 列表
 Route::get('admin/notice/add/{id}', 'Admin\NoticeController@add');// 添加

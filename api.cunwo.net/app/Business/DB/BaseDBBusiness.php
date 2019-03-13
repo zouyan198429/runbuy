@@ -145,7 +145,7 @@ class BaseDBBusiness
     }
 
     /**
-     * 批量新加接口-data只能返回成功true:失败:false
+     * 批量新加接口-data只能返回成功true:失败:false--里面也是一条一条加入的
      *
      * @param array $dataParams 需要新的数据-- 二维数组
      * @param string $primaryKey 默认自增列被命名为 id，如果你想要从其他“序列”获取ID
@@ -164,8 +164,8 @@ class BaseDBBusiness
     /**
      * 修改接口--按条件修改
      *
-     * @param string $dataParams 字段数组/json字符
-     * @param string $queryParams 条件数组/json字符
+     * @param array $dataParams 字段数组/json字符
+     * @param array $queryParams 条件数组/json字符
      * @return mixed Response
      * @author zouyan(305463219@qq.com)
      */
@@ -211,7 +211,7 @@ class BaseDBBusiness
      *
      * @param int $company_id 公司id
      * @param string $Model_name model名称
-     * @param string $queryParams 条件数组/json字符
+     * @param array $queryParams 条件数组/json字符
      * @return mixed Response
      * @author zouyan(305463219@qq.com)
      */
@@ -242,6 +242,7 @@ class BaseDBBusiness
 
     /**
      * 获得model所有记录-- 查询/所有记录分批获取[推荐],也可以获得总数量
+     * 注意如果想要数组，记得 ->toArray()
      *
      * @param json/array $queryParams 查询条件  有count下标则是查询数量--是否是查询总数
 
@@ -266,6 +267,7 @@ class BaseDBBusiness
       //              'count' => 0,//  有count下标则是查询数量--是否是查询总数
     //        ];
      * @param json/array $relations 要查询的与其它表的关系
+     * @param int $reType 返回数据类型 1 返回对象 2 返回数组 , $reType = 1
      * @return object 数据对象
      * @author zouyan(305463219@qq.com)
      */
@@ -273,7 +275,11 @@ class BaseDBBusiness
 //        $modelObj = null;
 //        Common::getObjByModelName(static::$model_name, $modelObj);
         static::getModelObj($modelObj );
-        return CommonDB::getAllModelDatas($modelObj, $queryParams, $relations);
+        $obj = CommonDB::getAllModelDatas($modelObj, $queryParams, $relations);
+//        if($reType == 2 && is_object($obj)){
+//            return $obj->toArray();
+//        }
+        return $obj;
     }
 
 

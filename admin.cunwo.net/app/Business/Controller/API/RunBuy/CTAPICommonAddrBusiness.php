@@ -1,39 +1,18 @@
 <?php
-// 店铺商品
+// 支付配置
 namespace App\Business\Controller\API\RunBuy;
 
-use App\Business\API\RunBuy\ShopGoodsHistoryAPIBusiness;
+
 use App\Services\Excel\ImportExport;
 use App\Services\Request\API\HttpRequest;
 use App\Services\Tool;
 use Illuminate\Http\Request;
 use App\Services\Request\CommonRequest;
 use App\Http\Controllers\BaseController as Controller;
-class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
+class CTAPICommonAddrBusiness extends BasicPublicCTAPIBusiness
 {
-    public static $model_name = 'API\RunBuy\ShopGoodsAPI';
+    public static $model_name = 'API\RunBuy\CommonAddrAPI';
 
-    // 热销1非热销2热销
-    public static $isHotArr = [
-        '1' => '非热销',
-        '2' => '热销',
-    ];
-
-    // 是否上架1上架2下架
-    public static $isSaleArr = [
-        '1' => '上架',
-        '2' => '下架',
-    ];
-
-    public static $orderProp = [
-        ['key' => 'prop_id', 'sort' => 'asc', 'type' => 'numeric'],
-        ['key' => 'prop_val_id', 'sort' => 'asc', 'type' => 'numeric'],
-    ];
-
-    public static $pricePropVals = [
-        ['key' => 'sort_num', 'sort' => 'desc', 'type' => 'numeric'],
-        ['key' => 'id', 'sort' => 'asc', 'type' => 'numeric'],
-    ];
     /**
      * 获得列表数据--所有数据
      *
@@ -73,7 +52,7 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
 //                //,'operate_staff_id','operate_staff_id_history'
 //                ,'created_at'
 //            ],
-            'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],//
+            'orderBy' => [ 'id'=>'desc'],// 'sort_num'=>'desc',
         ];// 查询条件参数
         if(empty($queryParams)){
             $queryParams = $defaultQueryParams;
@@ -91,28 +70,13 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
 
         if($useSearchParams) {
             // $params = self::formatListParams($request, $controller, $queryParams);
+//            $province_id = CommonRequest::getInt($request, 'province_id');
+//            if($province_id > 0 )  array_push($queryParams['where'], ['city_ids', 'like', '' . $province_id . ',%']);
+            $ower_type = CommonRequest::getInt($request, 'ower_type');
+            if($ower_type > 0 )  array_push($queryParams['where'], ['ower_type', '=', $ower_type]);
 
-            $city_site_id = CommonRequest::getInt($request, 'city_site_id');
-            if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
-
-            $city_partner_id = CommonRequest::getInt($request, 'city_partner_id');
-            if($city_partner_id > 0 )  array_push($queryParams['where'], ['city_partner_id', '=', $city_partner_id]);
-
-            $seller_id = CommonRequest::getInt($request, 'seller_id');
-            if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);
-
-            $shop_id = CommonRequest::getInt($request, 'shop_id');
-            if($shop_id > 0 )  array_push($queryParams['where'], ['shop_id', '=', $shop_id]);
-
-            $type_id = CommonRequest::getInt($request, 'type_id');
-            if($type_id > 0 )  array_push($queryParams['where'], ['type_id', '=', $type_id]);
-
-            $is_hot = CommonRequest::getInt($request, 'is_hot');
-            if($is_hot > 0 )  array_push($queryParams['where'], ['is_hot', '=', $is_hot]);
-
-            $is_sale = CommonRequest::getInt($request, 'is_sale');
-            if($is_sale > 0 )  array_push($queryParams['where'], ['is_sale', '=', $is_sale]);
-
+            $ower_id = CommonRequest::getInt($request, 'ower_id');
+            if($ower_id > 0 )  array_push($queryParams['where'], ['ower_id', '=', $ower_id]);
 
             $field = CommonRequest::get($request, 'field');
             $keyWord = CommonRequest::get($request, 'keyword');
@@ -138,60 +102,13 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
         // 格式化数据
         $data_list = $result['data_list'] ?? [];
         foreach($data_list as $k => $v){
-            // 城市分站名称
-            $data_list[$k]['site_name'] = $v['city']['city_name'] ?? '';
-            // $data_list[$k]['site_id'] = $v['city']['id'] ?? 0;
-            if(isset($data_list[$k]['city'])) unset($data_list[$k]['city']);
-            // 城市城市合伙人
-            $data_list[$k]['partner_name'] = $v['city_partner']['partner_name'] ?? '';
-            // $data_list[$k]['partner_id'] = $v['city_partner']['id'] ?? 0;
-            if(isset($data_list[$k]['city_partner'])) unset($data_list[$k]['city_partner']);
-            // 商家
-            $data_list[$k]['seller_name'] = $v['seller']['seller_name'] ?? '';
-            // $data_list[$k]['seller_id'] = $v['seller']['id'] ?? 0;
-            if(isset($data_list[$k]['seller'])) unset($data_list[$k]['seller']);
-            // 铺店
-            $data_list[$k]['shop_name'] = $v['shop']['shop_name'] ?? '';
-            // $data_list[$k]['shop_id'] = $v['shop']['id'] ?? 0;
-            if(isset($data_list[$k]['shop'])) unset($data_list[$k]['shop']);
-            // 分类
-            $data_list[$k]['type_name'] = $v['type']['type_name'] ?? '';
-            // $data_list[$k]['type_id'] = $v['type']['id'] ?? 0;
-            if(isset($data_list[$k]['type'])) unset($data_list[$k]['type']);
-
-            // 资源url
-            $resource_list = [];
-            if(isset($v['site_resources'])){
-                Tool::resourceUrl($v, 2);
-                $resource_list = Tool::formatResource($v['site_resources'], 2);
-                unset($data_list[$k]['site_resources']);
-            }
-            $data_list[$k]['resource_list'] = $resource_list;
-            // 价格处理
-            $priceList = [];
-            $price_type = $v['price_type'] ?? 1;// 是否有价格属性1没有2有
-            if($price_type == 1){
-                array_push($priceList, ['price_id' => 0, 'prop_id' => 0, 'prop_name' => '', 'prop_val_id' => 0, 'price_name' => '', 'price_val' => $v['price'] ?? 0]);
-            }
-            // 价格属性
-            $price_props = $v['price_props'] ?? [];
-            if($price_type == 2) {
-                // 排序
-                if(!empty($price_props)) $price_props = Tool::php_multisort($price_props, self::$pricePropVals);
-                foreach ($price_props as $t_v) {
-                    $prop_name = $t_v['prop_name']['main_name'] ?? '';
-                    array_push($priceList, [
-                        'price_id' => $t_v['id']
-                        , 'prop_id' => $t_v['prop_id']
-                        , 'prop_name' => $prop_name
-                        , 'prop_val_id' => $t_v['prop_val_id']
-                        , 'price_name' => $t_v['prop_val']['name']['main_name'] ?? ''
-                        , 'price_val' => $t_v['price'] ?? 0
-                    ]);
-                }
-                if(isset($v['price_props'])) unset($data_list[$k]['price_props']);
-            }
-            $data_list[$k]['price_list'] = $priceList;
+            // 所属人员
+            $data_list[$k]['nickname'] = $v['staff']['nickname'] ?? '';
+            $data_list[$k]['staff_id'] = $v['staff']['id'] ?? 0;
+            if(isset($data_list[$k]['staff'])) unset($data_list[$k]['staff']);
+//            // 公司名称
+//            $data_list[$k]['company_name'] = $v['company_info']['company_name'] ?? '';
+//            if(isset($data_list[$k]['company_info'])) unset($data_list[$k]['company_info']);
         }
         $result['data_list'] = $data_list;
         // 导出功能
@@ -227,33 +144,6 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
 //            'id' => $company_id,
 //        ];
 //        static::judgePowerByObj($request, $controller, $info, $judgeData );
-        // 店铺
-        $shop_name = $info['shop_history']['shop_name'] ?? '';
-        if(empty($shop_name)) $shop_name = $info['shop']['shop_name'] ?? '';
-        $info['shop_name'] = $shop_name;
-        $now_shop_state = 0;// 最新的商家 0没有变化 ;1 已经删除  2 试卷不同
-        if(isset($info['shop_history']) && isset($info['shop'])){
-            $history_version_num = $info['shop_history']['version_num'] ?? '';
-            $version_num = $info['shop']['version_num'] ?? '';
-            if(empty($info['shop'])){
-                $now_shop_state = 1;
-            }elseif($version_num != '' && $history_version_num != $version_num){
-                $now_shop_state = 2;
-            }
-        }
-        if(isset($info['shop_history'])) unset($info['shop_history']);
-        if(isset($info['shop'])) unset($info['shop']);
-        $info['now_shop_state'] = $now_shop_state;
-
-        // 资源url
-        $resource_list = [];
-        if(isset($info['site_resources'])){
-            Tool::resourceUrl($info, 2);
-            $resource_list = Tool::formatResource($info['site_resources'], 2);
-            unset($info['site_resources']);
-        }
-        $info['resource_list'] = $resource_list;
-
         return $info;
     }
 
@@ -308,7 +198,7 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
         // 前**条[默认]
         $defaultQueryParams = [
             'where' => [
-              //  ['company_id', $company_id],
+                //  ['company_id', $company_id],
 //                ['id', '>', $id],
             ],
 //            'select' => [
@@ -404,8 +294,16 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
     public static function replaceById(Request $request, Controller $controller, $saveData, &$id, $modifAddOprate = false, $notLog = 0){
         $company_id = $controller->company_id;
         $user_id = $controller->user_id;
-        if(isset($saveData['goods_name']) && empty($saveData['goods_name'])  ){
-            throws('商品名称不能为空！');
+        if(isset($saveData['real_name']) && empty($saveData['real_name'])  ){
+            throws('联系人不能为空！');
+        }
+
+        if(isset($saveData['mobile']) && empty($saveData['mobile'])  ){
+            throws('手机不能为空！');
+        }
+
+        if(isset($saveData['addr']) && empty($saveData['addr'])  ){
+            throws('详细地址不能为空！');
         }
 
         // 调用新加或修改接口
@@ -418,9 +316,8 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
         ];
         $id = static::exeDBBusinessMethodCT($request, $controller, '',  'replaceById', $apiParams, $company_id, $notLog);
         return $id;
-//        $isModify = false;
+//        $company_id = $controller->company_id;
 //        if($id > 0){
-//            $isModify = true;
 //            // 判断权限
 ////            $judgeData = [
 ////                'company_id' => $company_id,
@@ -431,24 +328,14 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
 //
 //        }else {// 新加;要加入的特别字段
 //            $addNewData = [
-//               // 'company_id' => $company_id,
+//                //  'company_id' => $company_id,
 //            ];
 //            $saveData = array_merge($saveData, $addNewData);
 //            // 加入操作人员信息
 //            static::addOprate($request, $controller, $saveData);
 //        }
 //        // 新加或修改
-//        $result =  static::replaceByIdBase($request, $controller, '', $saveData, $id, $notLog);
-//        if($isModify){
-//            // 判断版本号是否要+1
-//            $historySearch = [
-//                //  'company_id' => $company_id,
-//                'goods_id' => $id,
-//            ];
-//            static::compareHistoryOrUpdateVersion($request, $controller, '' , $id, ShopGoodsHistoryAPIBusiness::$model_name
-//                , 'shop_goods_history', $historySearch, ['goods_id'], 1, $company_id);
-//        }
-//        return $result;
+//        return static::replaceByIdBase($request, $controller, '', $saveData, $id, $notLog);
     }
 
     // ***********导入***开始************************************************************
@@ -521,15 +408,14 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
     // ***********导入***结束************************************************************
 
     // ***********获得kv***开始************************************************************
-
     // 根据父id,获得子数据kv数组
     public static function getCityByPid(Request $request, Controller $controller, $parent_id = 0, $notLog = 0){
         $company_id = $controller->company_id;
-        $kvParams = ['key' => 'id', 'val' => 'city_name'];
+        $kvParams = ['key' => 'id', 'val' => 'type_name'];
         $queryParams = [
             'where' => [
                 // ['id', '&' , '16=16'],
-                ['parent_id', '=', $parent_id],
+                //    ['parent_id', '=', $parent_id],
                 //['mobile', $keyword],
                 //['admin_type',self::$admin_type],
             ],
@@ -539,7 +425,7 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
 //            'select' => [
 //                'id','company_id','type_name','sort_num'
 //            ],
-            'orderBy' => ['sort_num'=>'desc', 'id'=>'asc'],
+            'orderBy' => [ 'id'=>'desc'],// 'sort_num'=>'desc',
         ];
         return static::getKVCT( $request,  $controller, '', $kvParams, [], $queryParams, $company_id, $notLog);
     }
@@ -561,7 +447,7 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
 //            'select' => [
 //                'id','company_id','type_name','sort_num'
 //            ],
-            'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],
+            'orderBy' => [ 'id'=>'desc'],// 'sort_num'=>'desc',
         ];
         return static::getKVCT( $request,  $controller, '', $kvParams, [], $queryParams, $company_id, $notLog);
     }
@@ -584,7 +470,6 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
         $department_list = $parentData['result']['data_list'] ?? [];
         return Tool::formatArrKeyVal($department_list, 'id', 'city_name');
     }
-
     /**
      * 获得列表数据--所有数据
      *
@@ -606,10 +491,10 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
                 ['parent_id', $pid],
             ],
             'select' => [
-                'id','city_name','sort_num'
+                'id','city_name'// ,'sort_num'
                 //,'operate_staff_id','operate_staff_history_id'
             ],
-            'orderBy' => ['sort_num'=>'desc','id'=>'asc'],
+            'orderBy' => ['id'=>'asc'],// 'sort_num'=>'desc',
         ];// 查询条件参数
         // $relations = ['CompanyInfo'];// 关系
         $relations = '';//['CompanyInfo'];// 关系
@@ -626,103 +511,4 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
     }
     // ***********通过组织条件获得kv***结束************************************************************
 
-    /**
-     * 获得商品属性数据--根据商品id
-     *
-     * @param Request $request 请求信息
-     * @param Controller $controller 控制对象
-     * @param int $notLog 是否需要登陆 0需要1不需要
-     * @return  array 商品属性数据
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function getPropByGoodId(Request $request, Controller $controller, $notLog = 0){
-        $good_id = CommonRequest::getInt($request, 'good_id');
-        $company_id = $controller->company_id;
-        $user_id = $controller->user_id;
-        // 调用获得商品及属性数据--根据商品id接口
-        $apiParams = [
-            'company_id' => $company_id,
-            'good_id' => $good_id,
-            'operate_staff_id' => $user_id,
-        ];
-        $info = static::exeDBBusinessMethodCT($request, $controller, '',  'getPropIdsByKey', $apiParams, $company_id, $notLog);
-        // 判断权限
-//        $judgeData = [
-//            // 'company_id' => $company_id,
-//            'id' => $company_id,
-//        ];
-//        static::judgePowerByObj($request, $controller, $info, $judgeData );
-        return $info['propList'] ?? [];
-    }
-    /**
-     * 格式化商品属性
-     *
-     * @param array $props 商品表关系获得的商品属性
-     * @param array $formatCartPropArr 已有的商品属性 ['属性id' => ['属性值id',...]]
-     * @return  array 商品属性数据
-     *
-        [
-        {
-            "prop_table_id": 1,
-            "sort_num": 5,
-            "prop_id": 3,
-            "prop_name": "糖量",
-            "is_multi": 0,
-            "is_must": 0,
-            "prop_vals": [
-                {
-                    "prop_val_id": 9,
-                    "prop_val_name": "多糖"
-                },
-                {
-                    "prop_val_id": 10,
-                    "prop_val_name": "中糖"
-                },
-                {
-                    "prop_val_id": 12,
-                    "prop_val_name": "无糖"
-                }
-            ]
-        },
-        ]
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function formatProps($props, $formatCartPropArr = []){
-        // 排序
-        $propDistance = [
-            ['key' => 'sort_num', 'sort' => 'desc', 'type' => 'numeric'],
-            ['key' => 'id', 'sort' => 'desc', 'type' => 'numeric'],
-        ];
-        $props = Tool::php_multisort($props, $propDistance);
-        $props = array_values($props);
-        $format_props = [];
-        foreach($props as $p_k => $p_v){
-            $table_id = $p_v['id'];
-            $is_multi = $p_v['is_multi'];
-            $is_must = $p_v['is_must'];
-            $sort_num = $p_v['sort_num'];
-
-            $prop_id = $p_v['prop_id'];
-            $prop_name = $p_v['prop_name']['main_name'] ?? '';
-            $prop_val_id = $p_v['prop_val_id'];
-            $prop_val_name = $p_v['prop_val_name']['main_name'] ?? '';
-            if(!isset($format_props[$prop_id])) $format_props[$prop_id] = [
-                'prop_id' => $prop_id,
-                'prop_name' => $prop_name,
-                'is_multi' => $is_multi,
-                'is_must' => $is_must,
-            ];
-            $checked = 0;
-            $seledPvArr = $formatCartPropArr[$prop_id] ?? [];
-            if(in_array($prop_val_id, $seledPvArr)) $checked = 1;
-            $format_props[$prop_id]['prop_vals'][] = [
-                'prop_table_id' => $table_id,
-                'sort_num' => $sort_num,
-                'prop_val_id' => $prop_val_id,
-                'prop_val_name' => $prop_val_name,
-                'checked' => $checked,// 是否选中 0 未选中 1选中
-            ];
-        }
-        return array_values($format_props);
-    }
 }

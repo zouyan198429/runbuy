@@ -252,7 +252,7 @@ class ShopGoodsController extends WorksController
     public function ajax_alist(Request $request){
         $this->InitParams($request);
         return  CTAPIShopGoodsBusiness::getList($request, $this, 2 + 4, [], ['city', 'cityPartner', 'seller'
-            , 'shop', 'type', 'siteResources', 'priceProps.propVal.name']);
+            , 'shop', 'type', 'siteResources', 'priceProps.propVal.name', 'priceProps.propName']);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\WX;
 
 use App\Business\Controller\API\RunBuy\CTAPIShopGoodsBusiness;
+use App\Services\Tool;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -20,20 +21,38 @@ class ShopGoodsController extends BaseController
         // $this->InitParams($request);
         // $resultDatas = [];
         // return ajaxDataArr(1, $resultDatas, '');
+        CTAPIShopGoodsBusiness::mergeRequest($request, $this, [
+            'is_sale' => 1,// 是否上架1上架2下架
+        ]);
         $result =  CTAPIShopGoodsBusiness::getList($request, $this, 2 + 4, [], ['city', 'cityPartner', 'seller'
-            , 'shop', 'type', 'siteResources', 'priceProps.propVal.name']); //
+            , 'shop', 'type', 'siteResources', 'priceProps.propVal.name', 'priceProps.propName', 'props.propName', 'props.propValName']); //
         $data_list = $result['result']['data_list'] ?? [];
         $temDataList = [];
         foreach($data_list as $k => $v){
+
+            // 属性及属性值处理
+            $props = $v['props'] ?? [];
+            $format_props = CTAPIShopGoodsBusiness::formatProps($props);
             $goods_name =  $v['goods_name'] ?? '';
-            $price_list = $v['price_list'] ?? [];
+            $price_list = $v['price_list'] ?? [];// 价格属性
             $resource_url = $v['resource_list'][0]['resource_url'] ?? '';
             $temInfo = [
                 'id' => $v['id'],
+                'is_sale' => $v['is_sale'],
                 'goods_name' => $goods_name,
                 'resource_url' => $resource_url,
                 'is_hot' => $v['is_hot'],
                 'is_hot_text' => $v['is_hot_text'] ?? '',
+                'props' => $format_props,
+
+
+                'price_val' => $v['price'] ?? '',
+                'price_name' => '',
+                'price_id' => 0,
+                'prop_id' => 0,
+                'prop_name' => '',
+                'prop_val_id' => 0,
+                'goods_name_full' => $goods_name,
             ];
             foreach($price_list as $t_v){
                 $tPriceArr = $temInfo;
@@ -45,6 +64,7 @@ class ShopGoodsController extends BaseController
                     'price_name' => $price_name,
                     'price_id' => $t_v['price_id'] ?? '0',
                     'prop_id' => $t_v['prop_id'] ?? '0',
+                    'prop_name' => $t_v['prop_name'] ?? '',
                     'prop_val_id' => $t_v['prop_val_id'] ?? '0',
                     'goods_name_full' => $goods_name_full,
                 ]);

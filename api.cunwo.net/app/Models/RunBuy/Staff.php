@@ -134,4 +134,11 @@ class Staff extends BasePublicModel
         return $this->belongsTo('App\Models\RunBuy\Shop', 'shop_id', 'id');
     }
 
+    /**
+     * 获取员工的地址-二维
+     */
+    public function address()
+    {
+        return $this->hasMany('App\Models\RunBuy\CommonAddr', 'ower_id', 'id');
+    }
 }

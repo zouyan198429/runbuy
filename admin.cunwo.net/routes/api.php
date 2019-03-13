@@ -217,8 +217,22 @@ Route::post('admin/labels/ajax_get_child', 'Admin\LabelsController@ajax_get_chil
 Route::post('admin/labels/ajax_get_areachild', 'Admin\LabelsController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 Route::post('admin/labels/ajax_import_staff','Admin\LabelsController@ajax_import'); // 导入员工
 
+
 Route::post('admin/labels/import', 'Admin\LabelsController@import');// 导入excel
 Route::post('admin/labels/ajax_get_ids', 'Admin\LabelsController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
+
+//地址[一级分类]
+Route::any('admin/commonAddr/ajax_alist', 'Admin\CommonAddrController@ajax_alist');//ajax获得列表数据
+Route::post('admin/commonAddr/ajax_del', 'Admin\CommonAddrController@ajax_del');// 删除
+Route::post('admin/commonAddr/ajax_save', 'Admin\CommonAddrController@ajax_save');// 新加/修改
+Route::post('admin/commonAddr/ajax_get_child', 'Admin\CommonAddrController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('admin/commonAddr/ajax_get_areachild', 'Admin\CommonAddrController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('admin/commonAddr/ajax_import_staff','Admin\CommonAddrController@ajax_import'); // 导入员工
+
+
+Route::post('admin/commonAddr/import', 'Admin\CommonAddrController@import');// 导入excel
+Route::post('admin/commonAddr/ajax_get_ids', 'Admin\CommonAddrController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
 //公告
 Route::any('admin/notice/ajax_alist', 'Admin\NoticeController@ajax_alist');//ajax获得列表数据
@@ -940,16 +954,27 @@ Route::any('shopGoods/ajax_alist', 'WX\ShopGoodsController@ajax_alist');//ajax�
 Route::any('shopGoodsType/ajax_alist', 'WX\ShopGoodsTypeController@ajax_alist');//ajax获得列表数据
 
 // 购物车相关的
-Route::any('cart/addGood', 'WX\CartController@addGood');// 添加单个商品到购物车，已有的，数量+n
+Route::any('cart/ajax_save', 'WX\CartController@ajax_save');// 添加单个商品到购物车，已有的，数量+n
 // Route::any('cart/addGoodCount', 'WX\CartController@addGoodCount');// 修改商品数量
-Route::any('cart/getGoods', 'WX\CartController@getGoods');//获得当前用户所有的购物车商品，按商户分组
-Route::any('cart/removeGood', 'WX\CartController@removeGood');//  移除商品
-Route::any('cart/empty', 'WX\CartController@empty');// 清空用户的购物车
+Route::any('cart/ajax_initCart', 'WX\CartController@ajax_initCart');// 根据城市id,获得购物车数据
+// Route::any('cart/ajax_alist', 'WX\CartController@ajax_alist');//获得当前用户所有的购物车商品，按商户分组
+// Route::any('cart/ajax_del', 'WX\CartController@ajax_del');//  移除商品
+Route::any('cart/ajax_del_shop', 'WX\CartController@ajax_del_shop');//  移除商品--通过店铺id
+// Route::any('cart/empty', 'WX\CartController@empty');// 清空用户的购物车
+Route::any('cart/ajax_prop', 'WX\CartController@ajax_prop');//  购物车商品属性操作 good_prop_table_id  多个用逗号分隔, 0 ：代表一个都没有选
+
 // 收货地址
-Route::any('address/add', 'WX\AddressController@add');// 添加 收货地址
-Route::any('address/list', 'WX\AddressController@list');// 列表 收货地址--有分页
-Route::any('address/modify', 'WX\AddressController@modify');// 修改 收货地址
-Route::any('address/del', 'WX\AddressController@del');// 删除 收货地址
+//Route::any('address/add', 'WX\AddressController@add');// 添加 收货地址
+//Route::any('address/list', 'WX\AddressController@list');// 列表 收货地址--有分页
+//Route::any('address/modify', 'WX\AddressController@modify');// 修改 收货地址
+//Route::any('address/del', 'WX\AddressController@del');// 删除 收货地址
+
+// 搜索标签
+Route::any('commonAddr/ajax_alist', 'WX\CommonAddrController@ajax_alist');//ajax获得列表数据
+Route::any('commonAddr/ajax_info/{id}', 'WX\CommonAddrController@ajax_info');//ajax获得详情数据
+Route::any('commonAddr/ajax_firstInfo', 'WX\CommonAddrController@ajax_firstInfo');//ajax获得详情数据--默认地址或最新的第一条[没有设置默认]
+Route::post('commonAddr/ajax_del', 'WX\CommonAddrController@ajax_del');// 删除
+Route::post('commonAddr/ajax_save', 'WX\CommonAddrController@ajax_save');// 新加/修改
 
 // 订单相关的
 Route::any('order/create', 'WX\OrderController@create');// 生成订单
