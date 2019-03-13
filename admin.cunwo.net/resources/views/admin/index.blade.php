@@ -263,7 +263,7 @@
                   <a lay-href="{{ url('admin/staffUser') }}">用户</a>
                 </dd>
                 <dd>
-                  <a lay-href="">常用地址</a>
+                  <a lay-href="{{ url('admin/commonAddr') }}">常用地址</a>
                 </dd>
               </dl>
             </li>
