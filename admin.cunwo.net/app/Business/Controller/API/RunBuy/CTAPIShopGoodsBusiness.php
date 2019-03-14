@@ -179,17 +179,29 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
                 // 排序
                 if(!empty($price_props)) $price_props = Tool::php_multisort($price_props, self::$pricePropVals);
                 foreach ($price_props as $t_v) {
-                    $prop_name = $t_v['prop_name']['main_name'] ?? '';
+                    $prop_name = '';
+                     if(isset($t_v['prop_name']['prop']['name']['main_name'])){// 实时
+                         $prop_name = $t_v['prop_name']['prop']['name']['main_name'];
+                     }elseif(isset($t_v['prop_name']['main_name'])){// 历史
+                         $prop_name = $t_v['prop_name']['main_name'] ?? '';
+                     }
+                     $price_pv_name = "";
+                    if(isset($t_v['prop_name']['prop_val']['name']['main_name'])){// 实时
+                        $price_pv_name = $t_v['prop_name']['prop_val']['name']['main_name'];
+                    }elseif(isset($t_v['prop_val']['name']['main_name'])){// 历史
+                        $price_pv_name = $t_v['prop_val']['name']['main_name'] ?? '';
+                    }
+
                     array_push($priceList, [
                         'price_id' => $t_v['id']
                         , 'prop_id' => $t_v['prop_id']
                         , 'prop_name' => $prop_name
                         , 'prop_val_id' => $t_v['prop_val_id']
-                        , 'price_name' => $t_v['prop_val']['name']['main_name'] ?? ''
+                        , 'price_name' => $price_pv_name
                         , 'price_val' => $t_v['price'] ?? 0
                     ]);
                 }
-                if(isset($v['price_props'])) unset($data_list[$k]['price_props']);
+                 if(isset($v['price_props'])) unset($data_list[$k]['price_props']);
             }
             $data_list[$k]['price_list'] = $priceList;
         }
@@ -659,6 +671,12 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
      *
      * @param array $props 商品表关系获得的商品属性
      * @param array $formatCartPropArr 已有的商品属性 ['属性id' => ['属性值id',...]]
+     * @param int $name_type 名称类型 1 实时[商品或购物车] 2 历史[订单]
+     *
+    , 'goods.props.propName', 'goods.props.propValName'// 属性名--订单后
+    , 'goods.props.prop.name', 'goods.props.propVal.name'// 属性名--订单前
+    , 'goodsPrice**.propName', 'goodsPrice**.propValName'// 价格属性名--订单后
+    , 'goodsPrice**.prop.name', 'goodsPrice**.propVal.name'// 价格属性名--订单前
      * @return  array 商品属性数据
      *
         [
@@ -687,7 +705,7 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
         ]
      * @author zouyan(305463219@qq.com)
      */
-    public static function formatProps($props, $formatCartPropArr = []){
+    public static function formatProps($props, $formatCartPropArr = [], $name_type = 1){
         // 排序
         $propDistance = [
             ['key' => 'sort_num', 'sort' => 'desc', 'type' => 'numeric'],
@@ -703,9 +721,17 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
             $sort_num = $p_v['sort_num'];
 
             $prop_id = $p_v['prop_id'];
-            $prop_name = $p_v['prop_name']['main_name'] ?? '';
+            if($name_type == 1){// 实时
+                $prop_name = $p_v['prop']['name']['main_name'] ?? '';
+            }else{// 历史
+                $prop_name = $p_v['prop_name']['main_name'] ?? '';
+            }
             $prop_val_id = $p_v['prop_val_id'];
-            $prop_val_name = $p_v['prop_val_name']['main_name'] ?? '';
+            if($name_type == 1) {// 实时
+                $prop_val_name = $p_v['prop_val']['name']['main_name'] ?? '';
+            }else{
+                $prop_val_name = $p_v['prop_val_name']['main_name'] ?? '';
+            }
             if(!isset($format_props[$prop_id])) $format_props[$prop_id] = [
                 'prop_id' => $prop_id,
                 'prop_name' => $prop_name,

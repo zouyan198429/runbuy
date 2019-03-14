@@ -61,7 +61,12 @@ class CartController extends BaseController
         CTAPICartBusiness::mergeRequest($request, $this, [
             'staff_id' => $this->user_id,
         ]);
-        $result =  CTAPICartBusiness::getList($request, $this, 1, [], ['shop', 'props', 'goods.siteResources', 'goods.props.propName', 'goods.props.propValName', 'goodsPrice.propName', 'goodsPrice.propValName']);
+        $result =  CTAPICartBusiness::getList($request, $this, 1, [], ['shop', 'props', 'goods.siteResources'
+            //, 'goods.props.propName', 'goods.props.propValName'// 属性名--订单后
+            , 'goods.props.prop.name', 'goods.props.propVal.name'// 属性名--订单前
+            //, 'goodsPrice.propName', 'goodsPrice.propValName'// 价格属性名--订单后
+            , 'goodsPrice.prop.name', 'goodsPrice.propVal.name'// 价格属性名--订单前
+        ]);
         $data_list = $result['result']['data_list'] ?? [];
         $formatList = [];
         foreach($data_list as $k => $v){
@@ -80,7 +85,7 @@ class CartController extends BaseController
             }
             // 属性及属性值处理
             $props = $v['goods']['props'] ?? [];
-            $format_props = ($need_props == 2) ? CTAPIShopGoodsBusiness::formatProps($props, $formatCartPropArr) : [] ;
+            $format_props = ($need_props == 2) ? CTAPIShopGoodsBusiness::formatProps($props, $formatCartPropArr, 1) : [] ;
             // 店铺状态  状态0待审核1审核通过2审核未通过4冻结(禁用)
             $shop_status = $v['shop']['status'] ?? 0;
             if($shop_status != 1) continue;
@@ -107,7 +112,8 @@ class CartController extends BaseController
             $resource_url = $site_resources[0]['resource_url'] ?? '';
 
             $goods_name = $v['goods']['goods_name'] ?? '';
-            $price_name = $v['goods_price']['prop_val_name']['main_name'] ?? '';
+            $price_name = $v['goods_price']['prop_val']['name']['main_name'] ?? '';// $v['goods_price']['prop_val_name']['main_name'] ?? '';
+            $price_prop_name = $v['goods_price']['prop']['name']['main_name'] ?? '';// $v['goods_price']['prop_name']['main_name'] ?? '';
             $goods_name_full = empty($price_name) ? $goods_name : $goods_name . '[' . $price_name . ']';
             if($v['goods']['is_hot'] == 2) $goods_name_full .= '-热销';
 
@@ -116,9 +122,9 @@ class CartController extends BaseController
                 'goods_id' => $goods_id,
                 'goods_name' => $v['goods']['goods_name'] ?? '',
                 'prop_id' => $prop_id,
-                'prop_name' => $v['goods_price']['prop_name']['main_name'] ?? '',
+                'prop_name' => $price_prop_name,// $v['goods_price']['prop_name']['main_name'] ?? '',
                 'price_id' => $prop_price_id,
-                'price_name' => $v['goods_price']['prop_val_name']['main_name'] ?? '',
+                'price_name' => $price_name,// $v['goods_price']['prop_val_name']['main_name'] ?? '',
                 'price' => $v['goods_price']['price'] ?? $v['goods']['price'],
                 'amount' => $v['amount'],
                 'resource_url' => $resource_url,
