@@ -13,8 +13,8 @@ class ShopGoodsPricesDBBusiness extends BasePublicDBBusiness
     public static function getIdHistory($mainId = 0, &$mainDBObj = null, &$historyDBObj = null){
         // $mainDBObj = null ;
         // $historyDBObj = null ;
-        return static::getHistoryId($mainDBObj, $mainId, ShopGoodsPricesDBBusiness::$model_name
-            , ShopGoodsPricesDBBusiness::$table_name, $historyDBObj, ['prop_price_id' => $mainId], []);
+        return static::getHistoryId($mainDBObj, $mainId, ShopGoodsPricesHistoryDBBusiness::$model_name
+            , ShopGoodsPricesHistoryDBBusiness::$table_name, $historyDBObj, ['prop_price_id' => $mainId], []);
     }
 
     /**
@@ -33,7 +33,7 @@ class ShopGoodsPricesDBBusiness extends BasePublicDBBusiness
         ];
         // $mainDBObj = null ;
         // $historyDBObj = null ;
-        return static::compareHistoryOrUpdateVersion($mainDBObj, $id, ShopGoodsPricesDBBusiness::$model_name
-            , ShopGoodsPricesDBBusiness::$table_name, $historyDBObj, $historySearch, ['prop_price_id'], $forceIncVersion);
+        return static::compareHistoryOrUpdateVersion($mainDBObj, $id, ShopGoodsPricesHistoryDBBusiness::$model_name
+            , ShopGoodsPricesHistoryDBBusiness::$table_name, $historyDBObj, $historySearch, ['prop_price_id'], $forceIncVersion);
     }
 }

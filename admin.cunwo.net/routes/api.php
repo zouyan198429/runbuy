@@ -962,7 +962,7 @@ Route::any('cart/ajax_initCart', 'WX\CartController@ajax_initCart');// 根据城
 Route::any('cart/ajax_del_shop', 'WX\CartController@ajax_del_shop');//  移除商品--通过店铺id
 // Route::any('cart/empty', 'WX\CartController@empty');// 清空用户的购物车
 Route::any('cart/ajax_prop', 'WX\CartController@ajax_prop');//  购物车商品属性操作 good_prop_table_id  多个用逗号分隔, 0 ：代表一个都没有选
-
+Route::any('cart/ajax_createOrder', 'WX\CartController@ajax_createOrder');// 生成订单
 // 收货地址
 //Route::any('address/add', 'WX\AddressController@add');// 添加 收货地址
 //Route::any('address/list', 'WX\AddressController@list');// 列表 收货地址--有分页
@@ -977,17 +977,28 @@ Route::post('commonAddr/ajax_del', 'WX\CommonAddrController@ajax_del');// 删除
 Route::post('commonAddr/ajax_save', 'WX\CommonAddrController@ajax_save');// 新加/修改
 
 // 订单相关的
-Route::any('order/create', 'WX\OrderController@create');// 生成订单
+
+Route::any('order/getInfoByOrderNoDoing', 'WX\OrderController@getInfoByOrderNoDoing');// 订单详情根据订单编号查询订单
+
+//Route::any('order/create', 'WX\OrderController@create');// 生成订单
 Route::any('order/cancel', 'WX\OrderController@cancel');// 订单作废
 Route::any('order/chState', 'WX\OrderController@chState');// 更新订单状态
 Route::any('order/getList', 'WX\OrderController@getList');// 订单--列表--有分页
-Route::any('order/getInfo', 'WX\OrderController@getInfo');// 订单详情
 
 // 订单支付相关的
 Route::any('orderPay/pay', 'WX\OrderPayController@pay');// 订单付款
 Route::any('orderPay/refund', 'WX\OrderPayController@refund');// 订单退款
 Route::any('orderPay/bond', 'WX\OrderPayController@bond');// 支付保证金
 Route::any('orderPay/recharge', 'WX\OrderPayController@recharge');// 充值
+
+// 微信支付相关的
+Route::any('pay/unifiedorderByNo', 'WX\PayController@unifiedorderByNo');// 统一下单--支付
+
+Route::any('pay/unifiedorder', 'WX\PayController@unifiedorder');// 统一下单
+Route::any('pay/wechatNotify', 'WX\PayController@wechatNotify');// 支付结果通知--回调
+Route::any('pay/refundOrder', 'WX\PayController@refundOrder');// 退单测试
+Route::any('pay/refundNotify', 'WX\PayController@refundNotify');// 退款结果通知--回调
+Route::any('pay/sweepCodePayNotify', 'WX\PayController@sweepCodePayNotify');// 扫码支付通知
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

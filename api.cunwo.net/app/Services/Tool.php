@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Services;
+use App\Services\Lock\RedisesLock;
+use App\Services\Lock\RedisLock;
 use App\Services\Request\CommonRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
@@ -172,6 +174,141 @@ class Tool
     }
 
     /**
+     * ShopNC 生成订单编号
+     * @return string
+     */
+    public static function snOrder() {
+        // $recharge_sn = date('Ymd').substr( implode(NULL,array_map('ord',str_split(substr(uniqid(),7,13),1))) , -8 , 8);
+        $recharge_sn = date('ymd').substr( implode(NULL,array_map('ord',str_split(substr(uniqid(),7,13),1))) , -8 , 8);
+        return $recharge_sn;
+    }
+
+    /**
+     * 生成订单号
+     *在网上找了一番，发现这位同学的想法挺不错的，redtamo，具体的请稳步过去看看，
+     * 我作简要概述，该方法用上了英文字母、年月日、Unix 时间戳和微秒数、随机数，重复的可能性大大降低，还是很不错的。
+     * 使用字母很有代表性，一个字母对应一个年份，总共16位，不多也不少.
+     *
+     * @return string
+     */
+    public static function createOrder(){
+        $yCode = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J');
+        $orderSn = $yCode[intval(date('Y')) - 2011] . strtoupper(dechex(date('m'))) . date('d') . substr(time(), -5) . substr(microtime(), 2, 5) . sprintf('%02d', rand(0, 99));
+        return $orderSn;
+    }
+
+    /**
+     * 生成订单流水号（18位数字）+ 前部会含 8位日期时间
+     *
+     * @param string $namespace redis记数器标识键 ；因为有redis锁，可以考虑把用户后两位做为用户分流，就分成100流了，注意在订单前缀/后缀加上分流的用户后两位。
+     * @param array $fixParams
+        $fixParams = [
+            'prefix' => '',// 前缀[1-2位] 可填;可写业务编号等
+            'midFix' => '',// 日期后中间缀[1-2位] 可填;适合用户编号里的后2位或其它等
+            'backfix' => '',// 后缀[1-2位] 可填;备用
+            'expireNums' => [],// redis设置缓存 ，在两个值之间时 - 二维 [[1,20,'缓存的秒数365 * 24 * 60 * 60'], [40,50,'缓存的秒数']]
+            'needNum' => 0,// 需要拼接的内容 1 年 2日期[一年中的第几个分钟[内-向上取整]] 4 自定义日期格式 8 自增的序号
+            'dataFormat' => '', // needNum 值为 4时的日期格式  'YmdHis'
+                // Y: 年，四位数字  y: 年，两位数字
+                // n: 月份，两位数字，不补零；从"1"至"12"  m 数字表示的月份，有前导零 01 到 12
+                //z 年份中的第几天 0 到 365
+                // d: 几日，两位数字，若不足则补零；从"01"至"31"  j: 几日，不足不被零；从"1"至"31"
+                // h: 12小时制的小时，从"01"至"12"
+                //  g 小时，12 小时格式，没有前导零 1 到 12  ;
+                //  H: 24小时制的小时，从"00"至"23"；
+                //  G: 24小时制的小时，不补零；从"0"至"23"
+                // i 有前导零的分钟数 00 到 59>
+
+                // s 秒数，有前导零 00 到 59>
+        ];
+     * @param int $length 字符串长度- 使用以后，只能增，不建议减[这样可以按时间排序] 选择自己适合的体量/每分钟  订单[选4] ,  其它不重要的单号评估一下，一分钟生成的数量，给高/低
+     *                                           共用          一个用户保一单/分
+     * 1 最大可以支持1分钟10个订单号不重复       10/分          10 * 用户要用的位数(如2位100) = 1千用户
+     * 2 最大可以支持1分钟1百个订单号不重复       1百/分        100 *   100  = 1 万+
+     * 3 最大可以支持1分钟1千订单号不重复       1千/分          1000 *  100 =  10 万+
+     * 4 最大可以支持1分钟1万订单号不重复       1万/分          1万 *  100  =  100 万+
+     * 5 最大可以支持1分钟10万订单号不重复       10万/分       10万*  100  =   千万+
+     * 6 最大可以支持1分钟百万订单号不重复       百万/分       百万 * 100 =  1亿+
+     * 7 最大可以支持1分钟千万订单号不重复       千万/分
+     * 8 最大可以支持1分钟1亿订单号不重复       1亿/分
+     * 9 最大可以支持1分钟十亿订单号不重复       十亿/分
+     * 10 最大可以支持1分钟百亿订单号不重复       百亿/分
+     * 11 最大可以支持1分钟千亿订单号不重复       千亿/分
+     * 12 最大可以支持1分钟万亿订单号不重复       万亿/分
+     * @param string $backfix 后缀[1-2位] 可填
+     * @return mixed
+     */
+    public static function makeOrder($namespace = 'default', $fixParams = [], $length = 6){
+        $prefix = $fixParams['prefix'] ?? '';
+        $midFix = $fixParams['midFix'] ?? '';
+        $backfix = $fixParams['backfix'] ?? '';
+        $expireNums = $fixParams['expireNums'] ?? [];// redis设置缓存 ，在两个值之间时 - 二维 [[1,20,'缓存的秒数365 * 24 * 60 * 60'], [40,50,'缓存的秒数']]
+        $needNum = $fixParams['needNum'] ?? 0;// 需要拼接的内容 1 年 2日期 4 自增的序号
+        $dataFormat = $fixParams['dataFormat'] ?? '';// needNum 值为 4时的日期格式
+        // 业务编号(1位0-9); 年(2位 当前-99)  ; 月12--2位	日31--2位(12*31=372 --3位) ; 时24--2位	分60--2位	秒 60--2位 (=86400 --5位)
+        if( (($needNum & (1 + 2)) > 0)  ) $year = date('y');// Y: 年，四位数字  y: 年，两位数字
+
+        if(($needNum & 2) == 2){
+            $month = date('n');//n: 月份，两位数字，不补零；从"1"至"12"  m 数字表示的月份，有前导零 01 到 12
+            $yearDays =((int)  date('z'));// + 1;//z 年份中的第几天 0 到 365
+            $day = date('j');// d: 几日，两位数字，若不足则补零；从"01"至"31"  j: 几日，不足不被零；从"1"至"31"
+            // h: 12小时制的小时，从"01"至"12"
+            //  g 小时，12 小时格式，没有前导零 1 到 12  ;
+            //  H: 24小时制的小时，从"00"至"23"；
+            //  G: 24小时制的小时，不补零；从"0"至"23"
+            $hour = date('G') + 1;
+            // i 有前导零的分钟数 00 到 59>
+            $minute = ((int) date('i')) + 1;
+            // s 秒数，有前导零 00 到 59>
+            $second = ((int) date('s')) + 1;
+            //一年中的第几个分钟[内] 月*日*时 12*31*24=8928--4位
+            $mdh = $yearDays * 24 * 60 + $minute;
+//        echo '$year = ' . $year . ';$month = ' . $month  . ';$yearDays = ' . $yearDays . ';$day = ' . $day . ';$hour = ' . $hour . ';$minute = ' . $minute . ';$second = ' . $second . '<br/>';
+//        echo '$mdh = ' . $mdh . '<br/>';
+        }
+
+
+        $lockObj = Tool::getLockRedisesLaravelObj();
+        $lockState = $lockObj->lock('locktest', 2000, 2000);//加锁
+        if($lockState)
+        {
+            $redisKey = 'FlowSn:' . ucfirst($namespace);
+            $insertId = Redis::incr($redisKey);
+            foreach($expireNums as $v){
+                if(count($v) < 3) continue;
+                $orderNums = [$v[0], $v[1]];
+                $orderNums = array_values($orderNums);
+                sort($orderNums);
+                if($insertId >= $orderNums[0] && $insertId <= $orderNums[1]) Redis::expire($redisKey, $v[2] );  #设置过期时间 单位秒数 一年  365 * 24 * 60 * 60
+            }
+
+            $lockObj->unlock($lockState);//解锁
+            $orderNum = $prefix;// 前缀
+            if(($needNum & 1) == 1) $orderNum .= $year;// 年2位
+
+            // 到一年的第几分钟 6位
+            if(($needNum & 2) == 2) $orderNum .= str_pad(substr($mdh, -6), 6, '0', STR_PAD_LEFT);
+
+            // needNum 值为 4时的日期格式
+            if(($needNum & 4) == 4 && (!empty($dataFormat))) $orderNum .= date($dataFormat);//
+
+            $orderNum .= $midFix;// 中缀
+
+            // 8 自增的序号
+            if(($needNum & 8) == 8) $orderNum .= str_pad(substr($insertId, -$length), $length, 0, STR_PAD_LEFT);
+
+            $orderNum .= $backfix;// 后缀
+
+            //   return $prefix . $year . str_pad(substr($mdh, -6), 6, '0', STR_PAD_LEFT)
+            //  . $midFix . str_pad(substr($insertId, -$length), $length, 0, STR_PAD_LEFT) . $backfix;// . $suffix
+            return $orderNum;
+        }else{
+            throws('生成单号有错，请稍后重试!');
+        }
+    }
+
+
+    /**
      * 获取唯一标识长度,最长37位,默认10位
      *
      * @param int $length 字符串长度
@@ -206,6 +343,80 @@ class Tool
 
         return $password;
     }
+
+
+    //----------------- 单个redis锁-------------------
+    /**
+     * 获得锁对象
+     *
+     * @param array
+    $config =[
+    'host' => '',// 默认 localhost
+    'port' => '',// 默认 6379
+    'auth' => '',// 默认空
+    'dbNum' => 0,// 默认 0
+    ];
+     * @return object
+     */
+    public static function getLockObjBase($config = []){
+        return RedisLock::instance($config);
+    }
+
+    /**
+     * 获得锁对象--laravel配置的
+     *
+     * @param array
+     * @return object
+     */
+    public static function getLockLaravelObj(){
+        $config =[
+            'host' => env('REDIS_HOST', 'localhost'),// 默认 localhost
+            'port' => env('REDIS_PORT', 6379),// 默认 6379
+            'auth' => env('REDIS_PASSWORD', ''),// 默认空
+            // 'dbNum' => env('REDIS_DB', 0),// 默认 0
+        ];
+        return Tool::getLockObjBase($config);
+    }
+
+    //----------------- 分布式锁-多个redis锁---------------
+
+    /**
+     * 获得锁对象
+     *
+     * @param array 二维数组
+    $servers = [
+    //['127.0.0.1', 6379, 0.01, '', 0],
+    ['192.168.56.114', 6379, 0.01, '', 0],
+    //['172.29.8.165', 6379, 0.01, '', 0],
+    //['127.0.0.1', 6399, 0.01, '', 0],
+    ];
+     * @return object
+     */
+    public static function getLockRedisesObjBase($config = []){
+        return RedisesLock::instance($config);
+    }
+
+    /**
+     *
+     *
+     * 获得锁对象--laravel配置的
+     *
+     * @param array
+     * @return object
+     */
+    public static function getLockRedisesLaravelObj(){
+        $config =[
+            [
+                'host' => env('REDIS_HOST', 'localhost'),// 默认 localhost
+                'port' => env('REDIS_PORT', 6379),// 默认 6379
+                'timeout' => 0.01,// 以秒为单位）。默认值为 15 秒。值 0 指示无限制
+                'auth' => env('REDIS_PASSWORD', ''),// 默认空
+                'dbNum' => env('REDIS_DB', 0),// 默认 0
+            ]
+        ];
+        return Tool::getLockRedisesObjBase($config);
+    }
+
 
     /**
      * Xml To array
@@ -918,6 +1129,221 @@ class Tool
             }
         }
         return true;
+    }
+
+    /**
+     * 功能：日期 加/减操作
+     * @param string $operateDate 操作日期/时间;// 为空，则操作当前时间
+     * @param array $oprates 操作类型 一维数组, 下面空格拼接执行
+    // +1 day +1 hour +1 minute  可以随便自由组合，以达到任意输出时间的目的
+    // -1 day  ---昨天  // 可以修改参数1为任何想需要的数  day也可以改成year（年），month（月），hour（小时），minute（分），second（秒）
+    // +1 day  ---明天
+    // +1 week  ---一周后
+    // +1 week 2 days 4 hours 2 seconds  ---一周零两天四小时两秒后
+    // next Thursday   ---下个星期四
+    // last Monday  --- 上个周一
+    // last month  ---一个月前
+    // +1 month  ---一个月后
+    // +10 year  ---十年后
+     * @param string $format 返回数据格式化 "Y-m-d H:i:s","Y-m-d","H:i:s"
+     * @param string $errDo 错误处理方式 1 throws 2直接返回错误
+     * @param string $dateName 日期(默认); 时间
+     * @return mixed  sting 具体错误 ； throws 错误
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function addMinusDate($operateDate, $oprates = [], $format = 'Y-m-d H:i:s', $errDo = 1, $dateName = '时间')
+    {
+        // date_default_timezone_set('PRC'); //默认时区
+        if(empty($operateDate)) $operateDate = date('Y-m-d H:i:s');
+        // 开始时间
+        $date_unix = judgeDate($operateDate);
+        if($date_unix === false){
+            $errMsg = '开始' . $dateName . '不是有效' . $dateName . '!';
+            if($errDo == 1) throws($errMsg);
+            return $errMsg;
+        }
+        // date('Y-m-d', strtotime ("+1 day", strtotime('2011-11-01')))
+        if(!empty($oprates)){
+            return date($format, strtotime (implode(' ', $oprates), strtotime(judgeDate($date_unix, "Y-m-d H:i:s"))));
+        }
+        return judgeDate($date_unix, $format);
+    }
+
+    /**
+     * 功能：开始、结束日期 差--单位秒
+     * @param string $begin_date 开始日期
+     * @param string $end_date 结束日期,默认当前时间
+     * @param string $errDo 错误处理方式 1 throws 2直接返回错误
+     * @param string $dateName 日期(默认); 时间
+     * @return mixed  sting 具体错误 ； throws 错误
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function diffDate($begin_date, $end_date = '', $errDo = 1, $dateName = '时间'){
+
+        if(empty($end_date)) $end_date = date('Y-m-d H:i:s');
+
+        // 开始时间
+        $begin_date_unix = judgeDate($begin_date);
+        if($begin_date_unix === false){
+            $errMsg = '开始' . $dateName . '不是有效' . $dateName . '!';
+            if($errDo == 1) throws($errMsg);
+            return $errMsg;
+        }
+
+        // 结束时间
+        $end_date_unix = judgeDate($end_date);
+        if($end_date_unix === false){
+            $errMsg = '结束' . $dateName . '不是有效' . $dateName . '!';
+            if($errDo == 1) throws($errMsg);
+            return $errMsg;
+        }
+
+        if($begin_date_unix <= $end_date_unix){
+            $starttime = $begin_date_unix;
+            $endtime = $end_date_unix;
+        }else{
+            $starttime = $end_date_unix;
+            $endtime = $begin_date_unix;
+        }
+
+        //计算天数
+        $timediff = $endtime - $starttime;
+        return $timediff;
+    }
+
+    /**
+     * 功能：格式化时间差--以年为基准
+     * @param int $timediff 时间差秒数
+     * @param string $errDo 错误处理方式 1 throws 2直接返回错误
+     * @param string $dateName 日期(默认); 时间
+     * @return mixed  sting 具体错误 ； throws 错误
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function formatTimeDiff($timediff){
+        $timediff = abs($timediff);
+        // 1: 总年 ; 2 总年[向上取整] ;
+        // 8 总天数 ; 16 总天数[向上取整] ;32 天数[去除年] 64 天数[去除年][向上取整]
+        // 128 总时数 ; 256 总时数[向上取整] ;512 时数[去除年天] 1024 时数[去除年天][向上取整]
+        // 2048 总分数 ; 4096 总分数[向上取整] ;8192 分数[去除年天时] 16384 分数[去除年天时][向上取整]
+        // 总秒数  秒数[去除年天时分]
+        // 返回类型
+
+        // 多少年
+        // 总年 ;
+        $yearInt = intval($timediff / (365 * 24 * 60 * 60) );
+        //  总年[向上取整] ;
+        $yearCeil = ceil($timediff / (365 * 24 * 60 * 60) );
+
+        // 8 总天数 ; 16 总天数[向上取整] ;32 天数[去除年] 64 天数[去除年][向上取整]
+        $daysInt = intval($timediff / (24 * 60 * 60) ); // 86400  多少天
+        $daysCeil = ceil($timediff / (24 * 60 * 60) ); // 86400  多少天
+
+        // 去除年的天数
+        $yearRemain = $timediff % (365 * 24 * 60 * 60);
+        $daysRemainInt = intval($yearRemain / (24 * 60 * 60) ); // 86400  多少天
+        $daysRemainCeil = ceil($yearRemain / (24 * 60 * 60) ); // 86400  多少天
+
+        // 128 总时数 ; 256 总时数[向上取整] ;512 时数[去除年天] 1024 时数[去除年天][向上取整]
+        //计算小时数
+        $hoursInt = intval($timediff / (60 * 60));// 多少小时 3600
+        $hoursCeil = ceil($timediff / (60 * 60));// 多少小时 3600
+
+        // 去除年天
+        $remain = $timediff % (24 * 60 * 60);// 86400
+        $hoursRemain = intval($remain / (60 * 60));// 多少小时 3600
+        $hoursRemainCeil = ceil($remain / (60 * 60));// 多少小时 3600
+
+        // 2048 总分数 ; 4096 总分数[向上取整] ;8192 分数[去除年天时] 16384 分数[去除年天时][向上取整]
+        //计算分钟数
+        $minsInt = intval($timediff / 60); // 多少分钟
+        $minsCeil = ceil($timediff / 60); // 多少分钟
+
+        $remain = $remain % (60 * 60);// 3600
+        $minsRemain = intval($remain / 60); // 多少分钟
+        $minsRemainCeil = ceil($remain / 60); // 多少分钟
+
+        //计算秒数
+        $secsRemain = $remain % 60; // 多少秒
+        $secsRemainCeil = ceil($remain % 60); // 多少秒
+        return [
+            "yearInt" => $yearInt // 总年
+            ,"yearCeil" => $yearCeil // 总年[向上取整]
+
+            ,"daysInt" => $daysInt // 总天数
+            ,"daysCeil" => $daysCeil // 总天数[向上取整]
+            ,"daysRemainInt" => $daysRemainInt // 天数[去除年]
+            ,"daysRemainCeil" => $daysRemainCeil // 天数[去除年][向上取整]
+
+            ,"hoursInt" => $hoursInt // 总时数
+            ,"hoursCeil" => $hoursCeil // 总时数[向上取整]
+            ,"hoursRemain" => $hoursRemain // 时数[去除年天]
+            ,"hoursRemainCeil" => $hoursRemainCeil // 时数[去除年天][向上取整]
+
+            ,"minsInt" => $minsInt // 总分数
+            ,"minsCeil" => $minsCeil // 总分数[向上取整]
+            ,"minsRemain" => $minsRemain // 分数[去除年天时]
+            ,"minsRemainCeil" => $minsRemainCeil // 分数[去除年天时][向上取整]
+
+            ,"timediff" => $timediff // 总秒数
+            ,"minsRemain" => $minsRemain // 秒数[去除年天时分]
+            ,"secsRemainCeil" => $secsRemainCeil // 秒数[去除年天时分][向上取整]
+            // ,"aaaa" => $aaaaa // aaaaa
+        ];
+    }
+
+    /**
+     * 功能：计算两个时间内相差多少个月
+     *
+     * @param string $start_m 开始日期 --小
+     * @param string $end_m 结束日期,默认当前时间  --大
+     * @param string $errDo 错误处理方式 1 throws 2直接返回错误
+     * @param string $dateName 日期(默认); 时间
+     * @return mixed  sting 具体错误 ； throws 错误
+     * @author zouyan(305463219@qq.com)
+     *
+    // 总月数
+    $monthInt = Tool::diffMonth($starttime, $endtime, $errDo, $dateName);
+    // 月数[去除年月]
+    $monthRemainInt = $monthInt % 12;
+     */
+    public static function diffMonth($begin_date, $end_date, $errDo = 1, $dateName = '时间'){
+
+        // 开始时间
+        $begin_date_unix = judgeDate($begin_date);
+        if($begin_date_unix === false){
+            $errMsg = '开始' . $dateName . '不是有效' . $dateName . '!';
+            if($errDo == 1) throws($errMsg);
+            return $errMsg;
+        }
+
+        // 结束时间
+        $end_date_unix = judgeDate($end_date);
+        if($end_date_unix === false){
+            $errMsg = '结束' . $dateName . '不是有效' . $dateName . '!';
+            if($errDo == 1) throws($errMsg);
+            return $errMsg;
+        }
+
+        if($begin_date_unix <= $end_date_unix){
+            $starttime = $begin_date_unix;
+            $endtime = $end_date_unix;
+        }else{
+            $starttime = $end_date_unix;
+            $endtime = $begin_date_unix;
+        }
+
+        $starttime = judgeDate($starttime, "Y-m-d H:i:s");
+        $endtime = judgeDate($endtime, "Y-m-d H:i:s");
+
+        $date1 = explode('-',$starttime);
+        $date2 = explode('-',$endtime);
+
+        if($date1[1] < $date2[1]){ //判断月份大小，进行相应加或减
+            $month_number = abs($date1[0] - $date2[0]) * 12 + abs($date1[1] - $date2[1]);
+        }else{
+            $month_number = abs($date1[0] - $date2[0]) * 12 - abs($date1[1] - $date2[1]);
+        }
+        return $month_number;
     }
 
     /**

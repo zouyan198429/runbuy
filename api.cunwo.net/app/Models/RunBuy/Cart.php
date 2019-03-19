@@ -20,6 +20,14 @@ class Cart extends BasePublicModel
     }
 
     /**
+     * 获取店铺对应的商家--一维
+     */
+    public function shopSeller()
+    {
+        return $this->belongsTo('App\Models\RunBuy\Seller', 'seller_id', 'id');
+    }
+
+    /**
      * 获取店铺商品对应的店铺--一维
      */
     public function shop()

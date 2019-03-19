@@ -205,4 +205,29 @@ class CartController extends BaseController
 //        return ajaxDataArr(1, $resultDatas, '');
 //    }
 
+    //  生成订单
+    public function ajax_createOrder(Request $request){
+
+        $this->InitParams($request);
+        $cartIds = CommonRequest::get($request, 'cartIds');// 购物车id,多个逗号分隔
+        $city_site_id = CommonRequest::getInt($request, 'city_site_id');// 城市id
+        $tableware = CommonRequest::getInt($request, 'tableware');// 需要的餐具数
+        $second_num = CommonRequest::getInt($request, 'second_num');// 时间分钟数
+        $total_run_price = CommonRequest::getInt($request, 'total_run_price');// 总跑腿费
+        $remarks = CommonRequest::get($request, 'remarks');// 买家备注
+        $addr_id = CommonRequest::getInt($request, 'addr_id');// 收货地址id
+
+        $saveData = [
+            'staff_id' => $this->user_id,
+            'city_site_id' => $city_site_id,
+            'addr_id' => $addr_id,
+            'tableware' => $tableware,
+            'remarks' => $remarks,
+            'second_num' => $second_num,
+            'total_run_price' => $total_run_price,
+        ];
+        $resultDatas = CTAPICartBusiness::createOrderByCartId($request, $this, $saveData, $cartIds, true);
+        return ajaxDataArr(1, $resultDatas, '');
+    }
+
 }

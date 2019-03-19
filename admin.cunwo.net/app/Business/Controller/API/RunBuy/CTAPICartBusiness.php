@@ -600,4 +600,48 @@ class CTAPICartBusiness extends BasicPublicCTAPIBusiness
         $prop_id = static::exeDBBusinessMethodCT($request, $controller, '', 'saveProps', $apiParams, $company_id, $notLog);
         return $prop_id;
     }
+
+    /**
+     * 根据购物车生成订单,返回生成的订单号
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param array $saveData 要保存或修改的数组
+     * @param string $cartIds 购物车id,多个用逗号分隔
+     * @param boolean $modifAddOprate 修改时是否加操作人，true:加;false:不加[默认]
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 单条数据 - -维数组 为0 新加，返回新的对象数组[-维],  > 0 ：修改对应的记录，返回true
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function createOrderByCartId(Request $request, Controller $controller, $saveData, &$cartIds, $modifAddOprate = false, $notLog = 0)
+    {
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+        if (isset($saveData['staff_id']) && empty($saveData['staff_id'])) {
+            throws('用户不能为空！');
+        }
+
+        if (isset($saveData['addr_id']) && empty($saveData['addr_id'])) {
+            throws('收货地址不能为空！');
+        }
+
+        if (isset($saveData['city_site_id']) && empty($saveData['city_site_id'])) {
+            throws('城市不能为空！');
+        }
+
+        if (isset($cartIds) && empty($cartIds)) {
+            throws('购物车编号不能为空！');
+        }
+
+        // 调用新加或修改接口
+        $apiParams = [
+            'saveData' => $saveData,
+            'company_id' => $company_id,
+            'cartIds' => $cartIds,
+            'operate_staff_id' => $user_id,
+            'modifAddOprate' => 0,
+        ];
+        $order_no = static::exeDBBusinessMethodCT($request, $controller, '', 'createOrder', $apiParams, $company_id, $notLog);
+        return $order_no;
+    }
 }

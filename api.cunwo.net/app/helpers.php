@@ -64,7 +64,7 @@ if ( ! function_exists('apiGetPost'))
     function apiGetPost(){
         $post_data = file_get_contents("php://input");
         if(empty($post_data)){
-            $post_data = $GLOBALS['HTTP_RAW_POST_DATA'];
+            $post_data = $GLOBALS['HTTP_RAW_POST_DATA'] ?? '';
         }
         return $post_data;
     }
