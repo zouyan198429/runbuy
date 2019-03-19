@@ -702,7 +702,7 @@ class CartDBBusiness extends BasePublicDBBusiness
             if(isset($cacheData['city_site_id'][$city_site_id]) && $cacheData['city_site_id'][$city_site_id] > 0){
                 $city_site_id_history = $cacheData['city_site_id'][$city_site_id];
             }else{
-                $city_site_id_history = CityDBBusiness::getIdHistory($city_site_id);// 城市分站历史id
+                $city_site_id_history = ($city_site_id > 0) ? CityDBBusiness::getIdHistory($city_site_id) : 0;// 城市分站历史id
                 $cacheData['city_site_id'][$city_site_id] = $city_site_id_history;
             }
 
@@ -710,7 +710,7 @@ class CartDBBusiness extends BasePublicDBBusiness
             if(isset($cacheData['city_partner_id'][$city_partner_id]) && $cacheData['city_partner_id'][$city_partner_id] > 0){
                 $city_partner_id_history = $cacheData['city_partner_id'][$city_partner_id];
             }else{
-                $city_partner_id_history = CityPartnerDBBusiness::getIdHistory($city_partner_id);// 城市合伙人历史id
+                $city_partner_id_history = ($city_partner_id > 0) ? CityPartnerDBBusiness::getIdHistory($city_partner_id) : 0;// 城市合伙人历史id
                 $cacheData['city_partner_id'][$city_partner_id] = $city_partner_id_history;
             }
 
@@ -718,7 +718,7 @@ class CartDBBusiness extends BasePublicDBBusiness
             if(isset($cacheData['seller_id'][$seller_id]) && $cacheData['seller_id'][$seller_id] > 0){
                 $seller_id_history = $cacheData['seller_id'][$seller_id];
             }else{
-                $seller_id_history = SellerDBBusiness::getIdHistory($seller_id);// 商家历史ID
+                $seller_id_history = ($seller_id > 0) ? SellerDBBusiness::getIdHistory($seller_id) : 0;// 商家历史ID
                 $cacheData['seller_id'][$seller_id] = $seller_id_history;
             }
 
@@ -726,7 +726,7 @@ class CartDBBusiness extends BasePublicDBBusiness
             if(isset($cacheData['shop_id'][$shop_id]) && $cacheData['shop_id'][$shop_id] > 0){
                 $shop_id_history = $cacheData['shop_id'][$shop_id];
             }else{
-                $shop_id_history = ShopDBBusiness::getIdHistory($shop_id);// 店铺历史ID
+                $shop_id_history = ($shop_id > 0) ? ShopDBBusiness::getIdHistory($shop_id) : 0;// 店铺历史ID
                 $cacheData['shop_id'][$shop_id] = $shop_id_history;
             }
 
@@ -735,7 +735,7 @@ class CartDBBusiness extends BasePublicDBBusiness
             if(isset($cacheData['province_id'][$province_id]) && $cacheData['province_id'][$province_id] > 0){
                 $province_id_history = $cacheData['province_id'][$province_id];
             }else{
-                $province_id_history = CityDBBusiness::getIdHistory($province_id); // 省历史id
+                $province_id_history = ($province_id > 0) ? CityDBBusiness::getIdHistory($province_id) : 0; // 省历史id
                 $cacheData['province_id'][$province_id] = $province_id_history;
             }
 
@@ -744,7 +744,7 @@ class CartDBBusiness extends BasePublicDBBusiness
             if(isset($cacheData['city_id'][$city_id]) && $cacheData['city_id'][$city_id] > 0){
                 $city_id_history = $cacheData['city_id'][$city_id];
             }else{
-                $city_id_history = CityDBBusiness::getIdHistory($city_id);// 市历史id
+                $city_id_history = ($city_id > 0) ?  CityDBBusiness::getIdHistory($city_id) : 0;// 市历史id
                 $cacheData['city_id'][$city_id] = $city_id_history;
             }
 
@@ -752,14 +752,14 @@ class CartDBBusiness extends BasePublicDBBusiness
             if(isset($cacheData['area_id'][$area_id]) && $cacheData['area_id'][$area_id] > 0){
                 $area_id_history = $cacheData['area_id'][$area_id];
             }else{
-                $area_id_history = CityDBBusiness::getIdHistory($area_id) ;// 区历史id
+                $area_id_history = ($area_id > 0) ?   CityDBBusiness::getIdHistory($area_id) : 0;// 区历史id
                 $cacheData['area_id'][$area_id] = $area_id_history;
             }
 
             if(isset($cacheData['addr_id'][$addr_id]) && $cacheData['addr_id'][$addr_id] > 0){
                 $addr_id_history = $cacheData['addr_id'][$addr_id];
             }else{
-                $addr_id_history = CommonAddrDBBusiness::getIdHistory($addr_id);// 收货地址历史ID
+                $addr_id_history = ($addr_id > 0) ? CommonAddrDBBusiness::getIdHistory($addr_id) : 0;// 收货地址历史ID
                 $cacheData['addr_id'][$addr_id] = $addr_id_history;
             }
 
@@ -830,7 +830,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                 if(isset($cacheData['city_site_id'][$city_site_id]) && $cacheData['city_site_id'][$city_site_id] > 0){
                     $city_site_id_history = $cacheData['city_site_id'][$city_site_id];
                 }else{
-                    $city_site_id_history = CityDBBusiness::getIdHistory($city_site_id);// 城市分站历史id
+                    $city_site_id_history = ($city_site_id > 0) ?  CityDBBusiness::getIdHistory($city_site_id) : 0;// 城市分站历史id
                     $cacheData['city_site_id'][$city_site_id] = $city_site_id_history;
                 }
 
@@ -838,7 +838,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                 if(isset($cacheData['city_partner_id'][$city_partner_id]) && $cacheData['city_partner_id'][$city_partner_id] > 0){
                     $city_partner_id_history = $cacheData['city_partner_id'][$city_partner_id];
                 }else{
-                    $city_partner_id_history = CityPartnerDBBusiness::getIdHistory($city_partner_id);// 城市合伙人历史id
+                    $city_partner_id_history = ($city_partner_id > 0) ? CityPartnerDBBusiness::getIdHistory($city_partner_id) : 0;// 城市合伙人历史id
                     $cacheData['city_partner_id'][$city_partner_id] = $city_partner_id_history;
                 }
 
@@ -846,7 +846,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                 if(isset($cacheData['seller_id'][$seller_id]) && $cacheData['seller_id'][$seller_id] > 0){
                     $seller_id_history = $cacheData['seller_id'][$seller_id];
                 }else{
-                    $seller_id_history = SellerDBBusiness::getIdHistory($seller_id);// 商家历史ID
+                    $seller_id_history = ($seller_id > 0) ? SellerDBBusiness::getIdHistory($seller_id) : 0;// 商家历史ID
                     $cacheData['seller_id'][$seller_id] = $seller_id_history;
                 }
 
@@ -854,7 +854,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                 if(isset($cacheData['shop_id'][$shop_id]) && $cacheData['shop_id'][$shop_id] > 0){
                     $shop_id_history = $cacheData['shop_id'][$shop_id];
                 }else{
-                    $shop_id_history = ShopDBBusiness::getIdHistory($shop_id);// 店铺历史ID
+                    $shop_id_history = ($shop_id > 0) ? ShopDBBusiness::getIdHistory($shop_id) : 0;// 店铺历史ID
                     $cacheData['shop_id'][$shop_id] = $shop_id_history;
                 }
 
@@ -863,7 +863,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                 if(isset($cacheData['province_id'][$province_id]) && $cacheData['province_id'][$province_id] > 0){
                     $province_id_history = $cacheData['province_id'][$province_id];
                 }else{
-                    $province_id_history = CityDBBusiness::getIdHistory($province_id); // 省历史id
+                    $province_id_history = ($province_id > 0) ?  CityDBBusiness::getIdHistory($province_id) : 0; // 省历史id
                     $cacheData['province_id'][$province_id] = $province_id_history;
                 }
 
@@ -872,7 +872,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                 if(isset($cacheData['city_id'][$city_id]) && $cacheData['city_id'][$city_id] > 0){
                     $city_id_history = $cacheData['city_id'][$city_id];
                 }else{
-                    $city_id_history = CityDBBusiness::getIdHistory($city_id);// 市历史id
+                    $city_id_history = ($city_id > 0) ?  CityDBBusiness::getIdHistory($city_id) : 0;// 市历史id
                     $cacheData['city_id'][$city_id] = $city_id_history;
                 }
 
@@ -880,14 +880,14 @@ class CartDBBusiness extends BasePublicDBBusiness
                 if(isset($cacheData['area_id'][$area_id]) && $cacheData['area_id'][$area_id] > 0){
                     $area_id_history = $cacheData['area_id'][$area_id];
                 }else{
-                    $area_id_history = CityDBBusiness::getIdHistory($area_id) ;// 区历史id
+                    $area_id_history = ($area_id > 0) ?   CityDBBusiness::getIdHistory($area_id) : 0 ;// 区历史id
                     $cacheData['area_id'][$area_id] = $area_id_history;
                 }
 
                 if(isset($cacheData['addr_id'][$addr_id]) && $cacheData['addr_id'][$addr_id] > 0){
                     $addr_id_history = $cacheData['addr_id'][$addr_id];
                 }else{
-                    $addr_id_history = CommonAddrDBBusiness::getIdHistory($addr_id);// 收货地址历史ID
+                    $addr_id_history = ($addr_id > 0) ?  CommonAddrDBBusiness::getIdHistory($addr_id) : 0;// 收货地址历史ID
                     $cacheData['addr_id'][$addr_id] = $addr_id_history;
                 }
 
@@ -967,7 +967,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                     if(isset($cacheData['goods_id'][$goods_id]) && $cacheData['goods_id'][$goods_id] > 0){
                         $goods_id_history = $cacheData['goods_id'][$goods_id];
                     }else{
-                        $goods_id_history = ShopGoodsDBBusiness::getIdHistory($goods_id);
+                        $goods_id_history = ($goods_id > 0) ? ShopGoodsDBBusiness::getIdHistory($goods_id) : 0;
                         $cacheData['goods_id'][$goods_id] = $goods_id_history;
                     }
 
@@ -975,7 +975,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                     if(isset($cacheData['prop_price_id'][$prop_price_id]) && $cacheData['prop_price_id'][$prop_price_id] > 0){
                         $prop_price_id_history = $cacheData['prop_price_id'][$prop_price_id];
                     }else{
-                        $prop_price_id_history = ShopGoodsPricesDBBusiness::getIdHistory($prop_price_id);
+                        $prop_price_id_history = ($prop_price_id > 0) ? ShopGoodsPricesDBBusiness::getIdHistory($prop_price_id) : 0;
                         $cacheData['prop_price_id'][$prop_price_id] = $prop_price_id_history;
                     }
 
@@ -1019,7 +1019,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                         if(isset($cacheData['goods_props_id'][$goods_props_id]) && $cacheData['goods_props_id'][$goods_props_id] > 0){
                             $goods_props_id_history = $cacheData['goods_props_id'][$goods_props_id];
                         }else{
-                            $goods_props_id_history = ShopGoodsPropsDBBusiness::getIdHistory($goods_props_id);
+                            $goods_props_id_history = ($goods_props_id > 0) ? ShopGoodsPropsDBBusiness::getIdHistory($goods_props_id) : 0;
                             $cacheData['goods_props_id'][$goods_props_id] = $goods_props_id_history;
                         }
 
