@@ -1813,6 +1813,119 @@ function getdiffdate(stime,etime){
     console.log(diffdate);
 }
 
+// 计算日期差
+// console.log(getDiffDate('2019-03-21')) ;
+// end_time 结束日期 格式 :当前日期/指定日期 -->到这个日期的信息
+// start_time 开始日期 --不传为当前日期时间
+function getDiffDate(end_time, start_time){
+    console.log('----end_time----', end_time);
+    console.log('----start_time----', start_time);
+    var date = new Date();
+    console.log('----date----', date);
+    if(start_time){
+        date = new Date(start_time);//设置截止时间
+        console.log('----date----', date);
+    }
+    var now = date.getTime();
+    console.log('----now----', now);
+
+    // var exam_end_time = EXAM_END_TIME;// 结束时间
+    var endDate = new Date(end_time);//设置截止时间
+    console.log('----endDate----', endDate);
+    var end = endDate.getTime();
+    console.log('----end----', end);
+    var leftTime = end - now; //时间差
+    console.log('----leftTime----', leftTime);
+    // var y, d, h, m, s, ms;
+    var diffTimeObj = getDiffTime(leftTime);
+    if(leftTime < 0 ){
+        for(let p in diffTimeObj){
+            diffTimeObj[p] = - diffTimeObj[p];
+        }
+    }
+    return diffTimeObj;
+}
+
+// 格式化值
+// num 数字
+// n 保留长度
+function padZoreLeft(num, n) {
+    var len = num.toString().length;
+    while(len < n) {
+        num = "0" + num;
+        len++;
+    }
+    return num;
+}
+
+// 根据毫秒，返回时间对象
+// leftTime 时间相差的毫秒数
+function getDiffTime(leftTime){
+    leftTime = Math.abs(leftTime);
+    var returnObj = {};
+    // ceil向上取整  floor向下取整
+    // max 向上取整
+    // min 下下取整
+
+    // 年
+    returnObj.a_min_y = Math.floor(leftTime / 1000 / 60 / 60 / 24 / 365);// 多少年 -- 向下取整
+    returnObj.a_max_y = Math.ceil(leftTime / 1000 / 60 / 60 / 24 / 365);// 多少年-- 向上取整
+
+    // 天
+    // 共多少天
+    returnObj.a_min_d = Math.floor(leftTime / 1000 / 60 / 60 / 24);// 共多少天 -- 向下取整
+    returnObj.a_max_d = Math.ceil(leftTime / 1000 / 60 / 60 / 24);// 共多少天 -- 向上取整
+
+    // 共多少天-- 除整年
+    returnObj.y_mix_d = Math.floor(leftTime / 1000 / 60 / 60 / 24 % 365);// -- 向下取整
+    returnObj.y_max_d = Math.ceil(leftTime / 1000 / 60 / 60 / 24 % 365);// -- 向上取整
+
+
+    // 小时
+    returnObj.a_min_h = Math.floor(leftTime / 1000 / 60 / 60);// 共多少小时--- 向下取整
+    returnObj.a_max_h = Math.ceil(leftTime / 1000 / 60 / 60);// 共多少小时--- 向上取整
+
+    // 共多少小时-- 除整年
+    returnObj.y_mix_h = Math.floor( leftTime / 1000 / 60 / 60  % (365 * 24 ) );// -- 向下取整
+    returnObj.y_max_h = Math.ceil( leftTime / 1000 / 60 / 60  % (365 * 24 ) );// -- 向上取整
+
+    // 共多少小时-- 除整年天
+    returnObj.d_mix_h = Math.floor(leftTime / 1000 / 60 / 60 % 24);// 最后一天的多少小时 -- 向下取整
+    returnObj.d_max_h = Math.ceil(leftTime / 1000 / 60 / 60 % 24);// 最后一天的多少小时 -- 向上取整
+
+    // 分钟
+    returnObj.a_min_m = Math.floor(leftTime / 1000 / 60);// 共多少分钟 -- 向下取整
+    returnObj.a_min_m = Math.ceil(leftTime / 1000 / 60);// 共多少分钟 -- 向上取整
+
+    returnObj.y_mix_m = Math.floor( leftTime / 1000 / 60  % (365 * 24 * 60 ) );// -- 向下取整
+    returnObj.y_max_m = Math.ceil( leftTime / 1000 / 60  % (365 * 24  * 60 ) );// -- 向上取整
+
+    returnObj.h_min_m = Math.floor(leftTime / 1000 / 60 % 60);// 最后一小时的多少分钟 -- 向下取整
+    returnObj.h_max_m = Math.ceil(leftTime / 1000 / 60 % 60);// 最后一小时的多少分钟 -- 向上取整
+
+    // 秒
+    returnObj.a_min_s = Math.floor(leftTime / 1000);// 共多少分钟 -- 向下取整
+    returnObj.a_min_s = Math.ceil(leftTime / 1000);// 共多少分钟 -- 向上取整
+
+    returnObj.y_mix_s = Math.floor( leftTime / 1000 % (365 * 24 * 60 * 60 ) );// -- 向下取整
+    returnObj.y_max_s = Math.ceil( leftTime / 1000 % (365 * 24  * 60 * 60 ) );// -- 向上取整
+
+    returnObj.m_min_s = Math.floor(leftTime / 1000 % 60);// 最后一分钟的多少秒 -- 向下取整
+    returnObj.m_max_s = Math.ceil(leftTime / 1000 % 60);// 最后一分钟的多少秒 -- 向上取整
+
+    // 毫秒
+    returnObj.a_min_ms = Math.floor(leftTime);// 共多少毫秒 -- 向下取整
+    returnObj.a_min_ms = Math.ceil(leftTime);// 共多少毫秒 -- 向上取整
+
+    returnObj.y_mix_ms = Math.floor( leftTime % (365 * 24 * 60 * 60 * 1000) );// -- 向下取整
+    returnObj.y_max_ms = Math.ceil( leftTime % (365 * 24  * 60 * 60  * 1000) );// -- 向上取整
+
+    returnObj.s_min_ms = Math.floor(leftTime  % 1000);// 最后一分钟的多少毫秒 -- 向下取整
+    returnObj.s_max_ms = Math.ceil(leftTime  % 1000);// 最后一分钟的多少毫秒 -- 向上取整
+
+    return returnObj;
+}
+
 // 单个文件上传
 // fileObj 文件上传对象
 // ajaxUrl 上传文件处理url

@@ -180,16 +180,16 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
                 if(!empty($price_props)) $price_props = Tool::php_multisort($price_props, self::$pricePropVals);
                 foreach ($price_props as $t_v) {
                     $prop_name = '';
-                     if(isset($t_v['prop_name']['prop']['name']['main_name'])){// 实时
-                         $prop_name = $t_v['prop_name']['prop']['name']['main_name'];
-                     }elseif(isset($t_v['prop_name']['main_name'])){// 历史
-                         $prop_name = $t_v['prop_name']['main_name'] ?? '';
+                    if(isset($t_v['prop_name']['main_name'])){// 含历史--用这个
+                        $prop_name = $t_v['prop_name']['main_name'] ?? '';
+                    }elseif(isset($t_v['prop']['name']['main_name'])){// 实时与属性表同步
+                         $prop_name = $t_v['prop']['name']['main_name'];
                      }
                      $price_pv_name = "";
-                    if(isset($t_v['prop_name']['prop_val']['name']['main_name'])){// 实时
-                        $price_pv_name = $t_v['prop_name']['prop_val']['name']['main_name'];
-                    }elseif(isset($t_v['prop_val']['name']['main_name'])){// 历史
-                        $price_pv_name = $t_v['prop_val']['name']['main_name'] ?? '';
+                    if(isset($t_v['prop_val_name']['main_name'])){// 历史--用这个
+                        $price_pv_name = $t_v['prop_val_name']['main_name'] ?? '';
+                    }elseif(isset($t_v['prop_val']['name']['main_name'])){// 实时与属性值表同步
+                        $price_pv_name = $t_v['prop_val']['name']['main_name'];
                     }
 
                     array_push($priceList, [
@@ -395,8 +395,22 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
     public static function delAjax(Request $request, Controller $controller, $notLog = 0)
     {
         $company_id = $controller->company_id;
-        // $id = CommonRequest::getInt($request, 'id');
-        return static::delAjaxBase($request, $controller, '', $notLog);
+        $user_id = $controller->user_id;
+        $id = CommonRequest::getInt($request, 'id');
+
+        // 调用删除接口
+        $apiParams = [
+            'company_id' => $company_id,
+            'id' => $id,
+            'operate_staff_id' => $user_id,
+            'modifAddOprate' => 0,
+        ];
+        static::exeDBBusinessMethodCT($request, $controller, '',  'delById', $apiParams, $company_id, $notLog);
+        return ajaxDataArr(1, $id, '');
+
+//        $company_id = $controller->company_id;
+//        // $id = CommonRequest::getInt($request, 'id');
+//        return static::delAjaxBase($request, $controller, '', $notLog);
 
     }
 
@@ -671,7 +685,7 @@ class CTAPIShopGoodsBusiness extends BasicPublicCTAPIBusiness
      *
      * @param array $props 商品表关系获得的商品属性
      * @param array $formatCartPropArr 已有的商品属性 ['属性id' => ['属性值id',...]]
-     * @param int $name_type 名称类型 1 实时[商品或购物车] 2 历史[订单]
+     * @param int $name_type 名称类型 1 实时[商品或购物车]--不用这个了 2 历史[订单][商品或购物车]
      *
     , 'goods.props.propName', 'goods.props.propValName'// 属性名--订单后
     , 'goods.props.prop.name', 'goods.props.propVal.name'// 属性名--订单前

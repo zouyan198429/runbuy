@@ -38,8 +38,10 @@ $(function(){
         // }, function(){
         //});
         return false;
-    })
+    });
 
+    // 解析属性值数据
+    initPropVal('prop_table', PV_LIST_JSON, 1);
 });
 
 //ajax提交表单
@@ -73,9 +75,27 @@ function ajax_form(){
         return false;
     }
 
-    var prop_vals = $('textarea[name=prop_vals]').val();
-    if(!judge_validate(4,'属性值',prop_vals,true,'length',2,500)){
+    var pv_i = 0;
+    var pverr = false;
+    $('.pvbody').find('tr').each(function(){
+        var trObj = $(this);
+        var pv_val = trObj.find('input[name="pv_names[]"]').val();
+        if(!judge_validate(4,'属性值',pv_val,true,'length',2,20)){
+            pverr = true;
+            return false;
+        }
+        console.log('----pv_i-------', pv_i);
+        pv_i += 1;
+    });
+    if(pverr){
         return false;
+    }
+
+    if(pv_i <= 0){
+        var prop_vals = $('textarea[name=prop_vals]').val();
+        if(!judge_validate(4,'属性值',prop_vals,true,'length',2,500)){
+            return false;
+        }
     }
 
     var sort_num = $('input[name=sort_num]').val();
@@ -166,7 +186,122 @@ var otheraction = {
         });
         return false;
     },
+    removePv : function(obj){// 移除
+        var recordObj = $(obj);
+        var addBtnObj = $(obj);
+        var trObj = addBtnObj.closest('tr');//获取当前<tr>'tr'
+        var prop_val_id = trObj.find('input[name="pv_ids[]"]').val();
+        console.log('------prop_val_id------', prop_val_id);
+
+        var index_query = layer.confirm('确定移除当前记录？[提交]后不可恢复!', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+
+            var data = {};
+            data['prop_val_id'] = prop_val_id;
+            console.log('data', data);
+            console.log('JUDGE_PV_USED_URL', JUDGE_PV_USED_URL);
+            var layer_index = layer.load();
+            $.ajax({
+                'async': false,// true,//false:同步;true:异步
+                'type' : 'POST',
+                'url' : JUDGE_PV_USED_URL,
+                'data' : data,
+                'dataType' : 'json',
+                'success' : function(ret){
+                    console.log('ret',ret);
+                    if(!ret.apistatus){//失败
+                        //alert('失败');
+                        err_alert(ret.errorMsg);
+                    }else{//成功
+                        var info = ret.result;
+                        console.log('info', info);
+
+                        recordObj.closest('tr').remove();
+                    }
+                    layer.close(index_query);
+
+                    layer.close(layer_index)//手动关闭
+                }
+            });
+        }, function(){
+        });
+        return false;
+    },
+    moveUp : function(obj, parentTag){// 上移
+        var recordObj = $(obj);
+        var current = recordObj.closest(parentTag);//获取当前<tr>  'tr'
+        var prev = current.prev();  //获取当前<tr>前一个元素
+        console.log('index', current.index());
+        if (current.index() > 0) {
+            current.insertBefore(prev); //插入到当前<tr>前一个元素前
+        }else{
+            layer_alert("已经是第一个，不能移动了。",3,0);
+        }
+        return false;
+    },
+    moveDown : function(obj, parentTag){// 下移
+        var recordObj = $(obj);
+        var current = recordObj.closest(parentTag);//获取当前<tr>'tr'
+        var next = current.next(); //获取当前<tr>后面一个元素
+        console.log('length', next.length);
+        console.log('next', next);
+        if (next.length > 0 && next) {
+            current.insertAfter(next);  //插入到当前<tr>后面一个元素后面
+        }else{
+            layer_alert("已经是最后一个，不能移动了。",3,0);
+        }
+        return false;
+    },
+    // 添加属性值
+    addPVName : function(obj){// 下移
+        var addBtnObj = $(obj);
+        var trObj = addBtnObj.closest('tr');//获取当前<tr>'tr'
+        var propname = trObj.find('input[name="propname"]').val();
+        if(!judge_validate(4,'属性值',propname,true,'length',1,50)){
+            return false;
+        }
+        // 遍历已有的属性值
+        var pverr = false;
+        $('.pvbody').find('tr').each(function(){
+            var trObj = $(this);
+            var pv_val = trObj.find('input[name="pv_names[]"]').val();
+            if(propname == pv_val){
+                layer_alert('属性值[' + propname + ']已存在！',3,0);
+                pverr = true;
+                return false;
+            }
+        });
+        if(pverr){
+            return false;
+        }
+        // 添加
+        // 数据模板，显示数据
+        var data_list = {
+            'data_list': [{'id':0,'main_name':propname}],
+        };
+        console.log('data_list', data_list);
+        // 解析数据
+        initPropVal('prop_table', data_list, 2);
+        // 清空
+        trObj.find('input[name="propname"]').val('');
+        return false;
+    },
 };
+
+// 初始化属性值列表
+// data_list 数据对象 {'data_list':[{}]}
+// type类型 1 全替换 2 追加到后面 3 返回html
+function initPropVal(class_name, data_list, type){
+    var htmlStr = resolve_baidu_template(DYNAMIC_PROPVAL_BAIDU_TEMPLATE,data_list,'');//解析
+    if(type == 3) return htmlStr;
+    //alert(htmlStr);
+    if(type == 1){
+        $('.'+ class_name).find('.' + DYNAMIC_PROPVAL_TABLE_BODY).html(htmlStr);
+    }else if(type == 2){
+        $('.'+ class_name).find('.' + DYNAMIC_PROPVAL_TABLE_BODY).append(htmlStr);
+    }
+}
 
 // 获得选中的店铺id 数组
 function getSelectedShopIds(){
@@ -230,3 +365,33 @@ function addShop(shop_id){
         }
     });
 }
+
+(function() {
+    document.write("<!-- 前端模板部分 -->");
+    document.write("<!-- 列表模板部分 开始  <! -- 模板中可以用HTML注释 -- >  或  <%* 这是模板自带注释格式 *%> -->");
+    document.write("<script type=\"text\/template\"  id=\"baidu_template_pv_data_list\">");
+    document.write("    <%for(var i = 0; i<data_list.length;i++){");
+    document.write("    var item = data_list[i];");
+    document.write("    %>");
+    document.write("    <tr>");
+    document.write("        <td>");
+    document.write("            <input type=\"hidden\" class=\"inp wnormal\"  name=\"pv_ids[]\" value=\"<%=item.id%>\"\/>");
+    document.write("            <input type=\"text\" class=\"inp wnormal\"  name=\"pv_names[]\" value=\"<%=item.main_name%>\" placeholder=\"请输入属性值名称\" \/>");
+    document.write("        <\/td>");
+    document.write("        <td>");
+    document.write("            <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-info\" onclick=\"otheraction.moveUp(this, \'tr\')\">");
+    document.write("                <i class=\"ace-icon fa fa-arrow-up bigger-60\"> 上移<\/i>");
+    document.write("            <\/a>");
+    document.write("            <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-info\" onclick=\"otheraction.moveDown(this, \'tr\')\">");
+    document.write("                <i class=\"ace-icon fa fa-arrow-down bigger-60\"> 下移<\/i>");
+    document.write("            <\/a>");
+    document.write("            <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-info\" onclick=\"otheraction.removePv(this)\">");
+    document.write("                <i class=\"ace-icon fa fa-trash-o bigger-60\"> 移除<\/i>");
+    document.write("            <\/a>");
+    document.write("        <\/td>");
+    document.write("    <\/tr>");
+    document.write("    <%}%>");
+    document.write("<\/script>");
+    document.write("<!-- 列表模板部分 结束-->");
+    document.write("<!-- 前端模板结束 -->");
+}).call();

@@ -461,9 +461,9 @@ class APIBasicRequest
         if (!empty($params)) {
             $requestData['params'] = $params ;
         }
-
         // 生成带参数的测试get请求
         $requestTesUrl = splicQuestAPI($url , $requestData);
+        // pr($requestTesUrl);
         return HttpRequest::HttpRequestApi($url, $requestData, [], 'POST');
     }
 

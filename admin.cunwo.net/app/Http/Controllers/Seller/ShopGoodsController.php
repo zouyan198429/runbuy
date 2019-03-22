@@ -255,7 +255,8 @@ class ShopGoodsController extends WorksController
             'city', 'cityPartner', 'seller'
             , 'shop', 'type', 'siteResources'
            //  , 'priceProps.propVal.name', 'priceProps.propName'
-            , 'priceProps.prop.name', 'priceProps.propVal.name'// 价格属性名--订单前
+           // , 'priceProps.prop.name', 'priceProps.propVal.name'// 价格属性名--订单前
+            , 'priceProps.propName', 'priceProps.propValName' //含历史--用这个
         ]);
     }
 

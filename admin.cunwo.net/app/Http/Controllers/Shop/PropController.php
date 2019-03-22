@@ -143,15 +143,34 @@ class PropController extends WorksController
         // $seller_id_history = CommonRequest::getInt($request, 'seller_id_history');
         $main_name = CommonRequest::get($request, 'main_name');
         $sort_num = CommonRequest::getInt($request, 'sort_num');
+        $pv_ids = CommonRequest::get($request, 'pv_ids');
+        if(is_string($pv_ids) || is_numeric($pv_ids)){
+            $pv_ids = explode(',' ,$pv_ids);
+        }
+        $pv_names = CommonRequest::get($request, 'pv_names');
+        if(is_string($pv_names) || is_numeric($pv_names)){
+            $pv_names = explode(',' ,$pv_names);
+        }
+        foreach($pv_names as $k => $v){
+            $pv_names[$k] = trim($v);
+        }
+
         $prop_vals = CommonRequest::get($request, 'prop_vals');
         // $prop_vals =  replace_enter_char($prop_vals,1);
         if(!is_array($prop_vals) && is_string($prop_vals)){// 转为数组
             $prop_vals = explode(PHP_EOL, $prop_vals);
         }
+
+        $propValArr = [];
+        foreach($pv_ids as $k => $v){
+            if(!is_numeric($v)) continue;
+            array_push($propValArr, ['pv_id' => $v, 'pv_val' => $pv_names[$k]]);
+        }
+
         foreach($prop_vals as $k => $v){
             if(!is_numeric($v) && !is_string($v)) continue;
             $v = trim($v);
-            if(strlen($v) <= 0) {
+            if(strlen($v) <= 0 || in_array($v, $pv_names)) {
                 unset($prop_vals[$k]);
                 continue;
             }
@@ -162,7 +181,7 @@ class PropController extends WorksController
             return ajaxDataArr(0, null, '属性名称不能为空！');
         }
 
-        if(empty($prop_vals)){
+        if(empty($propValArr)  && empty($prop_vals)){
             return ajaxDataArr(0, null, '属性值不能为空！');
         }
 
@@ -172,8 +191,11 @@ class PropController extends WorksController
             'sort_num' => $sort_num,
 
             'main_name' => $main_name,
-            'prop_vals' => $prop_vals,
+            // 'prop_vids' => $propValArr,// 修改已有的 二维数组 [['pv_id' => '属性值id', 'pv_val' => '属性值名称'],....]
+            // 'prop_vals' => $prop_vals,// 新加的 ['属性值',....]
         ];
+        if(!empty($propValArr)) $saveData['prop_vids'] = $propValArr;
+        if(!empty($prop_vals)) $saveData['prop_vals'] = $prop_vals;
 
 //        if($id <= 0) {// 新加;要加入的特别字段
 //            $addNewData = [
@@ -195,6 +217,20 @@ class PropController extends WorksController
     public function ajax_alist(Request $request){
         $this->InitParams($request);
         return  CTAPIPropBusiness::getList($request, $this, 2 + 4, [], ['propVals.name', 'name', 'city', 'cityPartner', 'seller', 'shop']);
+    }
+
+    /**
+     * ajax查询属性值id是否有商品正在使用,有在使用的抛出错误（正在使用的商品id）
+     *
+     * @param Request $request
+     * @return mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public function ajax_pv_used(Request $request){
+        $this->InitParams($request);
+        $prop_val_id = CommonRequest::getInt($request, 'prop_val_id');
+        $goods = CTAPIPropBusiness::judgePvIdUsed($request, $this, $prop_val_id, false);
+        return ajaxDataArr(1, $goods, '');
     }
 
     /**

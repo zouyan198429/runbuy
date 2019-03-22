@@ -927,7 +927,7 @@ class CommonDB
         if(empty($mainObj)){
             throws("原记录[" . $primaryVal  . "] 不存在");
         }
-        $versionNum = $mainObj->version_num;
+        $versionNum = $mainObj->version_num;// 当前记录版本号
 
         // 获得所有字段-历史表
         $historyColumns = Schema::getColumnListing($HistoryTableName);

@@ -310,6 +310,7 @@ class CTAPIPropBusiness extends BasicPublicCTAPIBusiness
         }
         $info['propValIds'] = array_column($propVals,'id');
         $info['propValIdKV'] = Tool::formatArrKeyVal($propVals, 'id', 'main_name');
+        $info['propVals'] = array_values(Tool::formatTwoArrKeys($propVals, Tool::arrEqualKeyVal(['id', 'main_name']), false));
         // $info['propValNnames'] = implode('、',array_column($propVals, 'main_name'));
         $info['prop_vals'] = implode(PHP_EOL,array_column($propVals, 'main_name'));
         //}
@@ -478,6 +479,12 @@ class CTAPIPropBusiness extends BasicPublicCTAPIBusiness
             throws('属性名称不能为空！');
         }
 
+        // 已有属性值
+        if(isset($saveData['prop_vids']) && empty($saveData['prop_vids'])  ){
+            throws('属性值不能为空！');
+        }
+
+        // 新加属性值
         if(isset($saveData['prop_vals']) && empty($saveData['prop_vals'])  ){
             throws('属性值不能为空！');
         }
@@ -730,5 +737,38 @@ class CTAPIPropBusiness extends BasicPublicCTAPIBusiness
 //        ];
 //        static::judgePowerByObj($request, $controller, $data_list, $judgeData );
         return $data_list;
+    }
+
+    /**
+     * 查询属性值id是否有商品正在使用,有在使用的抛出错误（正在使用的商品id）
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param int $prop_val_id 属性值id
+     * @param boolean $modifAddOprate 修改时是否加操作人，true:加;false:不加[默认]
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 单条数据 - -维数组 为0 新加，返回新的对象数组[-维],  > 0 ：修改对应的记录，返回true
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function judgePvIdUsed(Request $request, Controller $controller,  $prop_val_id, $modifAddOprate = false, $notLog = 0)
+    {
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+
+
+        if (!is_numeric($prop_val_id)) {
+            throws('属性值Id格式不对！');
+        }
+
+        // 调用新加或修改接口
+        $apiParams = [
+            'company_id' => $company_id,
+            'prop_val_id' => $prop_val_id,
+            'operate_staff_id' => $user_id,
+            'modifAddOprate' => 0,
+        ];
+        $goods = static::exeDBBusinessMethodCT($request, $controller, '', 'judgePvIdUsed', $apiParams, $company_id, $notLog);
+        if(!empty($goods)) throws('商品Id[' . implode(',', $goods) . ']正在使用此属性值，请先处理商品属性再删除。');
+        return $goods;
     }
 }

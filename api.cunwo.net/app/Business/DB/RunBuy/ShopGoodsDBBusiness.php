@@ -80,6 +80,38 @@ class ShopGoodsDBBusiness extends BasePublicDBBusiness
             unset($saveData['resourceIds']);
         }
 
+        // 获得当前商品已有的价格属性
+        $queryParams = [
+            'where' => [
+                ['goods_id', '=' , $id],
+                // ['main_name', 'like', '' . $main_name . '%'],
+                // ['id', '&' , '16=16'],
+            ],
+            'select' => [
+                'id'
+            ]
+        ];
+        // 获得已有的价格属性表id数组--一维
+        $dataListPrice = ShopGoodsPricesDBBusiness::getList($queryParams,[]);
+        $goodsPriceIds = array_column($dataListPrice->toArray(),'id');
+
+        // 获得当前商品已有的属性
+        $queryParams = [
+            'where' => [
+                ['goods_id', '=' , $id],
+                // ['main_name', 'like', '' . $main_name . '%'],
+                // ['id', '&' , '16=16'],
+            ],
+            'select' => [
+                'id'
+            ]
+        ];
+        // 获得已有的属性表id数组--一维
+        $dataListProps = ShopGoodsPropsDBBusiness::getList($queryParams,[]);
+        $goodsPropsIds = array_column($dataListProps->toArray(),'id');
+
+
+
         // 属性
         $propList = [];
         $hasProp = false;
@@ -132,178 +164,305 @@ class ShopGoodsDBBusiness extends BasePublicDBBusiness
                 static::saveResourceSync($id, $resourceIds, $operate_staff_id, $operate_staff_id_history, []);
             }
             // 属性
-            if($hasProp){
-                // 获得属性记录
-                $propIds = array_unique(array_column($propList,'prop_id'));
-                $queryParams = [
-                    'where' => [
-                        // ['goods_id', '=' , $good_id],
-                        // ['main_name', 'like', '' . $main_name . '%'],
-                        // ['id', '&' , '16=16'],
-                    ],
-                    //'select' => [
-                     //   'id', 'city_site_id', 'city_partner_id', 'seller_id', 'names_id', 'sort_num'
-                    //],
-                    // 'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],
-                ];
-                 $queryParams['whereIn']['id'] = $propIds;
+            if($hasProp ){
+                $goodsProp = [];// 新加操作，要批量新加的商品属性
+                $goodsPropPrice = [];// 新加操作，要批量新加的商品价格属性
+                $modifyPropIds = [];// 修改操作过的商品属性id数组-- 一维数组
+                $modifyPropPriceIds = [];// 修改操作过的商品属性价格id数组---一维数组
 
-                $propData = PropDBBusiness::getList($queryParams, []);
-                $propData = $propData->toArray();
-                $formatProps = [];
-                foreach($propData as $v){
-                    $formatProps[$v['id']] = $v;
-                }
-                // 获得属性值记录
-                $pvIdsArr = [];
-                foreach($propList as $v){
-                    $temPVIds = trim($v['pv_ids']);  // 属性值id串 '1,2' 多个用,号分隔
-                    if(empty($temPVIds)) continue;
-                    $temArr = explode(',', $temPVIds);
-                    $pvIdsArr = array_merge($pvIdsArr, $temArr);
-                }
-                $pvIdsArr = array_unique($pvIdsArr);
-
-                $queryParams = [
-                    'where' => [
-                        // ['goods_id', '=' , $good_id],
-                        // ['main_name', 'like', '' . $main_name . '%'],
-                        // ['id', '&' , '16=16'],
-                    ],
-                   // 'select' => [
-                    //    'id', 'prop_id', 'names_id', 'sort_num'
-                    //],
-                    //'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],
-                ];
-                $queryParams['whereIn']['id'] = $pvIdsArr;
-                $propValList = PropValDBBusiness::getList($queryParams,[]);
-                $propValList = $propValList->toArray();
-                $formatPVList = [];
-                foreach($propValList as $v){
-                    $formatPVList[$v['id']] = $v;
-                }
-
-                $goodsProp = [];
-                $goodsPropPrice = [];
-                $modifyPropIds = [];
-                $modifyPropPriceIds = [];
-                $propCount = count($propList);
-                $propValCount = count($pvIdsArr);
-                foreach($propList as $v){
-                    $propId = $v['prop_id'];
-                    $isPrices = $v['is_prices'] ?? 0;
-                    $pvIds = $v['pv_ids'];  // 属性值id串 '1,2' 多个用,号分隔
-                    if(empty($pvIds)) continue;
-                    $temPropInfo = $formatProps[$propId] ?? [];
-                    if(empty($temPropInfo)) continue;
-                    $temProp = [
-                        // 'is_prices' => $isPrices,
-                        // 'is_multi' => $v['is_multi'],
-                        // 'is_must' => $v['is_must'],
-                        'city_site_id' => $city_site_id,
-                        'city_partner_id' => $city_partner_id,
-                        'seller_id' => $seller_id,
-                        'shop_id' => $shop_id,
-                        'goods_id' => $id,
-                        'prop_id' => $propId,
-                        'prop_names_id' => $temPropInfo['names_id'],
-                        'operate_staff_id' => $operate_staff_id,
-                        'operate_staff_id_history' => $operate_staff_id_history,
-                        // 'sort_num' => $propCount--,
+                if( !empty($propList) ){
+                    // 获得属性记录
+                    $propIds = array_unique(array_column($propList,'prop_id'));
+                    $queryParams = [
+                        'where' => [
+                            // ['goods_id', '=' , $good_id],
+                            // ['main_name', 'like', '' . $main_name . '%'],
+                            // ['id', '&' , '16=16'],
+                        ],
+                        //'select' => [
+                        //   'id', 'city_site_id', 'city_partner_id', 'seller_id', 'names_id', 'sort_num'
+                        //],
+                        // 'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],
                     ];
-                    if($isPrices == 1){// 价格属性
-                       // $temProp = array_merge($temProp, [
-//                            'aaaa' => $aaa,
-                       // ]);
-                    }else{
-                        $temProp = array_merge($temProp, [
-                            'is_multi' => $v['is_multi'],
-                            'is_must' => $v['is_must'],
-                        ]);
+                    $queryParams['whereIn']['id'] = $propIds;
+
+                    $propData = PropDBBusiness::getList($queryParams, []);
+                    $propData = $propData->toArray();
+                    // 格式化属性表记录
+                    $formatProps = [];
+                    foreach($propData as $v){
+                        $formatProps[$v['id']] = $v;
                     }
-                    $temArr = explode(',', $pvIds);
-                    if($isPrices == 1) $temArr = array_keys($pvPrices);// 价格属性 ，用价格的顺序
-                    foreach($temArr as $temPVId){
-                        $temPVInfo = $formatPVList[$temPVId] ?? [];
-                        if(empty($temPVInfo)) continue;
-                        $temPVArr = $temProp;
-                        $temSortNum = $propValCount--;
-                        if($temSortNum < 0) $temSortNum = 0;
-                        $temPVArr = array_merge($temPVArr, [
-                            'prop_val_id' => $temPVId,
-                            'prop_val_names_id' => $temPVInfo['names_id'],
-                             'sort_num' => $temSortNum,
-                        ]);
-                        if($isPrices == 1) {// 价格属性
-                            $temPVArr['price'] = $pvPrices[$temPVId] ?? 0;
-                            if(!$isModify) array_push($goodsPropPrice, $temPVArr); // 新加
-                            if($isModify){// 更新
-                                $pvObj = null ;
-                                $searchConditon = [
-                                    'goods_id' => $id,
-                                    'prop_id' => $propId,
-                                    'prop_val_id' => $temPVId,
-                                ];
-                                ShopGoodsPricesDBBusiness::updateOrCreate($pvObj, $searchConditon, $temPVArr);
-                                array_push($modifyPropPriceIds, $pvObj->id);
-                            }
+
+                    // 获得属性值记录
+                    $pvIdsArr = [];// 属性值id数组---维
+                    foreach($propList as $v){
+                        $temPVIds = trim($v['pv_ids']);  // 属性值id串 '1,2' 多个用,号分隔
+                        if(empty($temPVIds)) continue;
+                        $temArr = explode(',', $temPVIds);
+                        $pvIdsArr = array_merge($pvIdsArr, $temArr);
+                    }
+                    $pvIdsArr = array_unique($pvIdsArr);
+
+                    $queryParams = [
+                        'where' => [
+                            // ['goods_id', '=' , $good_id],
+                            // ['main_name', 'like', '' . $main_name . '%'],
+                            // ['id', '&' , '16=16'],
+                        ],
+                        // 'select' => [
+                        //    'id', 'prop_id', 'names_id', 'sort_num'
+                        //],
+                        //'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],
+                    ];
+                    $queryParams['whereIn']['id'] = $pvIdsArr;
+                    $propValList = PropValDBBusiness::getList($queryParams,[]);
+                    $propValList = $propValList->toArray();
+                    // 格式化属性值id  --一维数组
+                    $formatPVList = [];
+                    foreach($propValList as $v){
+                        $formatPVList[$v['id']] = $v;
+                    }
+
+                    $propCount = count($propList);// 属性数量
+                    $propValCount = count($pvIdsArr);// 属性值的数量
+
+                    // 遍历属性
+                    foreach($propList as $v){
+                        $propId = $v['prop_id'];
+                        $isPrices = $v['is_prices'] ?? 0;
+                        $pvIds = $v['pv_ids'];  // 属性值id串 '1,2' 多个用,号分隔
+                        if(empty($pvIds)) continue;
+                        $temPropInfo = $formatProps[$propId] ?? [];
+                        if(empty($temPropInfo)) continue;
+                        $temProp = [
+                            // 'is_prices' => $isPrices,
+                            // 'is_multi' => $v['is_multi'],
+                            // 'is_must' => $v['is_must'],
+                            'city_site_id' => $city_site_id,
+                            'city_partner_id' => $city_partner_id,
+                            'seller_id' => $seller_id,
+                            'shop_id' => $shop_id,
+                            'goods_id' => $id,
+                            'prop_id' => $propId,
+                            'prop_names_id' => $temPropInfo['names_id'],
+                            'operate_staff_id' => $operate_staff_id,
+                            'operate_staff_id_history' => $operate_staff_id_history,
+                            // 'sort_num' => $propCount--,
+                        ];
+                        if($isPrices == 1){// 价格属性
+                            // $temProp = array_merge($temProp, [
+//                            'aaaa' => $aaa,
+                            // ]);
                         }else{
-                            if(!$isModify) array_push($goodsProp, $temPVArr); // 新加
-                            if($isModify){// 更新
-                                $pvObj = null ;
-                                $searchConditon = [
-                                    'goods_id' => $id,
-                                    'prop_id' => $propId,
-                                    'prop_val_id' => $temPVId,
-                                ];
-                                ShopGoodsPropsDBBusiness::updateOrCreate($pvObj, $searchConditon, $temPVArr);
-                                array_push($modifyPropIds, $pvObj->id);
+                            $temProp = array_merge($temProp, [
+                                'is_multi' => $v['is_multi'],
+                                'is_must' => $v['is_must'],
+                            ]);
+                        }
+                        $temArr = explode(',', $pvIds);
+                        if($isPrices == 1) $temArr = array_keys($pvPrices);// 价格属性 ，用价格的顺序
+                        foreach($temArr as $temPVId){
+                            $temPVInfo = $formatPVList[$temPVId] ?? [];
+                            if(empty($temPVInfo)) continue;
+                            $temPVArr = $temProp;
+                            $temSortNum = $propValCount--;
+                            if($temSortNum < 0) $temSortNum = 0;
+                            $temPVArr = array_merge($temPVArr, [
+                                'prop_val_id' => $temPVId,
+                                'prop_val_names_id' => $temPVInfo['names_id'],
+                                'sort_num' => $temSortNum,
+                            ]);
+                            if($isPrices == 1) {// 价格属性
+                                $temPVArr['price'] = $pvPrices[$temPVId] ?? 0;
+                                if(!$isModify) array_push($goodsPropPrice, $temPVArr); // 新加
+                                if($isModify){// 更新
+                                    $pvObj = null ;
+                                    $searchConditon = [
+                                        'goods_id' => $id,
+                                        'prop_id' => $propId,
+                                        'prop_val_id' => $temPVId,
+                                    ];
+                                    ShopGoodsPricesDBBusiness::updateOrCreate($pvObj, $searchConditon, $temPVArr);
+                                    array_push($modifyPropPriceIds, $pvObj->id);
+                                }
+                            }else{
+                                if(!$isModify) array_push($goodsProp, $temPVArr); // 新加
+                                if($isModify){// 更新
+                                    $pvObj = null ;
+                                    $searchConditon = [
+                                        'goods_id' => $id,
+                                        'prop_id' => $propId,
+                                        'prop_val_id' => $temPVId,
+                                    ];
+                                    ShopGoodsPropsDBBusiness::updateOrCreate($pvObj, $searchConditon, $temPVArr);
+                                    array_push($modifyPropIds, $pvObj->id);
+                                }
                             }
                         }
+
+                    }
+                }
+
+                if($isModify){
+
+                    // 删除多余的属性
+
+                    // 价格属性
+                    // 获得要删除的价格属性id
+                    $delGoodsPriceIds = array_diff($goodsPriceIds, $modifyPropPriceIds);
+                    if(!empty($delGoodsPriceIds)){
+                        // 获得购物车的记录
+                        $queryParams = [
+                            'where' => [
+                                ['goods_id', '=' , $id],
+                                // ['main_name', 'like', '' . $main_name . '%'],
+                                // ['id', '&' , '16=16'],
+                            ],
+                            'select' => [
+                                'id'
+                            ]
+                        ];
+                        $queryParams['whereIn']['prop_price_id'] = $delGoodsPriceIds;
+
+                        // 获得已有的属性表id数组--一维
+                        $dataListCarts = CartDBBusiness::getList($queryParams,[]);
+                        $cartIds = array_column($dataListCarts->toArray(),'id');
+                        if(!empty($cartIds)){
+                            // 删除购物车商品属性
+                            $queryParams = [
+                                'where' => [
+                                    //  ['id', '&' , '16=16'],
+                                    // ['goods_id', $id],
+                                    //['mobile', $keyword],
+                                    //['admin_type',self::$admin_type],
+                                ],
+                                //    'whereIn' => [
+                                //        'id' => $cityPids,
+                                //    ],
+                                //            'select' => [
+                                //                'id','company_id','type_name','sort_num'
+                                //                //,'operate_staff_id','operate_staff_id_history'
+                                //                ,'created_at'
+                                //            ],
+                                // 'orderBy' => ['id'=>'desc'],
+                            ];
+                            // if(!empty($modifyPropIds))  $queryParams['whereNotIn']['id'] = $modifyPropIds;
+                            $queryParams['whereIn']['cart_id'] = $cartIds;
+                            CartGoodsPropsDBBusiness::del($queryParams);
+                            // 删除购物车价格属性
+                            $queryParams = [
+                                'where' => [
+                                    //  ['id', '&' , '16=16'],
+                                    // ['goods_id', $id],
+                                    //['mobile', $keyword],
+                                    //['admin_type',self::$admin_type],
+                                ],
+                                //    'whereIn' => [
+                                //        'id' => $cityPids,
+                                //    ],
+                                //            'select' => [
+                                //                'id','company_id','type_name','sort_num'
+                                //                //,'operate_staff_id','operate_staff_id_history'
+                                //                ,'created_at'
+                                //            ],
+                                // 'orderBy' => ['id'=>'desc'],
+                            ];
+                            // if(!empty($modifyPropIds))  $queryParams['whereNotIn']['id'] = $modifyPropIds;
+                            $queryParams['whereIn']['id'] = $cartIds;
+                            CartDBBusiness::del($queryParams);
+                        }
+
+
+                        // 删除商品价格表记录
+                        $queryParams = [
+                            'where' => [
+                                //  ['id', '&' , '16=16'],
+                                ['goods_id', $id],
+                                //['mobile', $keyword],
+                                //['admin_type',self::$admin_type],
+                            ],
+                            // 'whereIn' => [
+                            //     'id' => $cityPids,
+                            // ],
+                            //            'select' => [
+                            //                'id','company_id','type_name','sort_num'
+                            //                //,'operate_staff_id','operate_staff_id_history'
+                            //                ,'created_at'
+                            //            ],
+                            // 'orderBy' => ['id'=>'desc'],
+                        ];
+                        // if(!empty($modifyPropPriceIds))  $queryParams['whereNotIn']['id'] = $modifyPropPriceIds;
+                        $queryParams['whereIn']['id'] = $delGoodsPriceIds;
+                        ShopGoodsPricesDBBusiness::del($queryParams);
                     }
 
-                }
-                if($isModify){
-                    // 删除多余的属性
-                    $queryParams = [
-                        'where' => [
-                            //  ['id', '&' , '16=16'],
-                            ['goods_id', $id],
-                            //['mobile', $keyword],
-                            //['admin_type',self::$admin_type],
-                        ],
-//                    'whereIn' => [
-//                        'id' => $cityPids,
-//                    ],
-                        //            'select' => [
-                        //                'id','company_id','type_name','sort_num'
-                        //                //,'operate_staff_id','operate_staff_id_history'
-                        //                ,'created_at'
-                        //            ],
-                        // 'orderBy' => ['id'=>'desc'],
-                    ];
-                    if(!empty($modifyPropPriceIds))  $queryParams['whereNotIn']['id'] = $modifyPropPriceIds;
-                    ShopGoodsPricesDBBusiness::del($queryParams);
+                    // 商品属性操作
+                    // 获得要删除的价格属性id
+                    $delGoodsPropsIds = array_diff($goodsPropsIds, $modifyPropIds);
+                    if(!empty($delGoodsPropsIds)){
 
-                    $queryParams = [
-                        'where' => [
-                            //  ['id', '&' , '16=16'],
-                            ['goods_id', $id],
-                            //['mobile', $keyword],
-                            //['admin_type',self::$admin_type],
-                        ],
-//                    'whereIn' => [
-//                        'id' => $cityPids,
-//                    ],
-                        //            'select' => [
-                        //                'id','company_id','type_name','sort_num'
-                        //                //,'operate_staff_id','operate_staff_id_history'
-                        //                ,'created_at'
-                        //            ],
-                        // 'orderBy' => ['id'=>'desc'],
-                    ];
-                    if(!empty($modifyPropIds))  $queryParams['whereNotIn']['id'] = $modifyPropIds;
-                    ShopGoodsPropsDBBusiness::del($queryParams);
+                        // 获得购物车的记录
+                        $queryParams = [
+                            'where' => [
+                                ['goods_id', '=' , $id],
+                                // ['main_name', 'like', '' . $main_name . '%'],
+                                // ['id', '&' , '16=16'],
+                            ],
+                            'select' => [
+                                'id'
+                            ]
+                        ];
+                        // 获得已有的属性表id数组--一维
+                        $dataListCarts = CartDBBusiness::getList($queryParams,[]);
+                        $cartIds = array_column($dataListCarts->toArray(),'id');
+                        if(!empty($cartIds)){
+                            // 删除购物车商品属性
+                            $queryParams = [
+                                'where' => [
+                                    //  ['id', '&' , '16=16'],
+                                    // ['goods_id', $id],
+                                    //['mobile', $keyword],
+                                    //['admin_type',self::$admin_type],
+                                ],
+                                //    'whereIn' => [
+                                //        'id' => $cityPids,
+                                //    ],
+                                //            'select' => [
+                                //                'id','company_id','type_name','sort_num'
+                                //                //,'operate_staff_id','operate_staff_id_history'
+                                //                ,'created_at'
+                                //            ],
+                                // 'orderBy' => ['id'=>'desc'],
+                            ];
+                            // if(!empty($modifyPropIds))  $queryParams['whereNotIn']['id'] = $modifyPropIds;
+                            $queryParams['whereIn']['cart_id'] = $cartIds;
+                            $queryParams['whereIn']['goods_props_id'] = $delGoodsPropsIds;
+                            CartGoodsPropsDBBusiness::del($queryParams);
+                        }
+
+                        // 删除商品属性
+                        $queryParams = [
+                            'where' => [
+                                //  ['id', '&' , '16=16'],
+                                ['goods_id', $id],
+                                //['mobile', $keyword],
+                                //['admin_type',self::$admin_type],
+                            ],
+                           // 'whereIn' => [
+                            //    'id' => $cityPids,
+                           // ],
+                            //            'select' => [
+                            //                'id','company_id','type_name','sort_num'
+                            //                //,'operate_staff_id','operate_staff_id_history'
+                            //                ,'created_at'
+                            //            ],
+                            // 'orderBy' => ['id'=>'desc'],
+                        ];
+                        // if(!empty($modifyPropIds))  $queryParams['whereNotIn']['id'] = $modifyPropIds;
+                        $queryParams['whereIn']['id'] = $delGoodsPropsIds;
+                        ShopGoodsPropsDBBusiness::del($queryParams);
+                    }
                 }else{
                     if(!empty($goodsPropPrice))  ShopGoodsPricesDBBusiness::addBath($goodsPropPrice);
                     if(!empty($goodsProp))  ShopGoodsPropsDBBusiness::addBath($goodsProp);
@@ -336,7 +495,7 @@ class ShopGoodsDBBusiness extends BasePublicDBBusiness
     public static function getPropIdsByKey($company_id, $good_id = 0, $operate_staff_id = 0){
         $goodInfo = [];
         // 获得当前商品信息
-        $info = static::getInfo($good_id);
+        $info = static::getInfo($good_id,['id'] );
         if(empty($info)) return $goodInfo;
         // 获得价格属性
         $queryParams = [
@@ -351,7 +510,7 @@ class ShopGoodsDBBusiness extends BasePublicDBBusiness
             'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],
         ];
         $priceList = ShopGoodsPricesDBBusiness::getList($queryParams,[]);
-        $priceList = $priceList->toArray();
+        $priceList = $priceList->toArray(); // [{'prop_id': 17, 'prop_val_id': 57, 'price': 5.000, 'is_multi': 0, 'is_must': 1, 'is_price': 1 }]
         Tool::arrAppendKeys($priceList, ['is_multi' => 0, 'is_must' => 1, 'is_price' => 1]);
 
         // 获得属性
@@ -367,7 +526,7 @@ class ShopGoodsDBBusiness extends BasePublicDBBusiness
             'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],
         ];
         $propList = ShopGoodsPropsDBBusiness::getList($queryParams,[]);
-        $propList = $propList->toArray();
+        $propList = $propList->toArray();// [{'prop_id': 17, 'prop_val_id': 57, 'price': 0, 'is_multi': 0, 'is_must': 1, 'is_price': 0 }]
         Tool::arrAppendKeys($propList, ['price' => 0, 'is_price' => 0]);
         $propArr = array_merge($priceList, $propList);
 
@@ -376,6 +535,176 @@ class ShopGoodsDBBusiness extends BasePublicDBBusiness
         $formatProp = PropDBBusiness::getPropByIds($company_id, $propArr, '', $operate_staff_id);
         $goodInfo['propList'] = $formatProp;
         return $goodInfo;
+    }
+
+    /**
+     * 根据id删除
+     *
+     * @param int  $company_id 企业id
+     * @param int $id id
+     * @param int $operate_staff_id 操作人id
+     * @param int $modifAddOprate 修改时是否加操作人，1:加;0:不加[默认]
+     * @return  int 记录id值
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function delById($company_id, $id, $operate_staff_id = 0, $modifAddOprate = 0){
+
+        if(strlen($id) <= 0){
+            throws('操作记录标识不能为空！');
+        }
+
+        // 获得当前商品已有的价格属性
+        $queryParams = [
+            'where' => [
+                ['goods_id', '=' , $id],
+                // ['main_name', 'like', '' . $main_name . '%'],
+                // ['id', '&' , '16=16'],
+            ],
+            'select' => [
+                'id'
+            ]
+        ];
+        // 获得已有的价格属性表id数组--一维
+        $dataListPrice = ShopGoodsPricesDBBusiness::getList($queryParams,[]);
+        $goodsPriceIds = array_column($dataListPrice->toArray(),'id');
+
+        // 获得当前商品已有的属性
+        $queryParams = [
+            'where' => [
+                ['goods_id', '=' , $id],
+                // ['main_name', 'like', '' . $main_name . '%'],
+                // ['id', '&' , '16=16'],
+            ],
+            'select' => [
+                'id'
+            ]
+        ];
+        // 获得已有的属性表id数组--一维
+        $dataListProps = ShopGoodsPropsDBBusiness::getList($queryParams,[]);
+        $goodsPropsIds = array_column($dataListProps->toArray(),'id');
+
+        // 获得购物车的记录
+        $queryParams = [
+            'where' => [
+                ['goods_id', '=' , $id],
+                // ['main_name', 'like', '' . $main_name . '%'],
+                // ['id', '&' , '16=16'],
+            ],
+            'select' => [
+                'id'
+            ]
+        ];
+        // $queryParams['whereIn']['prop_price_id'] = $goodsPriceIds;
+
+        // 获得已有的属性表id数组--一维
+        $dataListCarts = CartDBBusiness::getList($queryParams,[]);
+        $cartIds = array_column($dataListCarts->toArray(),'id');
+
+
+        DB::beginTransaction();
+        try {
+
+            if(!empty($cartIds)){
+                // 删除购物车商品属性
+                $queryParams = [
+                    'where' => [
+                        //  ['id', '&' , '16=16'],
+                        // ['goods_id', $id],
+                        //['mobile', $keyword],
+                        //['admin_type',self::$admin_type],
+                    ],
+                    //    'whereIn' => [
+                    //        'id' => $cityPids,
+                    //    ],
+                    //            'select' => [
+                    //                'id','company_id','type_name','sort_num'
+                    //                //,'operate_staff_id','operate_staff_id_history'
+                    //                ,'created_at'
+                    //            ],
+                    // 'orderBy' => ['id'=>'desc'],
+                ];
+                // if(!empty($modifyPropIds))  $queryParams['whereNotIn']['id'] = $modifyPropIds;
+                $queryParams['whereIn']['cart_id'] = $cartIds;
+                CartGoodsPropsDBBusiness::del($queryParams);
+                // 删除购物车价格属性
+                $queryParams = [
+                    'where' => [
+                        //  ['id', '&' , '16=16'],
+                        // ['goods_id', $id],
+                        //['mobile', $keyword],
+                        //['admin_type',self::$admin_type],
+                    ],
+                    //    'whereIn' => [
+                    //        'id' => $cityPids,
+                    //    ],
+                    //            'select' => [
+                    //                'id','company_id','type_name','sort_num'
+                    //                //,'operate_staff_id','operate_staff_id_history'
+                    //                ,'created_at'
+                    //            ],
+                    // 'orderBy' => ['id'=>'desc'],
+                ];
+                // if(!empty($modifyPropIds))  $queryParams['whereNotIn']['id'] = $modifyPropIds;
+                $queryParams['whereIn']['id'] = $cartIds;
+                CartDBBusiness::del($queryParams);
+            }
+
+            // 删除商品价格表记录
+            if(!empty($goodsPriceIds)){
+                $queryParams = [
+                    'where' => [
+                        //  ['id', '&' , '16=16'],
+                        ['goods_id', $id],
+                        //['mobile', $keyword],
+                        //['admin_type',self::$admin_type],
+                    ],
+                    // 'whereIn' => [
+                    //     'id' => $cityPids,
+                    // ],
+                    //            'select' => [
+                    //                'id','company_id','type_name','sort_num'
+                    //                //,'operate_staff_id','operate_staff_id_history'
+                    //                ,'created_at'
+                    //            ],
+                    // 'orderBy' => ['id'=>'desc'],
+                ];
+                // if(!empty($modifyPropPriceIds))  $queryParams['whereNotIn']['id'] = $modifyPropPriceIds;
+                $queryParams['whereIn']['id'] = $goodsPriceIds;
+                ShopGoodsPricesDBBusiness::del($queryParams);
+            }
+
+            // 删除商品属性
+            if(!empty($goodsPropsIds)){
+                $queryParams = [
+                    'where' => [
+                        //  ['id', '&' , '16=16'],
+                        ['goods_id', $id],
+                        //['mobile', $keyword],
+                        //['admin_type',self::$admin_type],
+                    ],
+                    // 'whereIn' => [
+                    //    'id' => $cityPids,
+                    // ],
+                    //            'select' => [
+                    //                'id','company_id','type_name','sort_num'
+                    //                //,'operate_staff_id','operate_staff_id_history'
+                    //                ,'created_at'
+                    //            ],
+                    // 'orderBy' => ['id'=>'desc'],
+                ];
+                // if(!empty($modifyPropIds))  $queryParams['whereNotIn']['id'] = $modifyPropIds;
+                $queryParams['whereIn']['id'] = $goodsPropsIds;
+                ShopGoodsPropsDBBusiness::del($queryParams);
+            }
+            // 删除商品
+            static::deleteByIds($id);
+        } catch ( \Exception $e) {
+            DB::rollBack();
+            throws('操作失败；信息[' . $e->getMessage() . ']');
+            // throws($e->getMessage());
+        }
+        DB::commit();
+        return $id;
     }
 
 }

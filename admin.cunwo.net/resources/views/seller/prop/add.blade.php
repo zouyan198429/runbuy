@@ -39,9 +39,36 @@
                 </td>
             </tr>
             <tr>
+                <th>属性值<span class="must"></span></th>
+                <td >
+                    <table  class="layui-table table2 prop_table"  style="width: 565px;" >
+                        <thead>
+                        <tr>
+                            <th style="width: 250px;">属性值</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody class="pvbody data_list_pv" >
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td>
+                                <input type="text" class="inp wnormal"  name="propname" value=""/>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0);" class="btn btn-mini btn-info  fa fa-plus-circle" onclick="otheraction.addPVName(this)">添加属性值</a>
+                            </td>
+                        </tr>
+                        </tfoot>
+
+                    </table>
+                </td>
+            </tr>
+            <tr  style="display: none;">
                 <th>属性值<span class="must">*</span></th>
                 <td>
-                    <textarea type="text" class="inptext wlong" name="prop_vals"  placeholder="请输入属性值"  >{{ $info['prop_vals'] or '' }}</textarea>
+                    <textarea type="text" class="inptext wlong" name="prop_vals"  placeholder="请输入属性值"  ></textarea>
+                    {{ $info['prop_vals'] or '' }}
                     <br/>多个属性值，则每行一个属性值。
                 </td>
             </tr>
@@ -75,7 +102,16 @@
     var AJAX_SHOP_SELECTED_URL = "{{ url('api/seller/shop/ajax_selected') }}";// ajax选中店铺地址
 
 
-    var FRM = "{{ $frm or 0 }}"
+    var FRM = "{{ $frm or 0 }}";
+
+    // 属性模板
+    var DYNAMIC_PROPVAL_BAIDU_TEMPLATE = "baidu_template_pv_data_list";//百度模板id
+    var DYNAMIC_PROPVAL_TABLE_BODY = "data_list_pv";//数据列表class
+
+    var PROPVAL_LIST = @json($info['propVals'] ?? []) ;
+    var PV_LIST_JSON =  {'data_list': PROPVAL_LIST };// 属性值 数据列表json对象格式  {‘data_list’:[{'id':57,'main_name':'小量'},...]}
+
+    var JUDGE_PV_USED_URL = "{{url('api/seller/prop/ajax_pv_used')}}";// 查询属性值id是否有商品正在使用
 </script>
 <script src="{{ asset('/js/seller/lanmu/prop_edit.js') }}"  type="text/javascript"></script>
 </body>

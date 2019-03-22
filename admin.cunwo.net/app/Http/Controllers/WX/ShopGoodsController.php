@@ -27,10 +27,11 @@ class ShopGoodsController extends BaseController
         $result =  CTAPIShopGoodsBusiness::getList($request, $this, 2 + 4, [], [
             'city', 'cityPartner', 'seller'
             , 'shop', 'type', 'siteResources'
-            , 'priceProps.prop.name', 'priceProps.propVal.name'// 价格属性名--订单前
+            // , 'priceProps.prop.name', 'priceProps.propVal.name'// 价格属性名--订单前
            //  , 'priceProps.propVal.name', 'priceProps.propName'// 属性名--订单后
-            , 'props.prop.name', 'props.propVal.name'// 属性名--订单前
-            // , 'props.propName', 'props.propValName'// 价格属性名--订单后
+            , 'priceProps.propName', 'priceProps.propValName' //含历史--用这个
+            // , 'props.prop.name', 'props.propVal.name'// 属性名--订单前
+            , 'props.propName', 'props.propValName'// 价格属性名--订单后 含历史--用这个
         ]); //
         $data_list = $result['result']['data_list'] ?? [];
         $temDataList = [];
@@ -38,7 +39,7 @@ class ShopGoodsController extends BaseController
 
             // 属性及属性值处理
             $props = $v['props'] ?? [];
-            $format_props = CTAPIShopGoodsBusiness::formatProps($props, [], 1);
+            $format_props = CTAPIShopGoodsBusiness::formatProps($props, [], 2);
             $goods_name =  $v['goods_name'] ?? '';
             $price_list = $v['price_list'] ?? [];// 价格属性
             $resource_url = $v['resource_list'][0]['resource_url'] ?? '';

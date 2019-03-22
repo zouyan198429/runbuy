@@ -154,6 +154,7 @@ Route::any('admin/prop/ajax_save', 'Admin\PropController@ajax_save');// 新加/�
 Route::post('admin/prop/ajax_get_child', 'Admin\PropController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
 Route::post('admin/prop/ajax_get_areachild', 'Admin\PropController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 Route::post('admin/prop/ajax_import_staff','Admin\PropController@ajax_import'); // 导入员工
+Route::any('admin/prop/ajax_pv_used', 'Admin\PropController@ajax_pv_used');// 查询属性值id是否有商品正在使用
 
 Route::post('admin/prop/import', 'Admin\PropController@import');// 导入excel
 Route::post('admin/prop/ajax_get_ids', 'Admin\PropController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
@@ -390,6 +391,7 @@ Route::any('city/prop/ajax_save', 'City\PropController@ajax_save');// 新加/修
 Route::post('city/prop/ajax_get_child', 'City\PropController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
 Route::post('city/prop/ajax_get_areachild', 'City\PropController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 Route::post('city/prop/ajax_import_staff','City\PropController@ajax_import'); // 导入员工
+Route::any('city/prop/ajax_pv_used', 'City\PropController@ajax_pv_used');// 查询属性值id是否有商品正在使用
 
 Route::post('city/prop/import', 'City\PropController@import');// 导入excel
 Route::post('city/prop/ajax_get_ids', 'City\PropController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
@@ -600,6 +602,7 @@ Route::any('seller/prop/ajax_save', 'Seller\PropController@ajax_save');// 新加
 Route::post('seller/prop/ajax_get_child', 'Seller\PropController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
 Route::post('seller/prop/ajax_get_areachild', 'Seller\PropController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 Route::post('seller/prop/ajax_import_staff','Seller\PropController@ajax_import'); // 导入员工
+Route::any('seller/prop/ajax_pv_used', 'Seller\PropController@ajax_pv_used');// 查询属性值id是否有商品正在使用
 
 Route::post('seller/prop/import', 'Seller\PropController@import');// 导入excel
 Route::post('seller/prop/ajax_get_ids', 'Seller\PropController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
@@ -809,6 +812,7 @@ Route::any('shop/prop/ajax_save', 'Shop\PropController@ajax_save');// 新加/修
 Route::post('shop/prop/ajax_get_child', 'Shop\PropController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
 Route::post('shop/prop/ajax_get_areachild', 'Shop\PropController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 Route::post('shop/prop/ajax_import_staff','Shop\PropController@ajax_import'); // 导入员工
+Route::any('shop/prop/ajax_pv_used', 'Shop\PropController@ajax_pv_used');// 查询属性值id是否有商品正在使用
 
 Route::post('shop/prop/import', 'Shop\PropController@import');// 导入excel
 Route::post('shop/prop/ajax_get_ids', 'Shop\PropController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
