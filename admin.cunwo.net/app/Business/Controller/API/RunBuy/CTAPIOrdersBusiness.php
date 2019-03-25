@@ -13,6 +13,16 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
 {
     public static $model_name = 'API\RunBuy\OrdersAPI';
 
+    // 状态1待支付2等待接单4取货或配送中8订单完成16作废
+    public static $status_arr = [
+        '1' => '待付款',
+        '2' => '待接单',
+        '4' => '配送中',// '取货或配送中',
+        '8' => '已完成',
+        '16' => '已取消',// '作废'
+        '32' => '用户取消',
+        '64' => '完成',
+    ];
     /**
      * 获得列表数据--所有数据
      *
@@ -100,7 +110,14 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
             if(!empty($order_no) )  array_push($queryParams['where'], ['order_no', '=', $order_no]);
 
             $parent_order_no = CommonRequest::get($request, 'parent_order_no');
-            if(!empty($parent_order_no) )  array_push($queryParams['where'], ['parent_order_no', '=', $parent_order_no]);
+            // if(!empty($parent_order_no) )  array_push($queryParams['where'], ['parent_order_no', '=', $parent_order_no]);
+            if(!empty($parent_order_no)){
+                if (strpos($parent_order_no, ',') === false) { // 单条
+                    array_push($queryParams['where'], ['parent_order_no', $parent_order_no]);
+                } else {
+                    $queryParams['whereIn']['parent_order_no'] = explode(',', $parent_order_no);
+                }
+            }
 
             $province_id = CommonRequest::getInt($request, 'province_id');
             if($province_id > 0 )  array_push($queryParams['where'], ['province_id', '=', $province_id]);
@@ -112,7 +129,15 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
             if($area_id > 0 )  array_push($queryParams['where'], ['area_id', '=', $area_id]);
 
             $status = CommonRequest::get($request, 'status');
-            if(is_numeric($status) )  array_push($queryParams['where'], ['status', '=', $status]);
+            // if(is_numeric($status) )  array_push($queryParams['where'], ['status', '=', $status]);
+            if(!empty($status)){
+                if (strpos($status, ',') === false) { // 单条
+                    array_push($queryParams['where'], ['status', $status]);
+                } else {
+                    $queryParams['whereIn']['status'] = explode(',', $status);
+                }
+            }
+
 
             $pay_type = CommonRequest::get($request, 'pay_type');
             if(is_numeric($pay_type) )  array_push($queryParams['where'], ['pay_type', '=', $pay_type]);
@@ -155,8 +180,134 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
         $result = static::getBaseListData($request, $controller, '', $queryParams, $relations , $oprateBit, $notLog);
 
         // 格式化数据
-//        $data_list = $result['data_list'] ?? [];
-//        foreach($data_list as $k => $v){
+        $data_list = $result['data_list'] ?? [];
+        $parentOrderNos = [];// 有子订单的订单数组
+        foreach($data_list as $k => $v){
+            $order_no = $v['order_no'] ?? '';
+            $parent_order_no = $v['parent_order_no'] ?? '';
+            $has_son_order = $v['has_son_order'] ?? 0;// 是否有子订单0无1有
+            $data_list[$k]['order_no_format'] = Tool::formatStrMiddle($order_no, ' ', 4);
+            $data_list[$k]['parent_order_no_format'] = Tool::formatStrMiddle($parent_order_no, ' ', 4);
+            if($has_son_order == 1 ) array_push($parentOrderNos, $order_no);
+
+            // 收货地址
+            if(isset($v['addr_history']) && !empty($v['addr_history'])){
+                $addr_history = $v['addr_history'] ?? [];
+                unset($data_list[$k]['addr_history']);
+                $data_list[$k]['addr'] = Tool::formatArrKeys($addr_history
+                    , Tool::arrEqualKeyVal(['addr_id', 'real_name', 'sex', 'sex_text', 'tel', 'mobile', 'addr_name', 'addr', 'longitude', 'latitude']), true );
+                $data_list[$k]['addr']['mobile_format'] = Tool::formatStr($data_list[$k]['addr']['mobile'], [
+                    ['len' => 3, 'splitStr' => ' ']
+                    , ['len' => 4, 'splitStr' => ' ']
+                    , ['len' => 4, 'splitStr' => ' ']
+                ]);
+            }
+            // 买家
+            if(isset($v['staff_history']) && !empty($v['staff_history'])){
+                $staff_history = $v['staff_history'] ?? [];
+                unset($data_list[$k]['staff_history']);
+                $data_list[$k]['staff'] = Tool::formatArrKeys($staff_history
+                    , Tool::arrEqualKeyVal(['staff_id', 'nickname', 'gender', 'province', 'city', 'country', 'avatar_url', 'longitude', 'latitude', 'sex_text']), true );
+            }
+
+            // 城市-省
+            if(isset($v['province_history']) && !empty($v['province_history'])){
+                $province_history = $v['province_history'] ?? [];
+                unset($data_list[$k]['province_history']);
+                $data_list[$k]['province'] = Tool::formatArrKeys($province_history
+                    , Tool::arrEqualKeyVal(['city_table_id', 'city_ids', 'city_name', 'code', 'head', 'initial', 'longitude', 'latitude']), true );
+            }
+
+            // 城市--市
+            if(isset($v['city_history']) && !empty($v['city_history'])){
+                $city_history = $v['city_history'] ?? [];
+                unset($data_list[$k]['city_history']);
+                $data_list[$k]['city'] = Tool::formatArrKeys($city_history
+                    , Tool::arrEqualKeyVal(['city_table_id', 'city_ids', 'city_name', 'code', 'head', 'initial', 'longitude', 'latitude']), true );
+            }
+
+            // 城市--县
+            if(isset($v['area_history']) && !empty($v['area_history'])){
+                $area_history = $v['area_history'] ?? [];
+                unset($data_list[$k]['area_history']);
+                $data_list[$k]['area'] = Tool::formatArrKeys($area_history
+                    , Tool::arrEqualKeyVal(['city_table_id', 'city_ids', 'city_name', 'code', 'head', 'initial', 'longitude', 'latitude']), true );
+            }
+
+            // 城市代理
+            if(isset($v['partner_history']) && !empty($v['partner_history'])){
+                $partner_history = $v['partner_history'] ?? [];
+                unset($data_list[$k]['partner_history']);
+                $data_list[$k]['partner'] = Tool::formatArrKeys($partner_history
+                    , Tool::arrEqualKeyVal(['city_partner_id', 'partner_name', 'linkman', 'mobile', 'tel', 'addr', 'longitude', 'latitude']), true );
+            }
+
+            // 商家
+            if(isset($v['seller_history']) && !empty($v['seller_history'])){
+                $seller_history = $v['seller_history'] ?? [];
+                unset($data_list[$k]['seller_history']);
+                $data_list[$k]['seller'] = Tool::formatArrKeys($seller_history
+                    , Tool::arrEqualKeyVal(['seller_id', 'seller_name', 'linkman', 'mobile', 'tel', 'addr', 'longitude', 'latitude']), true );
+            }
+
+            // 店铺
+            if(isset($v['shop_history']) && !empty($v['shop_history'])){
+                $shop_history = $v['shop_history'] ?? [];
+                unset($data_list[$k]['shop_history']);
+                $data_list[$k]['shop'] = Tool::formatArrKeys($shop_history
+                    , Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile', 'tel', 'addr', 'longitude', 'latitude']), true );
+            }
+
+            // 商品
+            if(isset($v['orders_goods']) && !empty($v['orders_goods'])) {
+                $formatGoods = [];
+                $orders_goods = $v['orders_goods'] ?? [];
+                unset($data_list[$k]['orders_goods']);
+                foreach($orders_goods as $gK =>$goodInfo){
+                    // 商品名称
+                    if(isset($goodInfo['goods_history']) && !empty($goodInfo['goods_history'])) {
+                        $goodsHistory = $goodInfo['goods_history'] ?? [];
+                        unset($goodInfo['goods_history']);
+                        $goodInfo['goods_name'] = $goodsHistory['goods_name'] ?? '';
+                    }
+                    // 商品图片
+                    $resource_url = $goodInfo['resources_history']['resource_url'] ?? '';
+                    if(!empty($resource_url))  $resource_url = url($resource_url);
+                    $goodInfo['resource_url'] = $resource_url;
+                    // 商品价格属性
+                    $goodInfo['pricePropName'] = $goodInfo['goods_price_history']['prop_name']['main_name'] ?? '';
+                    $goodInfo['pricePropValName'] = $goodInfo['goods_price_history']['prop_val_name']['main_name'] ?? '';
+
+                    // 商品属性
+                    $temProps = $goodInfo['props'] ?? [];
+                    if(isset($goodInfo['props'])) unset($goodInfo['props']);
+                    $formatProps = [];
+                    foreach($temProps as $propInfo){
+                        if(!isset($formatProps[$propInfo['prop_id']])){
+                            $formatProps[$propInfo['prop_id']] = [
+                                'prop_id' => $propInfo['prop_id'] ?? 0,
+                                'prop_name' => $propInfo['prop_name']['main_name'] ?? '',
+                            ];
+                        }
+                        $formatProps[$propInfo['prop_id']]['prop_val'][] = [
+                            'prop_val_id' => $propInfo['prop_val_id'] ?? 0,
+                            'prop_val_name' => $propInfo['prop_val_name']['main_name'] ?? '',
+                        ];
+                    }
+                    foreach($formatProps as $t_k => $t_v){
+                        $prop_vals = $t_v['prop_val'] ?? [];
+                        $t_pv_names = array_column($prop_vals, 'prop_val_name');
+                        $formatProps[$t_k]['pv_names'] = implode('、', $t_pv_names);
+                    }
+                    $goodInfo['prop'] = array_values($formatProps);
+
+                    array_push($formatGoods, Tool::formatArrKeys($goodInfo
+                        , Tool::arrEqualKeyVal(['goods_id', 'goods_name', 'price', 'amount', 'total_price', 'resource_url'
+                            , 'pricePropName', 'pricePropValName', 'prop']), true ));
+                    $data_list[$k]['orders_goods'] = $formatGoods;
+                }
+
+            }
             // 所属人员
 //            $data_list[$k]['nickname'] = $v['staff']['nickname'] ?? '';
 //            $data_list[$k]['staff_id'] = $v['staff']['id'] ?? 0;
@@ -164,8 +315,9 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
 //            // 公司名称
 //            $data_list[$k]['company_name'] = $v['company_info']['company_name'] ?? '';
 //            if(isset($data_list[$k]['company_info'])) unset($data_list[$k]['company_info']);
-//        }
-//        $result['data_list'] = $data_list;
+        }
+        $result['data_list'] = $data_list;
+        $result['parent_orders'] = $parentOrderNos;// // 有子订单的订单数组
         // 导出功能
         if($isExport == 1){
 //            $headArr = ['work_num'=>'工号', 'department_name'=>'部门'];
@@ -543,4 +695,65 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
     }
     // ***********通过组织条件获得kv***结束************************************************************
 
+    /**
+     * 根据状态，统计订单数量
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param string $status 订单状态,多个用逗号分隔, 可为空：所有的
+     * @param array $otherWhere 其它条件[['company_id', '=', $company_id],...]
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 单条数据 - -维数组 为0 新加，返回新的对象数组[-维],  > 0 ：修改对应的记录，返回true
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getStatusCount(Request $request, Controller $controller, $status, $otherWhere = [], $notLog = 0)
+    {
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+
+        // 调用新加或修改接口
+        $apiParams = [
+            'status' => $status,// 订单状态,多个用逗号分隔, 可为空：所有的
+            'company_id' => $company_id,
+            'otherWhere' => $otherWhere,// 其它条件[['company_id', '=', $company_id],...]
+            'operate_staff_id' => $user_id,
+        ];
+        $statusCountList = static::exeDBBusinessMethodCT($request, $controller, '', 'getGroupCount', $apiParams, $company_id, $notLog);
+        return $statusCountList;
+    }
+
+    /**
+     * 根据 订单号获得订单详情
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param string $order_no 订单号
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 单条数据 - -维数组
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getOrderInfoByOrderNo(Request $request, Controller $controller, $order_no, $notLog = 0){
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+        // 根据订单号查询订单
+
+        $queryParams = [
+            'where' => [
+                ['order_type', '=', 1],
+                ['staff_id', '=', $user_id],
+                ['order_no', '=', $order_no],
+                // ['id', '&' , '16=16'],
+                // ['company_id', $company_id],
+                // ['admin_type',self::$admin_type],
+            ],
+            // 'whereIn' => [
+            //   'id' => $subjectHistoryIds,
+            //],
+//            'select' => [
+//                'id'
+//            ],
+            // 'orderBy' => ['is_default'=>'desc', 'id'=>'desc'],
+        ];
+        return static::getInfoByQuery($request, $controller, '', $company_id, $queryParams);
+    }
 }

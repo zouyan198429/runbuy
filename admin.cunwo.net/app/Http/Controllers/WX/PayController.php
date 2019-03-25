@@ -14,12 +14,62 @@ use Illuminate\Support\Facades\Log;
 class PayController extends BaseController
 {
 
-    //  统一下单 -- 根据订单号
+    //  统一下单 -- 根据订单号[订单支付跑腿费、订单追加跑腿费]
+    //  参数 pay_type
+    //  1 订单支付跑腿费  order_no
+    //  2 订单追加跑腿费  order_no  amount 追加跑腿费 单位元
     public function unifiedorderByNo(Request $request)
     {
         $this->InitParams($request);
-        $order_no = CommonRequest::get($request, 'order_no');
-        if(empty($order_no)) throws('订单号不能为空!');
+        $pay_type = CommonRequest::getInt($request, 'pay_type');// 支付类型 1 订单支付跑腿费 2 订单追加跑腿费
+        if(!in_array($pay_type, [1,2])) throws('支付类型有误!');
+
+        switch($pay_type){
+            case 1:// 1 订单支付跑腿费
+                $order_no = CommonRequest::get($request, 'order_no');
+                if(empty($order_no)) throws('订单号不能为空!');
+                $orderInfo = CTAPIOrdersDoingBusiness::getOrderInfoByOrderNo($request, $this, $order_no, 1);
+
+                if(empty($orderInfo)) throws('订单信息不存在!');
+                $pay_run_price = $orderInfo['pay_run_price'] ?? '';// 是否支付跑腿费0未支付1已支付
+                $status = $orderInfo['status'] ?? 8;// 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
+                if($pay_run_price == 1) throws('订单已支付!');
+                if($status != 1) throws('订单非待支付状态!');
+                $total_run_price = $orderInfo['total_run_price'];
+
+                $body = config('public.webName') . '-跑腿订单[' . $order_no . ']服务费';
+                $total_fee = ceil($total_run_price * 100);
+                // 生成订单号
+                // 重新发起一笔支付要使用原订单号，避免重复支付；已支付过或已调用关单、撤销（请见后文的API列表）的订单号不能重新发起支付。--支付未成功的订单号，可以重新发起支付
+                $out_trade_no = $order_no;// CTAPIOrdersBusiness::createSn($request, $this, 3);
+                // TODO 生成支付数据
+                break;
+            case 2:// 2 订单追加跑腿费
+                $order_no = CommonRequest::get($request, 'order_no');
+                if(empty($order_no)) throws('订单号不能为空!');
+                $amount = CommonRequest::get($request, 'amount');// 追加跑腿费 单位元
+                if(!is_numeric($amount) && $amount <= 0) throws('费用不能<=0!');
+
+                $orderInfo = CTAPIOrdersDoingBusiness::getOrderInfoByOrderNo($request, $this, $order_no, 1);
+
+                if(empty($orderInfo)) throws('订单信息不存在!');
+                $pay_run_price = $orderInfo['pay_run_price'] ?? '';// 是否支付跑腿费0未支付1已支付
+                $status = $orderInfo['status'] ?? 8;// 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
+                if($pay_run_price != 1) throws('订单未支付!');
+                if($status != 2) throws('订单非等待接单状态，不能追加费用!');
+
+                $body = config('public.webName') . '-跑腿订单[' . $order_no . ']追加服务费';
+                $total_fee = ceil($amount * 100);
+
+                $out_trade_no = CTAPIOrdersBusiness::createSn($request, $this, 4);
+                throws('此功能正在调试中...!');
+                // TODO 生成支付数据
+
+                break;
+            default:
+                break;
+        }
+
         // 日志
 //        $requestLog = [
 //            'files'       => $request->file(),
@@ -30,46 +80,14 @@ class PayController extends BaseController
 //        Log::info('微信支付日志' . __FUNCTION__,$requestLog);
         // $url = config('public.wxPayURL') . 'pay/unifiedorder';
 
+        //  下单：主要参数 $body  $out_trade_no  $total_fee
         $userInfo = $this->user_info;
-
-        // 根据订单号查询订单
-
-        $user_id = $this->user_id;
-
-        $queryParams = [
-            'where' => [
-                ['order_type', '=', 1],
-                ['staff_id', '=', $user_id],
-                ['order_no', '=', $order_no],
-                // ['id', '&' , '16=16'],
-                // ['company_id', $company_id],
-                // ['admin_type',self::$admin_type],
-            ],
-            // 'whereIn' => [
-            //   'id' => $subjectHistoryIds,
-            //],
-//            'select' => [
-//                'id'
-//            ],
-            // 'orderBy' => ['is_default'=>'desc', 'id'=>'desc'],
-        ];
-        $resultDatas = CTAPIOrdersDoingBusiness::getInfoByQuery($request, $this, '', $this->company_id, $queryParams);
-
-        if(empty($resultDatas)) throws('订单信息不存在!');
-        $pay_run_price = $resultDatas['pay_run_price'] ?? '';// 是否支付跑腿费0未支付1已支付
-        if($pay_run_price == 1) throws('订单已支付!');
-        $total_run_price = $resultDatas['total_run_price'];
-        $total_run_price = ceil($total_run_price * 100);
-
-        // 生成订单号
-        // 重新发起一笔支付要使用原订单号，避免重复支付；已支付过或已调用关单、撤销（请见后文的API列表）的订单号不能重新发起支付。--支付未成功的订单号，可以重新发起支付
-        $orderNum = $order_no;// CTAPIOrdersBusiness::createSn($request, $this, 1);
 
         $app = app('wechat.payment');
         $params = [
-            'body' => config('public.webName') . '-跑腿订单[' . $order_no . ']服务费',
-            'out_trade_no' => $orderNum,
-            'total_fee' => $total_run_price,
+            'body' => $body,
+            'out_trade_no' => $out_trade_no,
+            'total_fee' => $total_fee,
             // 'spbill_create_ip' => '123.12.12.123', // 可选，如不传该参数，SDK 将会自动获取相应 IP 地址
             // 'notify_url' => 'https://pay.weixin.qq.com/wxpay/pay.action', // 支付结果通知网址，如果不设置则会使用配置里的默认地址
             'trade_type' => 'JSAPI', // 请对应换成你的支付方式对应的值类型
@@ -144,6 +162,73 @@ class PayController extends BaseController
     {
         $this->InitParams($request);
 
+        $this->InitParams($request);
+        $pay_type = CommonRequest::getInt($request, 'pay_type');// 支付类型 1 订单支付跑腿费 2 订单追加跑腿费
+        if(!in_array($pay_type, [1,2])) throws('支付类型有误!');
+        switch($pay_type){
+            case 1:// 1 订单支付跑腿费
+                $order_no = CommonRequest::get($request, 'order_no');
+                if(empty($order_no)) throws('订单号不能为空!');
+                $orderInfo = CTAPIOrdersDoingBusiness::getOrderInfoByOrderNo($request, $this, $order_no, 1);
+
+                if(empty($orderInfo)) throws('订单信息不存在!');
+                $pay_run_price = $orderInfo['pay_run_price'] ?? '';// 是否支付跑腿费0未支付1已支付
+                $status = $orderInfo['status'] ?? 8;// 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
+                if($pay_run_price != 1) throws('订单非已支付!');
+                if($status != 2) throws('订单非等待接单状态!');
+                $total_run_price = $orderInfo['total_run_price'];
+
+                $refund_desc = config('public.webName') . '-跑腿订单[' . $order_no . ']取消';
+                $totalFee = ceil($total_run_price * 100);
+                $refundFee = $totalFee;
+
+                // 生成订单号
+                // 重新发起一笔支付要使用原订单号，避免重复支付；已支付过或已调用关单、撤销（请见后文的API列表）的订单号不能重新发起支付。--支付未成功的订单号，可以重新发起支付
+                $out_trade_no = $order_no;// CTAPIOrdersBusiness::createSn($request, $this, 3);
+                // TODO 生成支付数据
+                break;
+            case 2:// 2 订单追加跑腿费
+
+                throws('此功能正在调试中...!');
+                // TODO 生成支付数据
+
+                break;
+            default:
+                break;
+        }
+
+        // 生成退订单号
+        $refundOrderNum = CTAPIOrdersBusiness::createSn($request, $this, 2);
+
+        $app = app('wechat.payment');
+        // $out_trade_no = '119109471350010';
+        // $transactionId = '4200000279201903189120405440';
+        $refundNumber = $refundOrderNum;
+        // $totalFee = 5;
+        // $refundFee = 1;
+        $config = [
+            'refund_desc' => $refund_desc,//'测试退款',// 退款原因 若商户传入，会在下发给用户的退款消息中体现退款原因  ；注意：若订单退款金额≤1元，且属于部分退款，则不会在退款消息中体现退款原因
+            'notify_url' => config('public.wxNotifyURL') . 'api/pay/refundNotify' ,// 退款结果通知的回调地址
+        ];
+
+        try{
+            // 根据商户订单号退款
+            $result = easyWechatPay::refundByOutTradeNumber($app, $out_trade_no, $refundNumber, $totalFee, $refundFee, $config);
+            // 根据微信订单号退款
+            // $result = easyWechatPay::refundByTransactionId($app, $transactionId, $refundNumber, $totalFee, $refundFee, $config);
+        } catch ( \Exception $e) {
+            throws('失败；信息[' . $e->getMessage() . ']');
+        }
+
+
+        return ajaxDataArr(1, $result, '');
+    }
+
+    //  退单测试
+    public function refundOrderBack(Request $request)
+    {
+        $this->InitParams($request);
+
         // 生成退订单号
         $refundOrderNum = CTAPIOrdersBusiness::createSn($request, $this, 2);
 
@@ -170,6 +255,8 @@ class PayController extends BaseController
 
         return ajaxDataArr(1, $result, '');
     }
+
+
 //
 //    //  支付结果通知--回调
 //    public function wechatNotify(Request $request)

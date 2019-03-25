@@ -326,6 +326,13 @@ Route::get('admin/feeScale/add/{id}', 'Admin\FeeScaleController@add');// 添加
 Route::get('admin/feeScale/export', 'Admin\FeeScaleController@export');// 导出
 Route::get('admin/feeScale/import_template', 'Admin\FeeScaleController@import_template');// 导入模版
 
+// 订单
+Route::get('admin/order', 'Admin\OrdersController@index');// 列表
+Route::get('admin/order/add/{id}', 'Admin\OrdersController@add');// 添加
+// Route::get('admin/order/select', 'Admin\OrdersController@select');// 选择-弹窗
+Route::get('admin/order/export', 'Admin\OrdersController@export');// 导出
+Route::get('admin/order/import_template', 'Admin\OrdersController@import_template');// 导入模版
+
 // ----城市代理商
 // City
 Route::get('city/index', 'City\IndexController@index');// 首页
@@ -456,6 +463,13 @@ Route::get('city/notice/add/{id}', 'City\NoticeController@add');// 添加
 // Route::get('city/notice/select', 'City\NoticeController@select');// 选择-弹窗
 Route::get('city/notice/export', 'City\NoticeController@export');// 导出
 Route::get('city/notice/import_template', 'City\NoticeController@import_template');// 导入模版
+
+// 订单
+Route::get('city/order', 'City\OrdersController@index');// 列表
+Route::get('city/order/add/{id}', 'City\OrdersController@add');// 添加
+// Route::get('city/order/select', 'City\OrdersController@select');// 选择-弹窗
+Route::get('city/order/export', 'City\OrdersController@export');// 导出
+Route::get('city/order/import_template', 'City\OrdersController@import_template');// 导入模版
 
 
 // ----商家后台
@@ -589,6 +603,15 @@ Route::get('seller/shopGoodsType/import_template', 'Seller\ShopGoodsTypeControll
 //Route::get('seller/notice/export', 'Seller\NoticeController@export');// 导出
 //Route::get('seller/notice/import_template', 'Seller\NoticeController@import_template');// 导入模版
 
+// 订单
+Route::get('seller/order', 'Seller\OrdersController@index');// 列表
+Route::get('seller/order/add/{id}', 'Seller\OrdersController@add');// 添加
+// Route::get('seller/order/select', 'Seller\OrdersController@select');// 选择-弹窗
+Route::get('seller/order/export', 'Seller\OrdersController@export');// 导出
+Route::get('seller/order/import_template', 'Seller\OrdersController@import_template');// 导入模版
+
+
+
 // ----店铺后台
 // Seller
 Route::get('shop/index', 'Shop\IndexController@index');// 首页
@@ -719,3 +742,10 @@ Route::get('shop/shopGoodsType/import_template', 'Shop\ShopGoodsTypeController@i
 //// Route::get('shop/notice/select', 'Shop\NoticeController@select');// 选择-弹窗
 //Route::get('shop/notice/export', 'Shop\NoticeController@export');// 导出
 //Route::get('shop/notice/import_template', 'Shop\NoticeController@import_template');// 导入模版
+
+// 订单
+Route::get('shop/order', 'Shop\OrdersController@index');// 列表
+Route::get('shop/order/add/{id}', 'Shop\OrdersController@add');// 添加
+// Route::get('shop/order/select', 'Shop\OrdersController@select');// 选择-弹窗
+Route::get('shop/order/export', 'Shop\OrdersController@export');// 导出
+Route::get('shop/order/import_template', 'Shop\OrdersController@import_template');// 导入模版

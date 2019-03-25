@@ -34,4 +34,12 @@ class Resource extends BasePublicModel
     {
         return $this->owerTypeArr[$this->ower_type] ?? '';
     }
+
+    /**
+     * 获取资源的历史-二维
+     */
+    public function resourceHistory()
+    {
+        return $this->hasMany('App\Models\RunBuy\ResourceHistory', 'resource_id', 'id');
+    }
 }

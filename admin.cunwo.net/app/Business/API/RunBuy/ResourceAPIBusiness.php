@@ -21,7 +21,7 @@ class ResourceAPIBusiness extends BasePublicAPIBusiness
     public static function ResourceDelById($id, $companyId = null, $notLog = 0){
         $model_name = static::$model_name;// 'Resource';
         // 获得数据记录
-        $relations = '';
+        $relations = ['resourceHistory'];
 //        if(is_numeric($companyId) && $companyId > 0){
 //            // 判断权限
 //            $judgeData = [
@@ -36,8 +36,9 @@ class ResourceAPIBusiness extends BasePublicAPIBusiness
             // throws('资源记录[' . $id . ']不存在!', $this->source);
             throws('资源记录[' . $id . ']不存在!');
         }
-        // 删除文件
-        Tool::resourceDelFile([$info]);
+        // 删除文件---没有使用过，则删除
+        $resourceHistory = $info['resource_history'] ?? [];
+        if(empty($resourceHistory)) Tool::resourceDelFile([$info]);
         //删除记录
         $queryParams =[// 查询条件参数
             'where' => [

@@ -460,7 +460,7 @@ class CartDBBusiness extends BasePublicDBBusiness
 
             ,'shopSeller'// 商家
             ,'shop'// 店铺
-            ,'goods'// 商品
+            ,'goods.siteResources'// 商品
 
             ,'goods.priceProps.prop.name'// 商品价格属性
             ,'goods.priceProps.propVal.name'// 商品价格属性值
@@ -510,6 +510,14 @@ class CartDBBusiness extends BasePublicDBBusiness
             if(empty($cartGoods)) throws('店铺[' . $cartShop['shop_name'] . '商品ID[' . $cart_goods_id . ']不存在，请移除店铺的产品，再提交。');
             // 商品已下架
             if($cartGoods['is_sale'] != 1) throws('店铺[' . $cartShop['shop_name'] . '的商品[' . $cartGoods['goods_name'] . ']未上架，请移除店铺的产品，再提交。');
+
+            // 商品图片
+            $site_resources = $cartGoods['site_resources'] ?? [];
+            $tem_resource_id = 0;
+            if(!empty($site_resources)){
+                $tem_resource_id = $site_resources[0]['id'];
+            }
+            $cartInfo['resource_id'] = $tem_resource_id;
 
             $shopGoodName = '店铺[' . $cartShop['shop_name'] . '商品[' . $cartGoods['goods_name'] . ']';
             $cartGoodsPriceProps = $cartGoods['price_props'] ?? [];// 商品价格属性
@@ -979,6 +987,15 @@ class CartDBBusiness extends BasePublicDBBusiness
                         $cacheData['prop_price_id'][$prop_price_id] = $prop_price_id_history;
                     }
 
+                    $resource_id = $goodInfo['resource_id'] ;
+                    if(isset($cacheData['resource_id'][$resource_id]) && $cacheData['resource_id'][$resource_id] > 0){
+                        $resource_id_history = $cacheData['resource_id'][$resource_id];
+                    }else{
+                        $resource_id_history = ($resource_id > 0) ? ResourceDBBusiness::getIdHistory($resource_id) : 0;
+                        $cacheData['resource_id'][$resource_id] = $resource_id_history;
+                    }
+
+
                     $price = $goodInfo['price'] ;
                     $amount = $goodInfo['amount'] ;
                     $totalPrice = $price * $amount;
@@ -1005,6 +1022,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                         'price' => $price,// 价格(单价)
                         'amount' => $amount,// 数量
                         'total_price' => $totalPrice,// 总价(商品)
+                        'resource_id_history' => $resource_id_history,// 资源历史id
                         'operate_staff_id' => $operate_staff_id,// 操作员工id
                         'operate_staff_id_history' => $operate_staff_id_history,// 操作员工历史id
                     ];

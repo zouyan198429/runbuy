@@ -23,13 +23,15 @@ class Orders extends BasePublicModel
         '1' => '有',
     ];
 
-    // 状态1待支付2等待接单4取货或配送中8订单完成16作废
+    // 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
     public $statusArr = [
         '1' => '待支付',
         '2' => '待接单',
         '4' => '已取货配送中',
         '8' => '订单完成',
-        '16' => '作废',
+        '16' => '系统取消',
+        '32' => '用户取消',
+        '64' => '完成',
     ];
 
     // 支付方式1余额支付2在线支付
@@ -112,4 +114,80 @@ class Orders extends BasePublicModel
     {
         return $this->hasRefundArr[$this->has_refund] ?? '';
     }
+
+    /**
+     * 获取订单的操作记录-二维
+     */
+    public function ordersRecords()
+    {
+        return $this->hasMany('App\Models\RunBuy\OrdersRecord', 'order_no', 'order_no');
+    }
+
+    /**
+     * 获取订单的商品-二维
+     */
+    public function ordersGoods()
+    {
+        return $this->hasMany('App\Models\RunBuy\OrdersGoods', 'order_no', 'order_no');
+    }
+
+    /**
+     * 获取订单的钱包操作记录-二维
+     */
+    public function walletRecord()
+    {
+        return $this->hasMany('App\Models\RunBuy\WalletRecord', 'pay_order_no', 'order_no');
+    }
+
+
+    /**
+     * 获取订单的会员历史--一维
+     */
+    public function staffHistory()
+    {
+        return $this->belongsTo('App\Models\RunBuy\StaffHistory', 'staff_id_history', 'id');
+    }
+
+    /**
+     * 获取订单的城市分站历史--一维
+     */
+    public function cityHistory()
+    {
+        return $this->belongsTo('App\Models\RunBuy\CityHistory', 'city_site_id_history', 'id');
+    }
+
+    /**
+     * 获取订单的城市合伙人历史--一维
+     */
+    public function partnerHistory()
+    {
+        return $this->belongsTo('App\Models\RunBuy\CityPartnerHistory', 'city_partner_id_history', 'id');
+    }
+
+    /**
+     * 获取订单的商家历史--一维
+     */
+    public function sellerHistory()
+    {
+        return $this->belongsTo('App\Models\RunBuy\SellerHistory', 'seller_id_history', 'id');
+    }
+
+    /**
+     * 获取订单对应的店铺历史--一维
+     */
+    public function shopHistory()
+    {
+        return $this->belongsTo('App\Models\RunBuy\ShopHistory', 'shop_id_history', 'id');
+    }
+
+
+    /**
+     * 获取订单对应的收货地址历史--一维
+     */
+    public function addrHistory()
+    {
+        return $this->belongsTo('App\Models\RunBuy\CommonAddrHistory', 'addr_id_history', 'id');
+    }
+
+
 }

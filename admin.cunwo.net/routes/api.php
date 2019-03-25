@@ -258,6 +258,17 @@ Route::post('admin/feeScale/ajax_import_staff','Admin\FeeScaleController@ajax_im
 Route::post('admin/feeScale/import', 'Admin\FeeScaleController@import');// 导入excel
 Route::post('admin/feeScale/ajax_get_ids', 'Admin\FeeScaleController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
+//订单
+Route::any('admin/order/ajax_alist', 'Admin\OrdersController@ajax_alist');//ajax获得列表数据
+Route::post('admin/order/ajax_del', 'Admin\OrdersController@ajax_del');// 删除
+Route::post('admin/order/ajax_save', 'Admin\OrdersController@ajax_save');// 新加/修改
+Route::post('admin/order/ajax_get_child', 'Admin\OrdersController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('admin/order/ajax_get_areachild', 'Admin\OrdersController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('admin/order/ajax_import_staff','Admin\OrdersController@ajax_import'); // 导入员工
+
+Route::post('admin/order/import', 'Admin\OrdersController@import');// 导入excel
+Route::post('admin/order/ajax_get_ids', 'Admin\OrdersController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+Route::any('admin/order/ajax_getCountByStatus', 'Admin\OrdersController@ajax_getCountByStatus');//ajax获得统计数据
 
 // ----城市代理后台
 // city
@@ -411,6 +422,7 @@ Route::post('city/shop/ajax_get_ids', 'City\ShopController@ajax_get_ids');// 获
 
 Route::any('city/shop/ajax_selected', 'City\ShopController@ajax_selected');//ajax选择中记录/更新记录
 
+
 //商品
 Route::any('city/shopGoods/ajax_alist', 'City\ShopGoodsController@ajax_alist');//ajax获得列表数据
 Route::post('city/shopGoods/ajax_del', 'City\ShopGoodsController@ajax_del');// 删除
@@ -469,6 +481,17 @@ Route::post('city/notice/ajax_import_staff','City\NoticeController@ajax_import')
 Route::post('city/notice/import', 'City\NoticeController@import');// 导入excel
 Route::post('city/notice/ajax_get_ids', 'City\NoticeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
+//订单
+Route::any('city/order/ajax_alist', 'City\OrdersController@ajax_alist');//ajax获得列表数据
+Route::post('city/order/ajax_del', 'City\OrdersController@ajax_del');// 删除
+Route::post('city/order/ajax_save', 'City\OrdersController@ajax_save');// 新加/修改
+Route::post('city/order/ajax_get_child', 'City\OrdersController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('city/order/ajax_get_areachild', 'City\OrdersController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('city/order/ajax_import_staff','City\OrdersController@ajax_import'); // 导入员工
+
+Route::post('city/order/import', 'City\OrdersController@import');// 导入excel
+Route::post('city/order/ajax_get_ids', 'City\OrdersController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+Route::any('city/order/ajax_getCountByStatus', 'City\OrdersController@ajax_getCountByStatus');//ajax获得统计数据
 
 // ----商家后台
 // seller
@@ -680,6 +703,19 @@ Route::post('seller/shopGoodsType/ajax_get_ids', 'Seller\ShopGoodsTypeController
 //Route::post('seller/notice/import', 'Seller\NoticeController@import');// 导入excel
 //Route::post('seller/notice/ajax_get_ids', 'Seller\NoticeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
+//订单
+Route::any('seller/order/ajax_alist', 'Seller\OrdersController@ajax_alist');//ajax获得列表数据
+Route::post('seller/order/ajax_del', 'Seller\OrdersController@ajax_del');// 删除
+Route::post('seller/order/ajax_save', 'Seller\OrdersController@ajax_save');// 新加/修改
+Route::post('seller/order/ajax_get_child', 'Seller\OrdersController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('seller/order/ajax_get_areachild', 'Seller\OrdersController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('seller/order/ajax_import_staff','Seller\OrdersController@ajax_import'); // 导入员工
+
+Route::post('seller/order/import', 'Seller\OrdersController@import');// 导入excel
+Route::post('seller/order/ajax_get_ids', 'Seller\OrdersController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+Route::any('seller/order/ajax_getCountByStatus', 'Seller\OrdersController@ajax_getCountByStatus');//ajax获得统计数据
+
+
 // ----店铺后台
 // seller
 // 上传图片
@@ -890,6 +926,19 @@ Route::post('shop/shopGoodsType/ajax_get_ids', 'Shop\ShopGoodsTypeController@aja
 //Route::post('shop/notice/import', 'Shop\NoticeController@import');// 导入excel
 //Route::post('shop/notice/ajax_get_ids', 'Shop\NoticeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
+//订单
+Route::any('shop/order/ajax_alist', 'Shop\OrdersController@ajax_alist');//ajax获得列表数据
+Route::post('shop/order/ajax_del', 'Shop\OrdersController@ajax_del');// 删除
+Route::post('shop/order/ajax_save', 'Shop\OrdersController@ajax_save');// 新加/修改
+Route::post('shop/order/ajax_get_child', 'Shop\OrdersController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('shop/order/ajax_get_areachild', 'Shop\OrdersController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('shop/order/ajax_import_staff','Shop\OrdersController@ajax_import'); // 导入员工
+
+Route::post('shop/order/import', 'Shop\OrdersController@import');// 导入excel
+Route::post('shop/order/ajax_get_ids', 'Shop\OrdersController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+Route::any('shop/order/ajax_getCountByStatus', 'Shop\OrdersController@ajax_getCountByStatus');//ajax获得统计数据
+
+
 // 微信相关的
 // 一定是 Route::any, 因为微信服务端认证的时候是 GET, 接收用户消息时是 POST ！
 Route::any('wx/wechat', 'WX\WeChatController@index');
@@ -988,6 +1037,8 @@ Route::any('order/getInfoByOrderNoDoing', 'WX\OrderController@getInfoByOrderNoDo
 Route::any('order/cancel', 'WX\OrderController@cancel');// 订单作废
 Route::any('order/chState', 'WX\OrderController@chState');// 更新订单状态
 Route::any('order/getList', 'WX\OrderController@getList');// 订单--列表--有分页
+Route::any('order/ajax_alist', 'WX\OrderController@ajax_alist');//ajax获得列表数据--列表--有分页
+Route::any('order/ajax_getCountByStatus', 'WX\OrderController@ajax_getCountByStatus');//ajax获得统计数据
 
 // 订单支付相关的
 Route::any('orderPay/pay', 'WX\OrderPayController@pay');// 订单付款
@@ -1000,7 +1051,7 @@ Route::any('pay/unifiedorderByNo', 'WX\PayController@unifiedorderByNo');// 统�
 
 Route::any('pay/unifiedorder', 'WX\PayController@unifiedorder');// 统一下单
 Route::any('pay/wechatNotify', 'WX\PayController@wechatNotify');// 支付结果通知--回调
-Route::any('pay/refundOrder', 'WX\PayController@refundOrder');// 退单测试
+Route::any('pay/refundOrder', 'WX\PayController@refundOrder');// 退单
 Route::any('pay/refundNotify', 'WX\PayController@refundNotify');// 退款结果通知--回调
 Route::any('pay/sweepCodePayNotify', 'WX\PayController@sweepCodePayNotify');// 扫码支付通知
 

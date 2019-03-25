@@ -1655,4 +1655,65 @@ class Tool
         //$infoData['upload_picture_list'] = $upload_picture_list;
         return $upload_picture_list;
     }
+
+    /**
+     * 格式化字符串--字符串每隔多少个字符加指定字符
+     *
+     * @param string $str 字符串
+     * @param string $splitStr 指定字符--默认空隔
+     * @param int  $len 每隔多少长度--默认4
+     * @return  string 格式化后字符串
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function formatStrMiddle($str, $splitStr = ' ', $len = 4){
+        return implode($splitStr, str_split($str, $len));
+    }
+
+    /**
+     * 格式化后手机/电话号码
+     *
+     * @param string $str 需要格式化的字符
+    $formatArr = [
+    [
+    'len' => 3,// 长度
+    'splitStr' => '',// 分隔符
+    ],
+    ....
+    ];
+     * @return  string 格式化后手机/电话号码
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function formatStr($str, $formatArr = []) {
+        $reStr = '';
+        $strLen = strlen($str);
+        foreach($formatArr as $v){
+            $len = $v['len'] ?? 1;
+            if($len < 1) $len = 1;
+            $splitStr = $v['splitStr'] ?? ' ';
+            if($splitStr == '') $splitStr = ' ';
+            $reStr .= substr($str,0, $len);
+
+            // 剩下的字符
+            $str = substr($str,$len);
+            $strLen = strlen($str);
+            if($strLen > 0) $reStr .= $splitStr;
+        }
+        // 加上剩下的
+        if($strLen > 0) $reStr .= $str;
+
+        return $reStr;
+        // $phone = preg_replace("/[^0-9]/", "", $phone);
+        // $replacement = [];// 用于替换的字符串或字符串数组。
+        // return preg_replace("/([0-9]{3})([0-9]{4})([0-9]{4})/","$1 $2 $3",$phone);
+        /*
+        if(strlen($phone) == 7)// 029-88214602  0831-6746036
+            return preg_replace("/([0-9]{3})([0-9]{4})/", "$1-$2", $phone);
+        elseif(strlen($phone) == 10)
+            return preg_replace("/([0-9]{3})([0-9]{3})([0-9]{4})/","($1) $2-$3",$phone);
+        elseif(strlen($phone) == 11)
+            return preg_replace("/([0-9]{3})([0-9]{4})([0-9]{4})/","$1 $2 $3",$phone);
+        else
+            return $phone;
+        */
+    }
 }

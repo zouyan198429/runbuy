@@ -135,10 +135,28 @@ class Staff extends BasePublicModel
     }
 
     /**
+     * 获取关联到的钱包---一维
+     */
+    public function wallet()
+    {
+        return $this->hasOne('App\Models\RunBuy\Wallet', 'staff_id', 'id');
+    }
+
+    /**
      * 获取员工的地址-二维
      */
     public function address()
     {
         return $this->hasMany('App\Models\RunBuy\CommonAddr', 'ower_id', 'id');
     }
+
+    /**
+     * 获取员工的钱包操作记录-二维
+     */
+    public function walletRecord()
+    {
+        return $this->hasMany('App\Models\RunBuy\WalletRecord', 'staff_id', 'id');
+    }
+
+
 }
