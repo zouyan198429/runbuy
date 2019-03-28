@@ -9,6 +9,7 @@ namespace App\Http\Controllers;
 use App\Business\DB\RunBuy\CityDBBusiness;
 use App\Business\DB\RunBuy\LrChinaCityDBBusiness;
 // use App\Models\LrChinaCity;
+use App\Business\DB\RunBuy\OrdersDoingDBBusiness;
 use App\Services\GetPingYing;
 use App\Services\pyClass;
 use Illuminate\Http\Request;
@@ -281,6 +282,46 @@ class TestbController extends CompController
      */
     public function index()
     {
+//        $queryParams = [
+//        'where' => [
+//            ['staff_id', 350],
+////            ['city_site_id', $saveData['city_site_id']],
+////            ['goods_id', $saveData['goods_id']],
+////            ['prop_price_id', $saveData['prop_price_id'] ],
+//        ],
+////            'select' => [
+////                'id','title','sort_num','volume'
+////                ,'operate_staff_id','operate_staff_id_history'
+////                ,'created_at' ,'updated_at'
+////            ],
+//        //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+//    ];
+//            $queryParams['select'] = ['id'];
+//            // 查询记录
+//            $info = OrdersDoingDBBusiness::getInfoByQuery(2, $queryParams, []);
+////            vd(empty($info), false);
+//        echo gettype($info->toArray()) . '<br/>';
+//        //echo count($info) . '<br/>';
+//            if(empty($info)){
+//                echo '空<br/>>';
+//            }else{
+//                echo '非空<br/>>';
+//            }
+////            if(!isset($info->id)){
+////                echo 'isset $info->id空<br/>>';
+////            }else{
+////                echo ' isset$info->id非空<br/>>';
+////            }
+////        if(!isset($info['id'])){
+////            echo 'isset $info id空<br/>>';
+////        }else{
+////            echo ' isset$info id非空<br/>>';
+////        }
+//           /// echo $info->id . '<br/>';
+//        //echo $info['id'];
+////            vd($info);
+//        pr($info);
+//        return 'aaaa';
         // 获得指定新闻的相关资源
         // 单条
 //        $siteNew = SiteNews::with('siteResources')->find(1);

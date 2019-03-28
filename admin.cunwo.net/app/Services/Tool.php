@@ -267,42 +267,48 @@ class Tool
 
 
         $lockObj = Tool::getLockRedisesLaravelObj();
-        $lockState = $lockObj->lock('locktest', 2000, 2000);//加锁
+        $lockState = $lockObj->lock('lock:' . Tool::getUniqueKey([Tool::getActionMethod(), __CLASS__, __FUNCTION__, $namespace, $fixParams]), 2000, 2000);//加锁
         if($lockState)
         {
-            $redisKey = 'FlowSn:' . ucfirst($namespace);
-            $insertId = Redis::incr($redisKey);
-            foreach($expireNums as $v){
-                if(count($v) < 3) continue;
-                $orderNums = [$v[0], $v[1]];
-                $orderNums = array_values($orderNums);
-                sort($orderNums);
-                if($insertId >= $orderNums[0] && $insertId <= $orderNums[1]) Redis::expire($redisKey, $v[2] );  #设置过期时间 单位秒数 一年  365 * 24 * 60 * 60
+            try {
+                $redisKey = 'FlowSn:' . ucfirst($namespace);
+                $insertId = Redis::incr($redisKey);
+                foreach($expireNums as $v){
+                    if(count($v) < 3) continue;
+                    $orderNums = [$v[0], $v[1]];
+                    $orderNums = array_values($orderNums);
+                    sort($orderNums);
+                    if($insertId >= $orderNums[0] && $insertId <= $orderNums[1]) Redis::expire($redisKey, $v[2] );  #设置过期时间 单位秒数 一年  365 * 24 * 60 * 60
+                }
+            } catch ( \Exception $e) {
+                throws($e->getMessage(), $e->getCode());
+            }finally{
+                $lockObj->unlock($lockState);//解锁
             }
-
-            $lockObj->unlock($lockState);//解锁
-            $orderNum = $prefix;// 前缀
-            if(($needNum & 1) == 1) $orderNum .= $year;// 年2位
-
-            // 到一年的第几分钟 6位
-            if(($needNum & 2) == 2) $orderNum .= str_pad(substr($mdh, -6), 6, '0', STR_PAD_LEFT);
-
-            // needNum 值为 4时的日期格式
-            if(($needNum & 4) == 4 && (!empty($dataFormat))) $orderNum .= date($dataFormat);//
-
-            $orderNum .= $midFix;// 中缀
-
-            // 8 自增的序号
-            if(($needNum & 8) == 8) $orderNum .= str_pad(substr($insertId, -$length), $length, 0, STR_PAD_LEFT);
-
-            $orderNum .= $backfix;// 后缀
-
-             //   return $prefix . $year . str_pad(substr($mdh, -6), 6, '0', STR_PAD_LEFT)
-             //  . $midFix . str_pad(substr($insertId, -$length), $length, 0, STR_PAD_LEFT) . $backfix;// . $suffix
-            return $orderNum;
         }else{
             throws('生成单号有错，请稍后重试!');
         }
+
+        $orderNum = $prefix;// 前缀
+        if(($needNum & 1) == 1) $orderNum .= $year;// 年2位
+
+        // 到一年的第几分钟 6位
+        if(($needNum & 2) == 2) $orderNum .= str_pad(substr($mdh, -6), 6, '0', STR_PAD_LEFT);
+
+        // needNum 值为 4时的日期格式
+        if(($needNum & 4) == 4 && (!empty($dataFormat))) $orderNum .= date($dataFormat);//
+
+        $orderNum .= $midFix;// 中缀
+
+        // 8 自增的序号
+        if(($needNum & 8) == 8) $orderNum .= str_pad(substr($insertId, -$length), $length, 0, STR_PAD_LEFT);
+
+        $orderNum .= $backfix;// 后缀
+
+         //   return $prefix . $year . str_pad(substr($mdh, -6), 6, '0', STR_PAD_LEFT)
+         //  . $midFix . str_pad(substr($insertId, -$length), $length, 0, STR_PAD_LEFT) . $backfix;// . $suffix
+        return $orderNum;
+
     }
 
     /**
@@ -1715,5 +1721,25 @@ class Tool
         else
             return $phone;
         */
+    }
+
+    /**
+     *  关键数据生成键 ,
+     *
+     * @param array $keyData 其内容项可以是字符、数字、数组
+     * @param string $reType 返回的值类型 md5
+     * @return  string md5值
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getUniqueKey($keyData, $reType = 'md5') {
+        $keyArr = [];
+        foreach($keyData as $k => $v){
+            array_push($keyArr, $k);
+            if(is_numeric($v) || is_string($v)) array_push($keyArr, $v);
+            if(is_array($v)) array_push($keyArr, json_encode($v));
+        }
+        $keyStr = implode('>!@#', $keyArr);
+        if($reType == 'md5' ) return md5($keyStr);
+        return $keyStr;
     }
 }

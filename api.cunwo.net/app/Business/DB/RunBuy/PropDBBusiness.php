@@ -310,7 +310,7 @@ class PropDBBusiness extends BasePublicDBBusiness
             }
         } catch ( \Exception $e) {
             DB::rollBack();
-            throws('操作失败；信息[' . $e->getMessage() . ']');
+            throws($e->getMessage());
             // throws($e->getMessage());
         }
         DB::commit();
@@ -381,7 +381,7 @@ class PropDBBusiness extends BasePublicDBBusiness
             static::deleteByIds($id);
         } catch ( \Exception $e) {
             DB::rollBack();
-            throws('操作失败；信息[' . $e->getMessage() . ']');
+            throws($e->getMessage());
             // throws($e->getMessage());
         }
         DB::commit();

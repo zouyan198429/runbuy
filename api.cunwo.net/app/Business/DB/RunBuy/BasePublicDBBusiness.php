@@ -19,7 +19,7 @@ class BasePublicDBBusiness extends BaseDBBusiness
      *
      * @param int $company_id 企业id
      * @param int $user_id 当前用户
-     * @param int  $orderType 要保存或修改的数组 1 订单号 2 退款订单
+     * @param int  $orderType 要保存或修改的数组 1 订单号 2 退款订单 3 支付跑腿费  4 追加跑腿费 5 冲值  6 提现 7 压金或保证金
      * @return  int
      * @author zouyan(305463219@qq.com)
      */
@@ -47,6 +47,11 @@ class BasePublicDBBusiness extends BaseDBBusiness
 //                ];
                 break;
             case 2:// 2 退款订单
+            case 3:// 3 支付跑腿费
+            case 4:// 4 追加跑腿费
+            case 5:// 5 冲值
+            case 6:// 6 提现
+            case 7:// 7 压金或保证金
                 $userIdBack = str_pad(substr($user_id, -2), 2, '0', STR_PAD_LEFT);
                 $midFix = $userIdBack;
                 $namespace = 'orderRefund' . $userIdBack;

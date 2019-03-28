@@ -46,10 +46,11 @@ class Orders extends BasePublicModel
         '1' => '已支付',
     ];
 
-    // 是否退费0未退费1已退费
+    // 是否退费0未退费1已退费2待退费
     public $hasRefundArr = [
         '0' => '未退费',
         '1' => '已退费',
+        '2' => '待退费',
     ];
 
     // 表里没有的字段

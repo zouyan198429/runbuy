@@ -11,11 +11,13 @@ class WalletRecord extends BasePublicModel
      */
     protected $table = 'wallet_record';
 
-    // 操作类型1充值2提现4付款8退款16冻结32解冻
-    public $typeArr = [
+    // 操作类型1充值2提现3交压金/保证金4订单付款5追加付款8退款16冻结32解冻
+    public $operateTypeArr = [
         '1' => '充值',
         '2' => '提现',
-        '4' => '付款',
+        '3' => '保证金',
+        '4' => '订单付款',
+        '5' => '追加付款',
         '8' => '退款',
         '16' => '冻结',
         '32' => '解冻',
@@ -36,16 +38,16 @@ class WalletRecord extends BasePublicModel
     ];
 
     // 表里没有的字段
-    protected $appends = ['type_text', 'status_text', 'pay_type_text'];
+    protected $appends = ['operate_type_text', 'status_text', 'pay_type_text'];
 
     /**
      * 获取操作类型文字
      *
      * @return string
      */
-    public function getTypeTextAttribute()
+    public function getOperateTypeTextAttribute()
     {
-        return $this->typeArr[$this->type] ?? '';
+        return $this->operateTypeArr[$this->operate_type] ?? '';
     }
 
     /**

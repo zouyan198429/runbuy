@@ -83,8 +83,8 @@ class ShopGoodsTypeDBBusiness extends BasePublicDBBusiness
 //            }
         } catch ( \Exception $e) {
             DB::rollBack();
-            throws('操作失败；信息[' . $e->getMessage() . ']');
-            // throws($e->getMessage());
+//            throws('操作失败；信息[' . $e->getMessage() . ']');
+             throws($e->getMessage());
         }
         DB::commit();
         return $id;

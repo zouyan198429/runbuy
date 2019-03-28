@@ -94,7 +94,7 @@ class ShopGoodsPricesDBBusiness extends BasePublicDBBusiness
             }
         } catch ( \Exception $e) {
             DB::rollBack();
-            throws('操作失败；信息[' . $e->getMessage() . ']');
+            throws($e->getMessage());
             // throws($e->getMessage());
         }
         DB::commit();

@@ -1055,6 +1055,11 @@ Route::any('pay/refundOrder', 'WX\PayController@refundOrder');// 退单
 Route::any('pay/refundNotify', 'WX\PayController@refundNotify');// 退款结果通知--回调
 Route::any('pay/sweepCodePayNotify', 'WX\PayController@sweepCodePayNotify');// 扫码支付通知
 
+Route::any('pay/operateRefundByNo', 'WX\PayController@operateRefundByNo');// 退款--手动查询退单结果并操作记录
+
+Route::any('pay/test', 'WX\PayController@test');// 统一下单
+
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

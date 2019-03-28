@@ -15,7 +15,7 @@ class BasicPublicCTAPIBusiness extends BasicCTAPIBusiness
      *
      * @param Request $request 请求信息
      * @param Controller $controller 控制对象
-     * @param int  $orderType 要保存或修改的数组 1 订单号 2 退款订单 3 支付跑腿费  4 追加跑腿费 5 冲值  6 提现
+     * @param int  $orderType 要保存或修改的数组 1 订单号 2 退款订单 3 支付跑腿费  4 追加跑腿费 5 冲值  6 提现 7 压金或保证金
      * @return  int
      * @author zouyan(305463219@qq.com)
      */
@@ -47,6 +47,7 @@ class BasicPublicCTAPIBusiness extends BasicCTAPIBusiness
             case 4:// 4 追加跑腿费
             case 5:// 5 冲值
             case 6:// 6 提现
+            case 7:// 7 压金或保证金
                 $userIdBack = str_pad(substr($user_id, -2), 2, '0', STR_PAD_LEFT);
                 $midFix = $userIdBack;
                 $namespace = 'orderRefund' . $userIdBack;

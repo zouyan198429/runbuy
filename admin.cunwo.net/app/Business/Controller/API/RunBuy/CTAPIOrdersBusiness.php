@@ -131,10 +131,15 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
             $status = CommonRequest::get($request, 'status');
             // if(is_numeric($status) )  array_push($queryParams['where'], ['status', '=', $status]);
             if(!empty($status)){
+
                 if (strpos($status, ',') === false) { // 单条
                     array_push($queryParams['where'], ['status', $status]);
                 } else {
                     $queryParams['whereIn']['status'] = explode(',', $status);
+                }
+                // 如果有状态 待接单，则把退款中的也去掉 2等待接单
+                if(strpos(',' . $status . ',', ',2,') !== false){
+                    array_push($queryParams['where'], ['has_refund', '!=', 2]); // 是否退费0未退费1已退费2待退费
                 }
             }
 

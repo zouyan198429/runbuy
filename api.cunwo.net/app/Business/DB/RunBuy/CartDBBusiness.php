@@ -152,8 +152,8 @@ class CartDBBusiness extends BasePublicDBBusiness
 
         } catch ( \Exception $e) {
             DB::rollBack();
-            throws('操作失败；信息[' . $e->getMessage() . ']');
-            // throws($e->getMessage());
+//            throws('操作失败；信息[' . $e->getMessage() . ']');
+             throws($e->getMessage());
         }
         DB::commit();
         return $id;
@@ -215,8 +215,8 @@ class CartDBBusiness extends BasePublicDBBusiness
             }
         } catch ( \Exception $e) {
             DB::rollBack();
-            throws('操作失败；信息[' . $e->getMessage() . ']');
-            // throws($e->getMessage());
+//            throws('操作失败；信息[' . $e->getMessage() . ']');
+             throws($e->getMessage());
         }
         DB::commit();
         return $shop_id;
@@ -377,8 +377,8 @@ class CartDBBusiness extends BasePublicDBBusiness
             }
         } catch ( \Exception $e) {
             DB::rollBack();
-            throws('操作失败；信息[' . $e->getMessage() . ']');
-            // throws($e->getMessage());
+//            throws('操作失败；信息[' . $e->getMessage() . ']');
+             throws($e->getMessage());
         }
         DB::commit();
         return $prop_id;
@@ -657,8 +657,8 @@ class CartDBBusiness extends BasePublicDBBusiness
 
             // 遍历商品属性---判断属性
             foreach($formatCartProps as $gp_k => $gp_v){
-                $is_multi = $gp_v['is_multi'] ?? 0  ;// 是否必选[下单时]0不是1是
-                if($is_multi != 1) continue;
+                $is_must = $gp_v['is_must'] ?? 0  ;// 是否必选[下单时]0不是1是
+                if($is_must != 1) continue;
                 $gp_prop_id = $gp_v['prop_id'] ?? 0;// 属性id
                 $gp_prop_name = $gp_v['prop_name'] ?? 0;// 属性名称
                 $gp_prop_val_idarr = $gp_v['pv_ids'] ?? [];// 属性值id数组
@@ -816,6 +816,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                     // 'total_price' => 'aaaa',// 商品总价
                     'status' => 1,// 状态1待支付2等待接单4取货或配送中8订单完成16作废
                     'total_run_price' => $total_run_price,// 总跑腿费
+                    'pay_run_amount' => $total_run_price,// 支付跑腿费[总共支付的]
                     // 'pay_type' => 'aaaa',// 支付方式1余额支付2在线支付
                     'pay_run_price' => 0,// 是否支付跑腿费0未支付1已支付
                     // 'pay_order_no' => 'aaaa',// 支付订单号
@@ -940,6 +941,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                     // 'total_price' => 'aaaa',// 商品总价
                     'status' => 1,// 状态1待支付2等待接单4取货或配送中8订单完成16作废
                     'total_run_price' => $total_run_price,// 总跑腿费
+                    'pay_run_amount' => $total_run_price,// 支付跑腿费[总共支付的]
                     // 'pay_type' => 'aaaa',// 支付方式1余额支付2在线支付
                     'pay_run_price' => 0,// 是否支付跑腿费0未支付1已支付
                     // 'pay_order_no' => 'aaaa',// 支付订单号
@@ -1110,7 +1112,7 @@ class CartDBBusiness extends BasePublicDBBusiness
 
         } catch ( \Exception $e) {
             DB::rollBack();
-            throws('操作失败；信息[' . $e->getMessage() . ']');
+            throws($e->getMessage());
             // throws($e->getMessage());
         }
         DB::commit();

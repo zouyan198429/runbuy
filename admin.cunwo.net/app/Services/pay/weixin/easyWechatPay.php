@@ -34,7 +34,7 @@ class easyWechatPay
         ];
         $unifyParams = array_merge($unifyParams, $params);
         $result = $app->order->unify($unifyParams);
-        Log::info('微信支付日志--统一下单 unify 返回：' . __FUNCTION__, ['params'=> $unifyParams,'result'=> $result,]);
+        Log::info('微信支付日志--统一下单 unify 返回：-->' . __FUNCTION__, ['params'=> $unifyParams,'result'=> $result,]);
         /*
         {
             "return_code": "SUCCESS",// 表示通信状态: SUCCESS 成功
@@ -69,7 +69,7 @@ class easyWechatPay
 
             // config('wechat.payment.default.key')为商户的key
             $params['paySign'] = generate_sign($params, config('wechat.payment.default.key'));
-            Log::info('微信支付日志 二次签名 ' . __FUNCTION__, [$params]);
+            Log::info('微信支付日志 二次签名 -->' . __FUNCTION__, [$params]);
 
             /*
             {
@@ -107,7 +107,7 @@ class easyWechatPay
         // 根据商户订单号查询
         // $app = app('wechat.payment');
         $result = $app->order->queryByOutTradeNumber($out_trade_no);// 商户系统内部的订单号（out_trade_no）
-        Log::info('微信支付日志 根据商户订单号查询$result' . __FUNCTION__, ['request' => $out_trade_no, 'result' => $result]);
+        Log::info('微信支付日志 根据商户订单号查询$result-->' . __FUNCTION__, ['request' => $out_trade_no, 'result' => $result]);
 
         static::returnErr($app, $result);// 通信错误判断
 
@@ -164,7 +164,7 @@ class easyWechatPay
         // $app = app('wechat.payment');
         $result = $app->order->queryByTransactionId($transaction_id);// "微信订单号（transaction_id）"
 
-        Log::info('微信支付日志 根据微信订单号查询 $result' . __FUNCTION__, ['request' => $transaction_id, 'result' => $result]);
+        Log::info('微信支付日志 根据微信订单号查询 $result-->' . __FUNCTION__, ['request' => $transaction_id, 'result' => $result]);
 
         static::returnErr($app, $result);// 通信错误判断
         /** 交易状态
@@ -218,7 +218,7 @@ class easyWechatPay
     public static function closeByOutTradeNumber(&$app, $out_trade_no)
     {
         $result = $app->order->close($out_trade_no);
-        Log::info('微信支付日志 关闭订单:' . __FUNCTION__, ['request' => $out_trade_no, 'result' => $result]);
+        Log::info('微信支付日志 关闭订单:-->' . __FUNCTION__, ['request' => $out_trade_no, 'result' => $result]);
 
         static::returnErr($app, $result);// 通信错误判断
         $result_code = $result['result_code'] ?? '';// result_code  业务结果  SUCCESS/FAIL
@@ -251,7 +251,7 @@ class easyWechatPay
     {
         // 参数分别为：微信订单号、商户退款单号、订单金额、退款金额、其他参数
         $result = $app->refund->byTransactionId($transactionId, $refundNumber, $totalFee, $refundFee, $config);
-        Log::info('微信支付日志 根据微信订单号退款:' . __FUNCTION__, ['request' => [
+        Log::info('微信支付日志 根据微信订单号退款:-->' . __FUNCTION__, ['request' => [
             'transactionId' => $transactionId
             ,'refundNumber' => $refundNumber
             ,'totalFee' => $totalFee
@@ -289,7 +289,7 @@ class easyWechatPay
         // 参数分别为：商户订单号、商户退款单号、订单金额、退款金额、其他参数
         $result = $app->refund->byOutTradeNumber($out_trade_no, $refundNumber, $totalFee, $refundFee, $config);
 
-        Log::info('微信支付日志 根据商户订单号退款:' . __FUNCTION__, ['request' => [
+        Log::info('微信支付日志 根据商户订单号退款:-->' . __FUNCTION__, ['request' => [
             'transactionId' => $out_trade_no
             ,'refundNumber' => $refundNumber
             ,'totalFee' => $totalFee
@@ -350,7 +350,7 @@ class easyWechatPay
         // 根据商户订单号查询
         // $app = app('wechat.payment');
         $result = $app->refund->queryByOutRefundNumber($outRefundNumber);
-        Log::info('微信支付日志 查询退款--根据 商户退款单号' . __FUNCTION__, ['request' => $outRefundNumber, 'result' => $result]);
+        Log::info('微信支付日志 查询退款--根据 商户退款单号-->' . __FUNCTION__, ['request' => $outRefundNumber, 'result' => $result]);
 
         static::returnErr($app, $result);// 通信错误判断
 
@@ -380,7 +380,8 @@ class easyWechatPay
         "refund_fee_0": "2",// 申请退款金额 退款总金额,单位为分,可以做部分退款
         "refund_id_0": "50000009922019031808806393608",  // 微信退款单号
         "refund_recv_accout_0": "工商银行借记卡6959",
-        "refund_status_0": "SUCCESS",// 退款状态
+        "refund_status_0": "SUCCESS",// 退款状态  款状态： SUCCESS—退款成功;  REFUNDCLOSE—退款关闭。;PROCESSING—退款处理中
+         *                          CHANGE—退款异常，退款到银行发现用户的卡作废或者冻结了，导致原路退款银行卡失败，可前往商户平台（pay.weixin.qq.com）-交易中心，手动处理此笔退款。$n为下标，从0开始编号。
         "refund_success_time_0": "2019-03-18 16:47:06",
         "result_code": "SUCCESS",// 业务结果   SUCCESS/FAIL  SUCCESS退款申请接收成功，结果通过退款查   询接口查询  FAIL
         "return_code": "SUCCESS",
@@ -405,7 +406,7 @@ class easyWechatPay
         // 根据微信订单号查询
         // $app = app('wechat.payment');
         $result = $app->refund->queryByRefundId($refundId);
-        Log::info('微信支付日志 查询退款--根据 微信退款单号 $result' . __FUNCTION__, ['request' => $refundId, 'result' => $result]);
+        Log::info('微信支付日志 查询退款--根据 微信退款单号 $result-->' . __FUNCTION__, ['request' => $refundId, 'result' => $result]);
 
         static::returnErr($app, $result);// 通信错误判断
 
@@ -460,7 +461,7 @@ class easyWechatPay
         // 根据商户订单号查询
         // $app = app('wechat.payment');
         $result = $app->refund->queryByOutTradeNumber($out_trade_no);// 商户系统内部的订单号（out_trade_no）
-        Log::info('微信支付日志 根据商户订单号查询$result' . __FUNCTION__, ['request' => $out_trade_no, 'result' => $result]);
+        Log::info('微信支付日志 根据商户订单号查询$result-->' . __FUNCTION__, ['request' => $out_trade_no, 'result' => $result]);
 
         static::returnErr($app, $result);// 通信错误判断
 
@@ -524,7 +525,7 @@ class easyWechatPay
         // $app = app('wechat.payment');
         $result = $app->refund->queryByTransactionId($transaction_id);// "微信订单号（transaction_id）"
 
-        Log::info('微信支付日志 根据微信订单号查询 $result' . __FUNCTION__, ['request' => $transaction_id, 'result' => $result]);
+        Log::info('微信支付日志 根据微信订单号查询 $result-->' . __FUNCTION__, ['request' => $transaction_id, 'result' => $result]);
 
         static::returnErr($app, $result);// 通信错误判断
 
