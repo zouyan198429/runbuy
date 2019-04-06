@@ -174,6 +174,12 @@
                 </td>
             </tr>
             <tr>
+                <th>排序[降序]<span class="must">*</span></th>
+                <td>
+                    <input type="text" class="inp wnormal"  name="sort_num" value="{{ $info['sort_num'] or '' }}" placeholder="请输入排序"  onkeyup="isnum(this) " onafterpaste="isnum(this)"  />
+                </td>
+            </tr>
+            <tr>
                 <th> </th>
                 <td><button class="btn btn-l wnormal"  id="submitBtn" >提交</button></td>
             </tr>

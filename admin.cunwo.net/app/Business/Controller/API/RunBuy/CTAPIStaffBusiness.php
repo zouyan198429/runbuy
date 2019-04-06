@@ -315,7 +315,7 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
             }
             $data_list[$k]['province_name'] =  $temProvinceName;
             // $data_list[$k]['province_id'] =  $temProvinceId;
-            if(isset($data_list[$k]['province'])) unset($data_list[$k]['province']);
+            // if(isset($data_list[$k]['province']) && !is_string($data_list[$k]['province'])) unset($data_list[$k]['province']);
             if(isset($data_list[$k]['province_history'])) unset($data_list[$k]['province_history']);
             // 市
             $temCityName = $v['city']['city_name'] ?? '';
@@ -326,7 +326,9 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
             }
             $data_list[$k]['city_name'] =  $temCityName;
             // $data_list[$k]['city_id'] =  $temCityId;
-            if(isset($data_list[$k]['city'])) unset($data_list[$k]['city']);
+            if(isset($data_list[$k]['city'])){
+                if(!is_string($data_list[$k]['city'])) unset($data_list[$k]['city']);
+            }
             if(isset($data_list[$k]['city_history'])) unset($data_list[$k]['city_history']);
             // 县区
             $temAreaName = $v['area']['city_name'] ?? '';

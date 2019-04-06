@@ -44,7 +44,8 @@ class StaffUserController extends WorksController
         $reDataArr['city_partner_id'] =  $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         $reDataArr['seller_id'] =  $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
         $reDataArr['shop_id'] =  CommonRequest::getInt($request, 'shop_id');
-        return view('seller.staffUser.index', $reDataArr);
+//        return view('seller.staffUser.index', $reDataArr);
+        return view('seller.WXUser.index', $reDataArr);
     }
 
     /**

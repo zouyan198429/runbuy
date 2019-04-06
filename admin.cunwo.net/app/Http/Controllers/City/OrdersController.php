@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\City;
 
 use App\Business\Controller\API\RunBuy\CTAPICityBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIOrdersBusiness;
@@ -32,11 +32,11 @@ class OrdersController extends WorksController
         $reDataArr['province_kv'] = CTAPICityBusiness::getCityByPid($request, $this,  0);
         $reDataArr['defaultProvince'] = -1;
 
-        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
-        $reDataArr['city_partner_id'] =  CommonRequest::getInt($request, 'city_partner_id');
+        $reDataArr['city_site_id'] =  $this->city_site_id;//CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_partner_id'] =  $this->city_partner_id;//CommonRequest::getInt($request, 'city_partner_id');
         $reDataArr['seller_id'] =  CommonRequest::getInt($request, 'seller_id');
         $reDataArr['shop_id'] =  CommonRequest::getInt($request, 'shop_id');
-        return view('admin.orders.index', $reDataArr);
+        return view('city.orders.index', $reDataArr);
     }
 
     /**
@@ -53,7 +53,7 @@ class OrdersController extends WorksController
 //        $reDataArr['province_kv'] = CTAPIOrdersBusiness::getCityByPid($request, $this,  0);
 //        $reDataArr['province_kv'] = CTAPIOrdersBusiness::getChildListKeyVal($request, $this, 0, 1 + 0, 0);
 //        $reDataArr['province_id'] = 0;
-//        return view('admin.orders.select', $reDataArr);
+//        return view('city.orders.select', $reDataArr);
 //    }
 
     /**
@@ -81,7 +81,7 @@ class OrdersController extends WorksController
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         $reDataArr['info'] = $info;
         $reDataArr['operate'] = $operate;
-        return view('admin.orders.add', $reDataArr);
+        return view('city.orders.add', $reDataArr);
     }
 
 
@@ -153,6 +153,10 @@ class OrdersController extends WorksController
         //  显示到定位点的距离
         CTAPIOrdersBusiness::mergeRequest($request, $this, [
             'order_type' => 1,// 订单类型1普通订单/父订单4子订单
+            'city_site_id' => $this->city_site_id ,// 城市分站id
+            'city_partner_id' => $this->city_partner_id,// 城市合伙人id
+//            'seller_id' => $this->seller_id,// 商家ID
+//            'shop_id' => $this->shop_id,// 店铺ID
         ]);
         $result = CTAPIOrdersBusiness::getList($request, $this, 2 + 4, [], $relations);
         $data_list = $result['result']['data_list'] ?? [];
@@ -162,6 +166,10 @@ class OrdersController extends WorksController
             CTAPIOrdersBusiness::mergeRequest($request, $this, [
                 'order_type' => 4,// 订单类型1普通订单/父订单4子订单
                 'parent_order_no' => implode(',', $parent_orders),
+                'city_site_id' => $this->city_site_id ,// 城市分站id
+                'city_partner_id' => $this->city_partner_id,// 城市合伙人id
+//                'seller_id' => $this->seller_id,// 商家ID
+//                'shop_id' => $this->shop_id,// 店铺ID
             ]);
             $childResult = CTAPIOrdersBusiness::getList($request, $this, 1, [], $relations);
             $childList = $childResult['result']['data_list'] ?? [];
@@ -211,10 +219,10 @@ class OrdersController extends WorksController
         $send_staff_id = CommonRequest::getInt($request, 'send_staff_id');
         if($send_staff_id > 0 )  array_push($otherWhere, ['send_staff_id', '=', $send_staff_id]);
 
-        $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id = $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         if($city_site_id > 0 )  array_push($otherWhere, ['city_site_id', '=', $city_site_id]);
 
-        $city_partner_id = CommonRequest::getInt($request, 'city_partner_id');
+        $city_partner_id = $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         if($city_partner_id > 0 )  array_push($otherWhere, ['city_partner_id', '=', $city_partner_id]);
 
         $seller_id = CommonRequest::getInt($request, 'seller_id');
@@ -250,10 +258,10 @@ class OrdersController extends WorksController
         $send_staff_id = CommonRequest::getInt($request, 'send_staff_id');
         if($send_staff_id > 0 )  array_push($otherWhere, ['send_staff_id', '=', $send_staff_id]);
 
-        $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id = $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         if($city_site_id > 0 )  array_push($otherWhere, ['city_site_id', '=', $city_site_id]);
 
-        $city_partner_id = CommonRequest::getInt($request, 'city_partner_id');
+        $city_partner_id = $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         if($city_partner_id > 0 )  array_push($otherWhere, ['city_partner_id', '=', $city_partner_id]);
 
         $seller_id = CommonRequest::getInt($request, 'seller_id');

@@ -211,11 +211,11 @@
                 <cite>订单管理</cite>
               </a>
               <dl class="layui-nav-child">
+                {{--<dd>--}}
+                  {{--<a lay-href="">加价管理</a>--}}
+                {{--</dd>--}}
                 <dd>
-                  <a lay-href="">加价管理</a>
-                </dd>
-                <dd>
-                  <a lay-href="">订单管理</a>
+                  <a lay-href="{{ url('seller/order') }}">订单管理</a>
                 </dd>
               </dl>
             </li>

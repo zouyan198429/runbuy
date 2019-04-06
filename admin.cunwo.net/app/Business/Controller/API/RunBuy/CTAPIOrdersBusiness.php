@@ -21,7 +21,7 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
         '8' => '已完成',
         '16' => '已取消',// '作废'
         '32' => '用户取消',
-        '64' => '完成',
+        '64' => '作废',
     ];
     /**
      * 获得列表数据--所有数据
@@ -105,6 +105,10 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
 
             $has_son_order = CommonRequest::get($request, 'has_son_order');
             if(is_numeric($has_son_order) )  array_push($queryParams['where'], ['has_son_order', '=', $has_son_order]);
+
+            $is_order = CommonRequest::get($request, 'is_order');
+            if(is_numeric($is_order) )  array_push($queryParams['where'], ['is_order', '=', $is_order]);
+
 
             $order_no = CommonRequest::get($request, 'order_no');
             if(!empty($order_no) )  array_push($queryParams['where'], ['order_no', '=', $order_no]);

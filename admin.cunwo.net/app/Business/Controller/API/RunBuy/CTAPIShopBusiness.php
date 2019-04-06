@@ -59,7 +59,7 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
 //                //,'operate_staff_id','operate_staff_id_history'
 //                ,'created_at'
 //            ],
-            'orderBy' => ['sort_num'=>'desc', 'mon_sales_volume'=>'desc', 'id'=>'desc'],
+            'orderBy' => ['status_business'=>'asc', 'sort_num'=>'desc', 'mon_sales_volume'=>'desc', 'id'=>'desc'],
         ];// 查询条件参数
         if(empty($queryParams)){
             $queryParams = $defaultQueryParams;

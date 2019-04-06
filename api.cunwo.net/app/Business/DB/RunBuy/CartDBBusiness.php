@@ -787,12 +787,13 @@ class CartDBBusiness extends BasePublicDBBusiness
                     'city_site_id_history' => $city_site_id_history,// 城市分站历史id
                     'city_partner_id' => $city_partner_id,// 城市合伙人id
                     'city_partner_id_history' => $city_partner_id_history,// 城市合伙人历史id
-                    'seller_id' => $seller_id,// 商家ID
-                    'seller_id_history' => $seller_id_history,// 商家历史ID
-                    'shop_id' => $shop_id,// 店铺ID
-                    'shop_id_history' => $shop_id_history,// 店铺历史ID
+                    'seller_id' => 0,//$seller_id,// 商家ID
+                    'seller_id_history' => 0,//$seller_id_history,// 商家历史ID
+                    'shop_id' => 0,//$shop_id,// 店铺ID
+                    'shop_id_history' => 0,//$shop_id_history,// 店铺历史ID
                     'order_type' => 1,// 订单类型1普通订单/父订单4子订单
                     'has_son_order' => ($shopCount <= 1) ? 0 : 1,// 是否有子订单0无1有
+                    'is_order' => 1,// 是否订单1非订单[父订单--无商品]2订单[有商品]
                     'order_no' => $parent_order_no,// 订单号
                     'parent_order_no' => '',// 父订单号
                     'province_id' => $province_id,// 省id
@@ -918,6 +919,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                     'shop_id_history' => $shop_id_history,// 店铺历史ID
                     'order_type' => ($shopCount <= 1) ? 1 : 4,// 订单类型1普通订单/父订单4子订单
                     'has_son_order' => 0,// 是否有子订单0无1有
+                    'is_order' => 2,// 是否订单1非订单[父订单--无商品]2订单[有商品]
                     'order_no' => $orderNum,// 订单号
                     'parent_order_no' => $parent_order_no,// 父订单号
                     'province_id' => $province_id,// 省id

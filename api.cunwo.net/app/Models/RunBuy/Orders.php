@@ -17,6 +17,12 @@ class Orders extends BasePublicModel
         '4' => '子订单',
     ];
 
+    // 是否订单1非订单[父订单--无商品]2订单[有商品]
+    public $isOrderArr = [
+        '1' => '父订单',
+        '2' => '店铺订单',
+    ];
+
     // 是否有子订单0无1有
     public $hasSonOrderArr = [
         '0' => '无',
@@ -54,7 +60,7 @@ class Orders extends BasePublicModel
     ];
 
     // 表里没有的字段
-    protected $appends = ['order_type_text', 'has_son_order_text', 'status_text', 'pay_type_text', 'pay_run_price_text', 'has_refund_text'];
+    protected $appends = ['order_type_text', 'is_order_text', 'has_son_order_text', 'status_text', 'pay_type_text', 'pay_run_price_text', 'has_refund_text'];
 
     /**
      * 获取订单类型文字
@@ -64,6 +70,16 @@ class Orders extends BasePublicModel
     public function getOrderTypeTextAttribute()
     {
         return $this->orderTypeArr[$this->order_type] ?? '';
+    }
+
+    /**
+     * 获取父/店铺订单文字
+     *
+     * @return string
+     */
+    public function getIsOrderTextAttribute()
+    {
+        return $this->isOrderArr[$this->is_order] ?? '';
     }
 
     /**

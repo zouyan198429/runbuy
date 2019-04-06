@@ -43,9 +43,12 @@ class ShopGoodsController extends BaseController
             $goods_name =  $v['goods_name'] ?? '';
             $price_list = $v['price_list'] ?? [];// 价格属性
             $resource_url = $v['resource_list'][0]['resource_url'] ?? '';
+//            $intro = $v['intro'] ?? '';
+//            $v['intro'] = replace_enter_char($intro,2);
             $temInfo = [
                 'id' => $v['id'],
                 'is_sale' => $v['is_sale'],
+                'intro' => $v['intro'],
                 'goods_name' => $goods_name,
                 'resource_url' => $resource_url,
                 'is_hot' => $v['is_hot'],

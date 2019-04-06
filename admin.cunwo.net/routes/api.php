@@ -269,6 +269,8 @@ Route::post('admin/order/ajax_import_staff','Admin\OrdersController@ajax_import'
 Route::post('admin/order/import', 'Admin\OrdersController@import');// 导入excel
 Route::post('admin/order/ajax_get_ids', 'Admin\OrdersController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 Route::any('admin/order/ajax_getCountByStatus', 'Admin\OrdersController@ajax_getCountByStatus');//ajax获得统计数据
+Route::any('admin/order/ajax_status_count', 'Admin\OrdersController@ajax_status_count');// 工单状态统计
+Route::any('admin/order/refundOrder', 'Admin\OrdersController@refundOrder');// 退单
 
 // ----城市代理后台
 // city
@@ -492,6 +494,8 @@ Route::post('city/order/ajax_import_staff','City\OrdersController@ajax_import');
 Route::post('city/order/import', 'City\OrdersController@import');// 导入excel
 Route::post('city/order/ajax_get_ids', 'City\OrdersController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 Route::any('city/order/ajax_getCountByStatus', 'City\OrdersController@ajax_getCountByStatus');//ajax获得统计数据
+Route::any('city/order/ajax_status_count', 'City\OrdersController@ajax_status_count');// 工单状态统计
+Route::any('city/order/refundOrder', 'City\OrdersController@refundOrder');// 退单
 
 // ----商家后台
 // seller
@@ -714,6 +718,8 @@ Route::post('seller/order/ajax_import_staff','Seller\OrdersController@ajax_impor
 Route::post('seller/order/import', 'Seller\OrdersController@import');// 导入excel
 Route::post('seller/order/ajax_get_ids', 'Seller\OrdersController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 Route::any('seller/order/ajax_getCountByStatus', 'Seller\OrdersController@ajax_getCountByStatus');//ajax获得统计数据
+Route::any('seller/order/ajax_status_count', 'Seller\OrdersController@ajax_status_count');// 工单状态统计
+Route::any('seller/order/refundOrder', 'Seller\OrdersController@refundOrder');// 退单
 
 
 // ----店铺后台
@@ -937,6 +943,8 @@ Route::post('shop/order/ajax_import_staff','Shop\OrdersController@ajax_import');
 Route::post('shop/order/import', 'Shop\OrdersController@import');// 导入excel
 Route::post('shop/order/ajax_get_ids', 'Shop\OrdersController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 Route::any('shop/order/ajax_getCountByStatus', 'Shop\OrdersController@ajax_getCountByStatus');//ajax获得统计数据
+Route::any('shop/order/ajax_status_count', 'Shop\OrdersController@ajax_status_count');// 工单状态统计
+Route::any('shop/order/refundOrder', 'Shop\OrdersController@refundOrder');// 退单
 
 
 // 微信相关的

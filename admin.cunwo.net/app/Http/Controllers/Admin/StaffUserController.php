@@ -44,7 +44,8 @@ class StaffUserController extends WorksController
         $reDataArr['city_partner_id'] =  CommonRequest::getInt($request, 'city_partner_id');
         $reDataArr['seller_id'] =  CommonRequest::getInt($request, 'seller_id');
         $reDataArr['shop_id'] =  CommonRequest::getInt($request, 'shop_id');
-        return view('admin.staffUser.index', $reDataArr);
+        // return view('admin.staffUser.index', $reDataArr);
+        return view('admin.WXUser.index', $reDataArr);
     }
 
     /**
@@ -192,9 +193,10 @@ class StaffUserController extends WorksController
     public function ajax_alist(Request $request){
         $this->InitParams($request);
         $request->merge(['admin_type' => 64]);
-        return  CTAPIStaffBusiness::getList($request, $this, 2 + 4, [], ['province', 'provinceHistory'
-            , 'city', 'cityHistory', 'area', 'areaHistory'
+        return  CTAPIStaffBusiness::getList($request, $this, 2 + 4, [], [ 'provinceHistory'
+           , 'cityHistory', 'area', 'areaHistory'
             , 'cityinfo' , 'cityPartner', 'seller' , 'shop']);
+        // 'province', , 'city'
     }
 
     /**

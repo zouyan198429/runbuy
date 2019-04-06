@@ -264,6 +264,10 @@ function ajax_form(){
         return false;
     }
 
+    var sort_num = $('input[name=sort_num]').val();
+    if(!judge_validate(4,'排序',sort_num,false,'digit','','')){
+        return false;
+    }
 
     // 验证通过
     // 上传图片

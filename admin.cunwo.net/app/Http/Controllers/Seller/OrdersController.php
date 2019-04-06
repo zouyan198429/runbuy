@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Seller;
 
 use App\Business\Controller\API\RunBuy\CTAPICityBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIOrdersBusiness;
@@ -32,11 +32,11 @@ class OrdersController extends WorksController
         $reDataArr['province_kv'] = CTAPICityBusiness::getCityByPid($request, $this,  0);
         $reDataArr['defaultProvince'] = -1;
 
-        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
-        $reDataArr['city_partner_id'] =  CommonRequest::getInt($request, 'city_partner_id');
-        $reDataArr['seller_id'] =  CommonRequest::getInt($request, 'seller_id');
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_partner_id'] =  $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
+        $reDataArr['seller_id'] =  $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
         $reDataArr['shop_id'] =  CommonRequest::getInt($request, 'shop_id');
-        return view('admin.orders.index', $reDataArr);
+        return view('seller.orders.index', $reDataArr);
     }
 
     /**
@@ -53,7 +53,7 @@ class OrdersController extends WorksController
 //        $reDataArr['province_kv'] = CTAPIOrdersBusiness::getCityByPid($request, $this,  0);
 //        $reDataArr['province_kv'] = CTAPIOrdersBusiness::getChildListKeyVal($request, $this, 0, 1 + 0, 0);
 //        $reDataArr['province_id'] = 0;
-//        return view('admin.orders.select', $reDataArr);
+//        return view('seller.orders.select', $reDataArr);
 //    }
 
     /**
@@ -81,7 +81,7 @@ class OrdersController extends WorksController
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         $reDataArr['info'] = $info;
         $reDataArr['operate'] = $operate;
-        return view('admin.orders.add', $reDataArr);
+        return view('seller.orders.add', $reDataArr);
     }
 
 
@@ -152,31 +152,41 @@ class OrdersController extends WorksController
         ];
         //  显示到定位点的距离
         CTAPIOrdersBusiness::mergeRequest($request, $this, [
-            'order_type' => 1,// 订单类型1普通订单/父订单4子订单
+            // 'order_type' => 1,// 订单类型1普通订单/父订单4子订单
+            'is_order' => 2,// 是否订单1非订单[父订单--无商品]2订单[有商品]
+            'city_site_id' => $this->city_site_id ,// 城市分站id
+            'city_partner_id' => $this->city_partner_id,// 城市合伙人id
+            'seller_id' => $this->seller_id,// 商家ID
+            // 'shop_id' => $this->shop_id,// 店铺ID
         ]);
         $result = CTAPIOrdersBusiness::getList($request, $this, 2 + 4, [], $relations);
         $data_list = $result['result']['data_list'] ?? [];
-        $parent_orders = $result['result']['parent_orders'] ?? [];
-        $childList = [];
-        if(!empty($parent_orders)){
-            CTAPIOrdersBusiness::mergeRequest($request, $this, [
-                'order_type' => 4,// 订单类型1普通订单/父订单4子订单
-                'parent_order_no' => implode(',', $parent_orders),
-            ]);
-            $childResult = CTAPIOrdersBusiness::getList($request, $this, 1, [], $relations);
-            $childList = $childResult['result']['data_list'] ?? [];
-        }
-        $formatChildList = [];
-        foreach ($childList as $k => $v){
-            $formatChildList[$v['parent_order_no']][] = $v;
-        }
+
+//        $parent_orders = $result['result']['parent_orders'] ?? [];
+//        $childList = [];
+//        if(!empty($parent_orders)){
+//            CTAPIOrdersBusiness::mergeRequest($request, $this, [
+//                'order_type' => 4,// 订单类型1普通订单/父订单4子订单
+//                'parent_order_no' => implode(',', $parent_orders),
+//                'city_site_id' => $this->city_site_id ,// 城市分站id
+//                'city_partner_id' => $this->city_partner_id,// 城市合伙人id
+//                'seller_id' => $this->seller_id,// 商家ID
+//               // 'shop_id' => $this->shop_id,// 店铺ID
+//            ]);
+//            $childResult = CTAPIOrdersBusiness::getList($request, $this, 1, [], $relations);
+//            $childList = $childResult['result']['data_list'] ?? [];
+//        }
+//        $formatChildList = [];
+//        foreach ($childList as $k => $v){
+//            $formatChildList[$v['parent_order_no']][] = $v;
+//        }
 
         foreach($data_list as $k => $v){
             $parent_order_no = $v['order_no'] ?? '';
             $has_son_order = $v['has_son_order'] ?? 0;// 是否有子订单0无1有
-            $childOrder = $formatChildList[$parent_order_no] ?? [];
+            // $childOrder = $formatChildList[$parent_order_no] ?? [];
             if($has_son_order == 1 ){// 有子订单
-                $data_list[$k]['shopList'] = $childOrder;
+                // $data_list[$k]['shopList'] = $childOrder;
             }else{
                 $data_list[$k]['shopList'][] = $v;
                 if(isset($v['orders_goods'])) unset($data_list[$k]['orders_goods']);
@@ -201,7 +211,8 @@ class OrdersController extends WorksController
         $user_id = $this->user_id;
         $status = '1,2,4';// 订单状态,多个用逗号分隔, 可为空：所有的
         $otherWhere = [
-            ['order_type', '=', 1]// // 订单类型1普通订单/父订单4子订单
+            // ['order_type', '=', 1]// 订单类型1普通订单/父订单4子订单
+            ['is_order', '=', 2]// 是否订单1非订单[父订单--无商品]2订单[有商品]
            // ,['staff_id', '=', $user_id]
         ];//  其它条件[['company_id', '=', $company_id],...]
 
@@ -211,13 +222,13 @@ class OrdersController extends WorksController
         $send_staff_id = CommonRequest::getInt($request, 'send_staff_id');
         if($send_staff_id > 0 )  array_push($otherWhere, ['send_staff_id', '=', $send_staff_id]);
 
-        $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id = $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         if($city_site_id > 0 )  array_push($otherWhere, ['city_site_id', '=', $city_site_id]);
 
-        $city_partner_id = CommonRequest::getInt($request, 'city_partner_id');
+        $city_partner_id = $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         if($city_partner_id > 0 )  array_push($otherWhere, ['city_partner_id', '=', $city_partner_id]);
 
-        $seller_id = CommonRequest::getInt($request, 'seller_id');
+        $seller_id = $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
         if($seller_id > 0 )  array_push($otherWhere, ['seller_id', '=', $seller_id]);
 
         $shop_id = CommonRequest::getInt($request, 'shop_id');
@@ -240,7 +251,8 @@ class OrdersController extends WorksController
         $user_id = $this->user_id;
         $status = '1,2,4';// CommonRequest::get($request, 'status');// 订单状态,多个用逗号分隔, 可为空：所有的
         $otherWhere = [
-            ['order_type', '=', 1]// // 订单类型1普通订单/父订单4子订单
+            // ['order_type', '=', 1]// // 订单类型1普通订单/父订单4子订单
+            ['is_order', '=', 2]// 是否订单1非订单[父订单--无商品]2订单[有商品]
            // ,['staff_id', '=', $user_id]
         ];//  其它条件[['company_id', '=', $company_id],...]
 
@@ -250,13 +262,13 @@ class OrdersController extends WorksController
         $send_staff_id = CommonRequest::getInt($request, 'send_staff_id');
         if($send_staff_id > 0 )  array_push($otherWhere, ['send_staff_id', '=', $send_staff_id]);
 
-        $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id = $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         if($city_site_id > 0 )  array_push($otherWhere, ['city_site_id', '=', $city_site_id]);
 
-        $city_partner_id = CommonRequest::getInt($request, 'city_partner_id');
+        $city_partner_id = $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
         if($city_partner_id > 0 )  array_push($otherWhere, ['city_partner_id', '=', $city_partner_id]);
 
-        $seller_id = CommonRequest::getInt($request, 'seller_id');
+        $seller_id = $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
         if($seller_id > 0 )  array_push($otherWhere, ['seller_id', '=', $seller_id]);
 
         $shop_id = CommonRequest::getInt($request, 'shop_id');

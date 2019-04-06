@@ -182,6 +182,7 @@ class ShopController extends WorksController
         $sure_password = CommonRequest::get($request, 'sure_password');
         $intro = CommonRequest::get($request, 'intro');
         $intro =  replace_enter_char($intro,1);
+        $sort_num = CommonRequest::getInt($request, 'sort_num');
 
         // 标签
         $labelIds = CommonRequest::get($request, 'label_ids');
@@ -222,6 +223,7 @@ class ShopController extends WorksController
             'latitude' => $latitude,
             'longitude' => $longitude,
             'intro' => $intro,
+            'sort_num' => $sort_num,
             // 'admin_username' => $admin_username,
             'label_ids' => $label_ids,// 标签id串(逗号分隔-未尾逗号结束)
             'labelIds' => $labelIds,// 此下标为标签关系

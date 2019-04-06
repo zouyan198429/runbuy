@@ -35,7 +35,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         $saveQueryParams = [
             'where' => [
                 ['order_type', 4],
-                ['staff_id', $operate_staff_id],
+                // ['staff_id', $operate_staff_id],
                 ['parent_order_no', $order_no],
             ],
             /*
@@ -53,7 +53,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         $queryParams = [
             'where' => [
                 ['order_type', 1],
-                ['staff_id', $operate_staff_id],
+                // ['staff_id', $operate_staff_id],
                 ['order_no',$order_no],
             ],
             // 'select' => ['id', 'status', 'pay_run_price', 'has_refund', 'total_run_price' ]

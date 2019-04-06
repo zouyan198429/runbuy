@@ -126,14 +126,14 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
             $queryParams = [
                 'where' => [
                     ['order_type', 1],
-                    ['staff_id', $operate_staff_id],
+                    // ['staff_id', $operate_staff_id],
                     ['order_no',$order_no],
                 ],
                 // 'select' => ['id', 'status', 'pay_run_price', 'has_refund', 'total_run_price' ]
             ];
             // 获得订单详情
             $orderInfo = OrdersDoingDBBusiness::getInfoByQuery(1, $queryParams, []);
-            if(empty($orderInfo)) throws('订单信息不存在!');
+            if(empty($orderInfo)) throws('订单信息不存在 !');
         }
 
         $lockObj = Tool::getLockRedisesLaravelObj();
@@ -494,14 +494,14 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
                             $queryParams = [
                                 'where' => [
                                     ['order_type', 1],
-                                    ['staff_id', $wrInfo->staff_id],
+                                    // ['staff_id', $wrInfo->staff_id],
                                     ['order_no',$order_no],
                                 ],
                                 // 'select' => ['id', 'status', 'pay_run_price', 'has_refund', 'total_run_price' ]
                             ];
                             // 获得订单详情
                             $orderInfo = OrdersDoingDBBusiness::getInfoByQuery(1, $queryParams, []);
-                            if(empty($orderInfo)) throws('订单信息不存在!', 10);// throws(1);// throws('订单信息不存在!');
+                            if(empty($orderInfo)) throws('订单信息不存在!!', 10);// throws(1);// throws('订单信息不存在!');
                             if($orderType == 3){// 支付跑腿费
                                 $status = $orderInfo->status;// 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
                                 if($status != 1) throws('订单非待支付状态!', 10);// throws(1);// throws('订单非待支付状态!');
@@ -686,7 +686,6 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
      */
     public static function refundApplyWX($params, $company_id, $operate_staff_id = 0){
         $returnArr = [];
-
         // 查询支付单
         $queryParams = [
             'where' => [

@@ -3,11 +3,14 @@
 namespace App\Business\Controller\API\RunBuy;
 
 use App\Services\Excel\ImportExport;
+use App\Services\pay\weixin\easyWechatPay;
 use App\Services\Request\API\HttpRequest;
 use App\Services\Tool;
 use Illuminate\Http\Request;
 use App\Services\Request\CommonRequest;
 use App\Http\Controllers\BaseController as Controller;
+use Illuminate\Support\Facades\Log;
+
 class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
 {
     public static $model_name = 'API\RunBuy\WalletRecordAPI';
@@ -720,5 +723,108 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
         return $result;
     }
 
+    /**
+     * 根据订单号取消订单--
+     *
+     * @param Request $request 请求信息  order_no 订单号 、 my_order_no 付款 我方单号 二选一;  amount 需要退款的金额--0为全退---单位元;  refund_reason  退款的原因--:为空，则后台自己组织内容
+     * @param Controller $controller 控制对象
+     * @return  mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function cancelOrder(Request $request, Controller $controller){
+
+        // $pay_type = CommonRequest::getInt($request, 'pay_type');// 支付类型 1 订单支付跑腿费 2 订单追加跑腿费
+        // if(!in_array($pay_type, [1,2])) throws('支付类型有误!');
+
+        $order_no = CommonRequest::get($request, 'order_no');// 订单号 , 如果是订单操作必传-- order_no 或 my_order_no 之一不能为空
+        $my_order_no = CommonRequest::get($request, 'my_order_no');//付款 我方单号--与第三方对接用 -- order_no 或 my_order_no 之一不能为空
+
+
+        if(empty($order_no) && empty($my_order_no)) throws('订单号或付款单号不能为空!');
+
+
+        $amount = CommonRequest::get($request, 'amount');// 需要退款的金额--0为全退---单位元
+        if(!is_numeric($amount)) $amount = 0;
+        if(!is_numeric($amount) && $amount < 0) throws('费用不能小于0!');
+
+        $refund_reason = CommonRequest::get($request, 'refund_reason');// 退款的原因--:为空，则后台自己组织内容
+
+        $params = [
+            [
+                'order_no' => $order_no, // 订单号 , 如果是订单操作必传-- order_no 或 my_order_no 之一不能为空
+                'my_order_no' => $my_order_no,//付款 我方单号--与第三方对接用 -- order_no 或 my_order_no 之一不能为空
+                'refund_amount' => $amount,// 需要退款的金额--0为全退---单位元
+                'refund_reason' => $refund_reason,// 退款的原因--:为空，则后台自己组织内容
+            ]
+        ];
+
+        Log::info('微信支付日志 退款申请-->' . __FUNCTION__,$params);
+        $out_refund_nos = [];
+        try{
+
+            $returnArr = CTAPIWalletRecordBusiness::refundApplyWX($request, $controller, $params);
+
+            Log::info('微信支付日志 退款申请返回参数-->' . __FUNCTION__,$returnArr);
+            $config = [
+                'refund_desc' => '',// $refund_desc,//'测试退款',// 退款原因 若商户传入，会在下发给用户的退款消息中体现退款原因  ；注意：若订单退款金额≤1元，且属于部分退款，则不会在退款消息中体现退款原因
+                'notify_url' => config('public.wxNotifyURL') . 'api/pay/refundNotify' ,// 退款结果通知的回调地址
+            ];
+            Log::info('微信支付日志 退款申请参数config-->' . __FUNCTION__,$config);
+            // 根据商户订单号退款
+            $app = app('wechat.payment');
+            foreach($returnArr as $v){
+                $out_refund_no = $v['refund_order_no'];//  我方生成的退款单号
+                $pay_order_no = $v['pay_order_no'];//我方的付款单号
+
+                $out_trade_no =  $pay_order_no;//我方的付款单号
+                $refundNumber = $out_refund_no;//我方生成的退款单号
+                $totalFee = floor($v['pay_amount'] * 100);//我方付款的总金额[当前付款单]--单位元
+                $refundFee = floor($v['refund_amount'] * 100);// 需要退款的金额---单位元
+                $refund_desc = $v['config']['refund_desc'];// 其它退款参数  退款的原因
+                $config['refund_desc'] = $refund_desc ;
+                $result = easyWechatPay::refundByOutTradeNumber($app, $out_trade_no, $refundNumber, $totalFee, $refundFee, $config);
+                // $result['result_code'] = 'FAIL';
+                Log::info('微信支付日志 退款申请返回结果-->' . __FUNCTION__,[$result]);
+                // 业务结果  SUCCESS/FAIL SUCCESS/FAIL  SUCCESS退款申请接收成功，结果通过退款查询接口查询  FAIL 提交业务失败
+                $result_code = $result['result_code'];
+                if($result_code != 'SUCCESS'){// FAIL 提交业务失败,回退
+                    $return_msg = $result['return_msg'] ?? '';// 失败原因
+                    $resultFail = CTAPIWalletRecordBusiness::refundApplyWXFail($request, $controller, $out_refund_no, $result_code, $return_msg);
+                    Log::info('微信支付日志 退款申请业务失败回退$resultFail-->' . __FUNCTION__,[$resultFail]);
+                    throws('退款申请失败');
+                }else{// 成功，查询是否成功
+                    // 重试 3次 6秒
+//                    $queryNum = 0;
+//                    while(true)   #循环获取锁
+//                    {
+//                        $queryNum++;
+//                        $delay = mt_rand(2 * 1000 * 1000, 3 * 1000 * 1000);
+//                        usleep($delay);//usleep($delay * 1000);
+
+//                        $resultQuery = easyWechatPay::queryByOutRefundNumber($app, $out_refund_no);
+//                        Log::info('微信支付日志 退款结果查询情况$resultQuery-->' . __FUNCTION__,[$resultQuery]);
+//                        // 如果成功，则修改退款单为成功
+//                        $quest_result_code = $resultQuery['result_code'] ?? '';
+//                        $quest_refund_status = $resultQuery['refund_status_0'] ?? '';
+//                        Log::info('微信支付日志 退款结果查询情况 $quest_result_code-->' . __FUNCTION__,[$quest_result_code]);
+//                        Log::info('微信支付日志 退款结果查询情况 $quest_refund_status-->' . __FUNCTION__,[$quest_refund_status]);
+//                        if($quest_result_code == 'SUCCESS' && $quest_refund_status == 'SUCCESS' ) {
+//                            $quest_return_msg = $resultQuery['return_msg'] ?? '';// 失败原因
+//                            $resultSuccess = CTAPIWalletRecordBusiness::refundApplyWXFail($request, $controller, $out_refund_no, $quest_refund_status, $quest_return_msg);
+//                            Log::info('微信支付日志 退款申请业务成功自动更新记录-->' . __FUNCTION__,[$resultSuccess]);
+//                        }
+//                        if($quest_refund_status == 'SUCCESS' || $queryNum >= 3) break;
+//                    }
+
+                }
+                array_push($out_refund_nos, $out_refund_no);
+                // 根据微信订单号退款
+                // $result = easyWechatPay::refundByTransactionId($app, $transactionId, $refundNumber, $totalFee, $refundFee, $config);
+            }
+        } catch ( \Exception $e) {
+            throws('失败；信息[' . $e->getMessage() . ']');
+        }
+        return ajaxDataArr(1, $out_refund_nos, '');
+    }
 
 }
