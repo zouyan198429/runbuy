@@ -789,9 +789,12 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
                 $result_code = $result['result_code'];
                 if($result_code != 'SUCCESS'){// FAIL 提交业务失败,回退
                     $return_msg = $result['return_msg'] ?? '';// 失败原因
-                    $resultFail = CTAPIWalletRecordBusiness::refundApplyWXFail($request, $controller, $out_refund_no, $result_code, $return_msg);
+                    $err_code = $result['err_code'] ?? '';// 错误代码
+                    $err_code_des = $result['err_code_des'] ?? '';// 错误代码描述
+                    $errMsg = '错误代码[' . $err_code . '];错误代码描述[' . $err_code_des . ']';
+                    $resultFail = CTAPIWalletRecordBusiness::refundApplyWXFail($request, $controller, $out_refund_no, $result_code, $errMsg);
                     Log::info('微信支付日志 退款申请业务失败回退$resultFail-->' . __FUNCTION__,[$resultFail]);
-                    throws('退款申请失败');
+                    throws('退款申请失败:' . $errMsg);
                 }else{// 成功，查询是否成功
                     // 重试 3次 6秒
 //                    $queryNum = 0;
