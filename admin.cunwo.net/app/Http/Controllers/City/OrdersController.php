@@ -140,7 +140,7 @@ class OrdersController extends WorksController
     public function ajax_alist(Request $request){
         $this->InitParams($request);
         $relations = [
-            'addrHistory', 'staffHistory', 'partnerHistory'
+            'addrHistory', 'staffHistory', 'partnerHistory', 'sendHistory'
             ,'provinceHistory','cityHistory','areaHistory'
             , 'sellerHistory', 'shopHistory'
             ,'ordersGoods.goodsHistory'

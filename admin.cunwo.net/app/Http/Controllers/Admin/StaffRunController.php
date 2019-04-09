@@ -35,6 +35,11 @@ class StaffRunController extends WorksController
         // 冻结状态
         $reDataArr['accountStatus'] =  CTAPIStaffBusiness::$accountStatus;
         $reDataArr['defaultAccountStatus'] = -1;// 默认状态
+
+        // 审核状态1待审核2审核通过3审核未通过--32快跑人员用
+        $reDataArr['openStatus'] =  CTAPIStaffBusiness::$openStatus;
+        $reDataArr['defaultOpenStatus'] = -1;// 默认状态
+
         // 省
         $reDataArr['province_kv'] = CTAPICityBusiness::getCityByPid($request, $this,  0);
         $reDataArr['defaultProvince'] = -1;
@@ -44,7 +49,8 @@ class StaffRunController extends WorksController
         $reDataArr['city_partner_id'] =  CommonRequest::getInt($request, 'city_partner_id');
         $reDataArr['seller_id'] =  CommonRequest::getInt($request, 'seller_id');
         $reDataArr['shop_id'] =  CommonRequest::getInt($request, 'shop_id');
-        return view('admin.staffRun.index', $reDataArr);
+        // return view('admin.staffRun.index', $reDataArr);
+        return view('admin.WXRun.index', $reDataArr);
     }
 
     /**
@@ -179,6 +185,20 @@ class StaffRunController extends WorksController
 //            $saveData = array_merge($saveData, $addNewData);
 //        }
         $resultDatas = CTAPIStaffBusiness::replaceById($request, $this, $saveData, $id, true);
+        return ajaxDataArr(1, $resultDatas, '');
+    }
+
+    /**
+     * ajax保存数据-操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
+     *
+     * @param int $id
+     * @return Response
+     * @author zouyan(305463219@qq.com)
+     */
+    public function ajax_save_operate(Request $request)
+    {
+        $this->InitParams($request);
+        $resultDatas = CTAPIStaffBusiness::staffOperateById($request, $this, true);
         return ajaxDataArr(1, $resultDatas, '');
     }
 

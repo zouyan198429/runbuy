@@ -303,6 +303,71 @@ class CityDBBusiness extends BasePublicDBBusiness
             $cityList = $resultArr;
         }
         return $cityList;
+    }
 
+
+    /**
+     *  人员上下班操作
+     * @param int  $city_id 城市id
+     * @param int  $on_line 是否上班 1下班2上班
+     * @param int  $diff_amount 上下班人数
+     * @return mixed 订单饱和度[订单数除以在线送餐员人数]
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function cityOnlineOperate($city_id, $on_line = 2, $diff_amount = 1){
+        // 获得当前记录
+        $infoObj = static::getInfo($city_id, ['id', 'staff_amount', 'order_amount', 'order_saturation'] );
+        if(empty($infoObj)) return 0;
+        $staff_amount = $infoObj->staff_amount;// 在线接单人数
+        $order_amount = $infoObj->order_amount;// 订单数量[待接单]
+        // $order_saturation = $infoObj->order_saturation;// 订单饱和度[订单数除以在线送餐员人数]
+        if($on_line == 1){// 下班
+            $staff_amount -= $diff_amount;
+        }else{// 上班
+            $staff_amount += $diff_amount;
+        }
+        if($staff_amount <= 0) $staff_amount = 0;
+
+        $infoObj->staff_amount =  $staff_amount;
+        if($staff_amount <= 0 || $order_amount <= 0){// 没有接单人
+            $infoObj->order_saturation = 0;
+        }else{
+            $infoObj->order_saturation = $order_amount / $staff_amount;
+        }
+        $infoObj->save();
+
+        return $infoObj->order_saturation;
+    }
+
+    /**
+     *  订单数增减操作
+     * @param int  $city_id 城市id
+     * @param int  $operate_type 操作类型 1减2 加
+     * @param int  $diff_amount 加减订单数
+     * @return mixed 订单饱和度[订单数除以在线送餐员人数]
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function cityOrdersOperate($city_id, $operate_type = 2, $diff_amount = 1){
+        // 获得当前记录
+        $infoObj = static::getInfo($city_id, ['id', 'staff_amount', 'order_amount', 'order_saturation'] );
+        if(empty($infoObj)) return 0 ;
+        $staff_amount = $infoObj->staff_amount;// 在线接单人数
+        $order_amount = $infoObj->order_amount;// 订单数量[待接单]
+        // $order_saturation = $infoObj->order_saturation;// 订单饱和度[订单数除以在线送餐员人数]
+        if($operate_type == 1){// 减
+            $order_amount -= $diff_amount;
+        }else{// 加
+            $order_amount += $diff_amount;
+        }
+        if($order_amount <= 0) $order_amount = 0;
+
+        $infoObj->order_amount =  $order_amount;
+        if($staff_amount <= 0 || $order_amount <= 0){// 没有接单人
+            $infoObj->order_saturation = 0;
+        }else{
+            $infoObj->order_saturation = $order_amount / $staff_amount;
+        }
+        $infoObj->save();
+        return $infoObj->order_saturation;
     }
 }

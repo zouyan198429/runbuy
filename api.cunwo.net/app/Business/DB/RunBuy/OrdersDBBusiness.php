@@ -134,7 +134,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         // 数字或单条
         $statusArr = [];
         if( is_numeric($status) ||  (is_string($status) && strpos($status, ',') === false) ){
-            if($status != '') array_push($where,['$status', '=', $status]);
+            if($status != '') array_push($where,['status', '=', $status]);
             if($status != '') array_push($statusArr, $status);
         }else{// 其它的转为数组
             if(is_string($status)) $status = explode(',', $status);
@@ -161,7 +161,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         foreach($dataList as $info){
             $requestData[$info['status']] = $info['status_count'];
         }
-        foreach ($status as $temStatus){
+        foreach ($statusArr as $temStatus){
             if(isset($requestData[$temStatus])){
                 continue;
             }
@@ -199,7 +199,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         // 数字或单条
         $statusArr = [];
         if( is_numeric($status) ||  (is_string($status) && strpos($status, ',') === false) ){
-            if($status != '') array_push($where,['$status', '=', $status]);
+            if($status != '') array_push($where,['status', '=', $status]);
             if($status != '') array_push($statusArr, $status);
         }else{// 其它的转为数组
             if(is_string($status)) $status = explode(',', $status);
@@ -226,7 +226,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
     /**
      * 根据订单号，删除正在进行的订单数据
      *
-     * @param string  $order_no 订单号
+     * @param string  $order_no 订单号, 多个用逗号,分隔
      * @param int $operate_staff_id 操作员工id
      * @param int $operate_staff_history_id 操作员工历史id
      * @param string $logContent 操作说明
@@ -241,10 +241,10 @@ class OrdersDBBusiness extends BasePublicDBBusiness
             $queryParams = [
                 'where' => [
                     ['order_type', 1],// 订单类型1普通订单/父订单4子订单
-                    ['order_no', $order_no],
+                    // ['order_no', $order_no],
                     // ['pay_run_price', 1],// 是否支付跑腿费0未支付1已支付
                 ],
-                'select' => ['id', 'has_son_order']
+                'select' => ['id', 'has_son_order', 'order_no']
                 /*
                 'select' => [
                     'id','title','sort_num','volume'
@@ -254,28 +254,44 @@ class OrdersDBBusiness extends BasePublicDBBusiness
                 */
                 //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
             ];
-            $orderInfo = OrdersDoingDBBusiness::getInfoByQuery(1, $queryParams, []);
-            if(empty($orderInfo)) return ;// throws('订单[' . $order_no . '] 记录不存在');
-            $order_noArr = [$order_no];
-            $orderIds = [$orderInfo->id];
-            if($orderInfo->has_son_order == 1){// 是否有子订单0无1有
-                $queryParams = [
-                    'where' => [
-                        ['order_type', 4],// 订单类型1普通订单/父订单4子订单
-                        ['parent_order_no', $order_no],
-                    ],
-                    'select' => ['id', 'order_no']
-                ];
-                $childOrderList = OrdersDoingDBBusiness::getAllList($queryParams, [])->toArray();
-
-                $childOrders = array_column($childOrderList, 'order_no');
-                $order_noArr =  array_merge($order_noArr, $childOrders);
-
-                $childOrderIds = array_column($childOrderList, 'id');
-                $orderIds =  array_merge($orderIds, $childOrderIds);
+            if (strpos($order_no, ',') === false) { // 单条
+                array_push($queryParams['where'], ['order_no', $order_no]);
+            } else {
+                $queryParams['whereIn']['order_no'] = explode(',', $order_no);
             }
+            $ordersList = OrdersDoingDBBusiness::getAllList($queryParams, []);
+//            $orderInfo = OrdersDoingDBBusiness::getInfoByQuery(1, $queryParams, []);
+//            if(empty($orderInfo)) return ;// throws('订单[' . $order_no . '] 记录不存在');
+            if(is_object($ordersList) && count($ordersList) <= 0) return ;
+            $order_noArr = [];
+            $orderIds = [];
+            foreach($ordersList as $orderInfo){
+//                $order_noArr = [$order_no];
+//                $orderIds = [$orderInfo->id];
+                array_push($order_noArr, $orderInfo->order_no);
+                array_push($orderIds, $orderInfo->id);
+                if($orderInfo->has_son_order == 1){// 是否有子订单0无1有
+                    $queryParams = [
+                        'where' => [
+                            ['order_type', 4],// 订单类型1普通订单/父订单4子订单
+                            ['parent_order_no', $order_no],
+                        ],
+                        'select' => ['id', 'order_no']
+                    ];
+                    $childOrderList = OrdersDoingDBBusiness::getAllList($queryParams, [])->toArray();
+
+                    $childOrders = array_column($childOrderList, 'order_no');
+                    $order_noArr =  array_merge($order_noArr, $childOrders);
+
+                    $childOrderIds = array_column($childOrderList, 'id');
+                    $orderIds =  array_merge($orderIds, $childOrderIds);
+                }
+            }
+
             $order_no_str = implode(',', $order_noArr);
             $order_ids_str = implode(',', $orderIds);
+
+
             // 获得订单商品
             $queryGoodsParams = [
                 'where' => [
@@ -318,6 +334,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
                 $delQuery['whereIn']['order_no'] = explode(',', $order_no_str);
             }
             OrdersRecordDoingDBBusiness::del($delQuery);
+
             // 删除订单商品
             OrdersGoodsDoingDBBusiness::del($delQuery);
             // 删除订单表
@@ -335,6 +352,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
                 $delQuery['whereIn']['id'] = explode(',', $order_ids_str);
             }
             OrdersDoingDBBusiness::del($delQuery);
+
             // 写操作日志
             $queryParams = [
                 'where' => [
@@ -360,5 +378,194 @@ class OrdersDBBusiness extends BasePublicDBBusiness
             // throws($e->getMessage());
         }
         DB::commit();
+    }
+
+    /**
+     * 根据订单号，抢单/派单
+     *
+     * @param $order_no  订单号,多个用逗号分隔
+     * @param int  $company_id 企业id
+     * @param int $send_staff_id 派送给的用户id
+     * @param int $operate_staff_id 操作人id
+     * @return  int 记录id值，
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function grabOrder($order_no, $company_id, $send_staff_id, $operate_staff_id = 0){
+        if(empty($order_no)) throws('订单号不能为空！');
+        if(empty($send_staff_id)) throws('指定派送人员不能为空！');
+        // 获得派送人员信息
+        $staffInfo = StaffDBBusiness::getInfo($send_staff_id, ['city_site_id', 'city_partner_id', 'admin_type', 'open_status', 'account_status', 'on_line']);
+        if(empty($staffInfo)) throws('指定派送人员信息不存在!');
+        if($staffInfo['admin_type'] != 32) throws('指定派送人员不是跑腿人员!');
+        if($staffInfo['open_status'] != 2) throws('指定派送人员不是已审核状态!');
+        if($staffInfo['account_status'] == 1) throws('指定派送人员冻结状态!');
+        if($staffInfo['on_line'] != 2) throws('非上班状态，不能接单!');
+        $city_site_id = $staffInfo['city_site_id'];
+        $city_partner_id = $staffInfo['city_partner_id'];
+
+        // 根据订单号，获得订单信息
+        $queryParams = [
+            'where' => [
+                ['order_type', 1],// 订单类型1普通订单/父订单4子订单
+            ],
+            /*
+            'select' => [
+                'id','title','sort_num','volume'
+                ,'operate_staff_id','operate_staff_id_history'
+                ,'created_at' ,'updated_at'
+            ],
+            */
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        if (strpos($order_no, ',') === false) { // 单条
+            array_push($queryParams['where'], ['order_no', $order_no]);
+        } else {
+            $queryParams['whereIn']['order_no'] = explode(',', $order_no);
+        }
+        $orderLists = OrdersDoingDBBusiness::getAllList($queryParams, []);
+        if(is_object($orderLists) && count($orderLists) <= 0) throws('订单[' . $order_no . '] 记录不存在'); //记录不存在
+
+        // 遍历判断订单是否可以操作
+        foreach($orderLists as $orderInfoObj){
+            $temOrderNo = $orderInfoObj->order_no;
+            // if($orderInfoObj->city_site_id != $city_site_id) throws('订单[' . $temOrderNo . '] 与指定派送人员不是同一个城市!');
+            if($orderInfoObj->send_staff_id > 0 ) throws('订单[' . $temOrderNo . '] 已指定派送人员!');
+            if($orderInfoObj->status != 2 ) throws('订单[' . $temOrderNo . '] 非待接单状态!');
+        }
+
+        DB::beginTransaction();
+        try {
+            // 获得派送人员历史id
+            $send_staff_id_history = 0;
+            $saveData = [];
+            static::addOprate($saveData, $send_staff_id, $send_staff_id_history);
+
+            // 操作人员历史
+            $temData = [];
+            $operate_staff_id_history = 0;
+            if($send_staff_id != $operate_staff_id){
+                static::addOprate($temData, $operate_staff_id,$operate_staff_id_history);
+            }else{
+                $operate_staff_id_history = $send_staff_id_history;
+            }
+
+            // 遍历判断订单是否可以操作
+            $cityOrderAmount = [];
+            foreach($orderLists as $orderInfoObj){
+                $temOrderNo = $orderInfoObj->order_no;
+                // if($orderInfoObj->city_site_id != $city_site_id) throws('订单[' . $temOrderNo . '] 与指定派送人员不是同一个城市!');
+                if($orderInfoObj->send_staff_id > 0 ) throws('订单[' . $temOrderNo . '] 已指定派送人员!');
+                if($orderInfoObj->status != 2 ) throws('订单[' . $temOrderNo . '] 非待接单状态!');
+
+                $orderSaveData = [
+                     'send_staff_id' => $send_staff_id,// 派送用户id
+                     'send_staff_id_history' => $send_staff_id_history,// 派送用户历史id
+                     'receipt_time' => date("Y-m-d H:i:s",time()),// 接单时间
+                    'status' => 4,// 状态1待支付2等待接单4取货或配送中8订单完成16作废
+                ];
+                OrdersDoingDBBusiness::updateOrders($orderSaveData,  $temOrderNo, 1 + 2 + 4, $operate_staff_id, $operate_staff_id_history
+                    , '指定派送人员成功！派送人员:' . $send_staff_id);
+                if( isset($cityOrderAmount[$orderInfoObj->city_site_id]) ){
+                    $cityOrderAmount[$orderInfoObj->city_site_id] += 1;
+                }else{
+                    $cityOrderAmount[$orderInfoObj->city_site_id] = 1;
+                }
+            }
+            // 更新订单饱和度
+            foreach($cityOrderAmount as $tem_city_id => $tem_order_amount){
+                CityDBBusiness::cityOrdersOperate($tem_city_id, 1, $tem_order_amount);// 减订单
+            }
+
+        } catch ( \Exception $e) {
+            DB::rollBack();
+//            throws('操作失败；信息[' . $e->getMessage() . ']');
+            throws($e->getMessage());
+        }
+        DB::commit();
+        return 1;
+    }
+
+    /**
+     * 根据订单号，订单完成
+     *
+     * @param $order_no  订单号,多个用逗号分隔
+     * @param int  $company_id 企业id
+     * @param int $operate_staff_id 操作人id
+     * @return  int 记录id值，
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function finishOrder($order_no, $company_id, $operate_staff_id = 0){
+        if(empty($order_no)) throws('订单号不能为空！');
+        // 根据订单号，获得订单信息
+        $queryParams = [
+            'where' => [
+                ['order_type', 1],// 订单类型1普通订单/父订单4子订单
+            ],
+            /*
+            'select' => [
+                'id','title','sort_num','volume'
+                ,'operate_staff_id','operate_staff_id_history'
+                ,'created_at' ,'updated_at'
+            ],
+            */
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        if (strpos($order_no, ',') === false) { // 单条
+            array_push($queryParams['where'], ['order_no', $order_no]);
+        } else {
+            $queryParams['whereIn']['order_no'] = explode(',', $order_no);
+        }
+        $orderLists = OrdersDoingDBBusiness::getAllList($queryParams, []);
+        if(is_object($orderLists) && count($orderLists) <= 0) throws('订单[' . $order_no . '] 记录不存在'); //记录不存在
+
+        // 遍历判断订单是否可以操作
+        foreach($orderLists as $orderInfoObj){
+            $temOrderNo = $orderInfoObj->order_no;
+            if($orderInfoObj->send_staff_id <= 0 ) throws('订单[' . $temOrderNo . '] 未指定派送人员!');
+            if($orderInfoObj->status != 4 ) throws('订单[' . $temOrderNo . '] 非取货或配送中状态!');
+        }
+
+        DB::beginTransaction();
+        try {
+            // 操作人员历史
+            $temData = [];
+            $operate_staff_id_history = 0;
+            static::addOprate($temData, $operate_staff_id,$operate_staff_id_history);
+
+            // 遍历判断订单是否可以操作
+            $order_no_arr = [];
+            foreach($orderLists as $orderInfoObj){
+                $temOrderNo = $orderInfoObj->order_no;
+                if($orderInfoObj->send_staff_id <= 0 ) throws('订单[' . $temOrderNo . '] 未指定派送人员!');
+                if($orderInfoObj->status != 4 ) throws('订单[' . $temOrderNo . '] 非取货或配送中状态!');
+                array_push($order_no_arr, $orderInfoObj->order_no);
+                // 订单统计数据
+                CountOrdersGrabDBBusiness::createOrderGrab($orderInfoObj, $operate_staff_id , $operate_staff_id_history);
+
+                // 更新订单
+                $orderSaveData = [
+                    'finish_time' => date("Y-m-d H:i:s",time()),// 送到完成时间
+                    'status' => 8,// 状态1待支付2等待接单4取货或配送中8订单完成16作废
+                ];
+                OrdersDoingDBBusiness::updateOrders($orderSaveData,  $temOrderNo, 2 + 4, $operate_staff_id, $operate_staff_id_history
+                    , '订单完成！');
+            }
+            if(!empty($order_no_arr)){
+                // 订单商品统计
+                OrdersGoodsDoingDBBusiness::finishGoods(implode(',', $order_no_arr), $operate_staff_id, $operate_staff_id_history);
+
+                // 删除正在进行订单数据
+                OrdersDoingDBBusiness::delDoingOrders( implode(',', $order_no_arr), $operate_staff_id , $operate_staff_id_history, '');// 删除正在进行的订单
+
+            }
+
+
+        } catch ( \Exception $e) {
+            DB::rollBack();
+//            throws('操作失败；信息[' . $e->getMessage() . ']');
+            throws($e->getMessage());
+        }
+        DB::commit();
+        return 1;
     }
 }

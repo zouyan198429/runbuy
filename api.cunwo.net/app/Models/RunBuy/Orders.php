@@ -166,6 +166,14 @@ class Orders extends BasePublicModel
     }
 
     /**
+     * 获取订单的抢单会员历史--一维
+     */
+    public function sendHistory()
+    {
+        return $this->belongsTo('App\Models\RunBuy\StaffHistory', 'send_staff_id_history', 'id');
+    }
+
+    /**
      * 获取订单的城市分站历史--一维
      */
     public function cityHistory()

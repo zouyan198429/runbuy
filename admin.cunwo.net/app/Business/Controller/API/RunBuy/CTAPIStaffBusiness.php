@@ -32,6 +32,13 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
         '1' => '冻结',
     ];
 
+    // 审核状态1待审核2审核通过3审核未通过--32快跑人员用
+    public static $openStatus = [
+        '1' => '待审核',
+        '2' => '已通过',
+        '3' => '未通过',
+    ];
+
     /**
      * 登录
      *
@@ -273,6 +280,10 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
 
             $account_status = CommonRequest::get($request, 'account_status');
             if(is_numeric($account_status) && $account_status >= 0 )  array_push($queryParams['where'], ['account_status', '=', $account_status]);
+
+            $open_status = CommonRequest::get($request, 'open_status');
+            if(is_numeric($open_status) && $open_status >= 0 )  array_push($queryParams['where'], ['open_status', '=', $open_status]);
+
 
             $province_id = CommonRequest::getInt($request, 'province_id');
             if($province_id > 0 )  array_push($queryParams['where'], ['province_id', '=', $province_id]);
@@ -588,6 +599,7 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
      * @param Request $request 请求信息
      * @param Controller $controller 控制对象
      * @param array $saveData 要保存或修改的数组
+     *    operate_type 可有 操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
      * @param int $id id
      * @param boolean $modifAddOprate 修改时是否加操作人，true:加;false:不加[默认]
      * @param int $notLog 是否需要登陆 0需要1不需要
@@ -597,6 +609,7 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
     public static function replaceById(Request $request, Controller $controller, $saveData, &$id, $modifAddOprate = false, $notLog = 0){
         $company_id = $controller->company_id;
         $user_id = $controller->user_id;
+        if(!is_numeric($user_id) || $user_id <= 0) $user_id = 0;
 
         $real_name = $saveData['real_name'] ?? '';
         $mobile = $saveData['mobile'] ?? '';
@@ -915,4 +928,89 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
     }
     // ***********通过组织条件获得kv***结束************************************************************
 
+    /**
+     * 根据id可有 操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
+     *  id ；operate_type ； reason
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param boolean $modifAddOprate 修改时是否加操作人，true:加;false:不加[默认]
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  mixed 返回true
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function staffOperateById(Request $request, Controller $controller, $modifAddOprate = false, $notLog = 0){
+        $id = CommonRequest::getInt($request, 'id');
+        $operate_type = CommonRequest::getInt($request, 'operate_type');
+        // operate_type 可有 操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
+        $reason = CommonRequest::get($request, 'reason');// 原因
+
+        $staffInfo = static::getInfoData($request, $controller, $id, ['admin_type', 'open_status', 'account_status'
+            , 'on_line', 'city_site_id', 'real_name', 'mobile'], '', $notLog);
+        if(empty($staffInfo)) throws('记录不存在');
+
+        $admin_type = $staffInfo['admin_type'] ?? 0;
+        if($admin_type != 32) throws('非快跑人员');
+
+        $open_status = $staffInfo['open_status'] ?? 0;// 审核状态1待审核2审核通过3审核未通过--32快跑人员用
+        $account_status = $staffInfo['account_status'] ?? 0;// 状态 0正常 1冻结
+        $on_line = $staffInfo['on_line'] ?? 0;
+
+        switch ($operate_type)
+        {
+            case 1://  1 提交申请修改信息 ;
+                break;
+            case 2:// 2 审核通过
+                if($open_status != 1) throws('非待审核状态!');
+                if(empty($staffInfo['city_site_id']) || empty($staffInfo['real_name']) || empty($staffInfo['mobile'])) throws('所属城市或真实姓名或手机为空，不能审核通过!');
+                $saveData = [
+                    'open_status' => 2,
+                    'open_fail_reason' => '',
+                ];
+                break;
+            case 3://  3 审核不通过
+                if($open_status != 1) throws('非待审核状态!');
+                $saveData = [
+                    'open_status' => 3,
+                    'open_fail_reason' => $reason,
+                ];
+                break;
+            case 4:// 4 冻结
+                if($account_status != 0) throws('非解冻状态!');
+                $saveData = [
+                    'account_status' => 1,
+                    'frozen_fail_reason' => $reason,
+                ];
+                break;
+            case 5:// 5 解冻
+                if($account_status != 1) throws('非冻结状态!');
+                $saveData = [
+                    'account_status' => 0,
+                    'frozen_fail_reason' => '',
+                ];
+                break;
+            case 6://  6 上班
+                if($open_status != 2) throws('非审核通过状态!');
+                if($account_status == 1) throws('冻结状态!');
+                // if($on_line != 1) throws('非下班状态!');
+                $saveData = [
+                    'on_line' => 2,
+                ];
+                break;
+            case 7:// 7 下班
+                if($open_status != 2) throws('非审核通过状态!');
+                if($account_status == 1) throws('冻结状态!');
+                // if($on_line != 2) throws('非上班状态!');
+                $saveData = [
+                    'on_line' => 1,
+                ];
+                break;
+            default:
+        }
+        // operate_type 可有 操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
+        $saveData['operate_type'] = $operate_type;
+
+        $resultDatas = static::replaceById($request, $controller, $saveData, $id, $modifAddOprate, $notLog);
+        return $resultDatas;
+    }
 }

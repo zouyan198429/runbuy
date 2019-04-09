@@ -81,6 +81,7 @@ Route::post('admin/staffShop/ajax_get_ids', 'Admin\StaffShopController@ajax_get_
 Route::any('admin/staffRun/ajax_alist', 'Admin\StaffRunController@ajax_alist');//ajax获得列表数据
 Route::post('admin/staffRun/ajax_del', 'Admin\StaffRunController@ajax_del');// 删除
 Route::any('admin/staffRun/ajax_save', 'Admin\StaffRunController@ajax_save');// 新加/修改
+Route::any('admin/staffRun/ajax_save_operate', 'Admin\StaffRunController@ajax_save_operate');// ajax保存数据-操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
 Route::post('admin/staffRun/ajax_get_child', 'Admin\StaffRunController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
 Route::post('admin/staffRun/ajax_get_areachild', 'Admin\StaffRunController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 Route::post('admin/staffRun/ajax_import_staff','Admin\StaffRunController@ajax_import'); // 导入员工
@@ -331,6 +332,7 @@ Route::post('city/staffShop/ajax_get_ids', 'City\StaffShopController@ajax_get_id
 Route::any('city/staffRun/ajax_alist', 'City\StaffRunController@ajax_alist');//ajax获得列表数据
 Route::post('city/staffRun/ajax_del', 'City\StaffRunController@ajax_del');// 删除
 Route::any('city/staffRun/ajax_save', 'City\StaffRunController@ajax_save');// 新加/修改
+Route::any('city/staffRun/ajax_save_operate', 'City\StaffRunController@ajax_save_operate');// ajax保存数据-操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
 Route::post('city/staffRun/ajax_get_child', 'City\StaffRunController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
 Route::post('city/staffRun/ajax_get_areachild', 'City\StaffRunController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 Route::post('city/staffRun/ajax_import_staff','City\StaffRunController@ajax_import'); // 导入员工
@@ -556,6 +558,7 @@ Route::post('seller/staffShop/ajax_get_ids', 'Seller\StaffShopController@ajax_ge
 //Route::any('seller/staffRun/ajax_alist', 'Seller\StaffRunController@ajax_alist');//ajax获得列表数据
 //Route::post('seller/staffRun/ajax_del', 'Seller\StaffRunController@ajax_del');// 删除
 //Route::any('seller/staffRun/ajax_save', 'Seller\StaffRunController@ajax_save');// 新加/修改
+//Route::any('seller/staffRun/ajax_save_operate', 'Seller\StaffRunController@ajax_save_operate');// ajax保存数据-操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
 //Route::post('seller/staffRun/ajax_get_child', 'Seller\StaffRunController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
 //Route::post('seller/staffRun/ajax_get_areachild', 'Seller\StaffRunController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 //Route::post('seller/staffRun/ajax_import_staff','Seller\StaffRunController@ajax_import'); // 导入员工
@@ -781,6 +784,7 @@ Route::post('shop/staffShop/ajax_get_ids', 'Shop\StaffShopController@ajax_get_id
 //Route::any('shop/staffRun/ajax_alist', 'Shop\StaffRunController@ajax_alist');//ajax获得列表数据
 //Route::post('shop/staffRun/ajax_del', 'Shop\StaffRunController@ajax_del');// 删除
 //Route::any('shop/staffRun/ajax_save', 'Shop\StaffRunController@ajax_save');// 新加/修改
+//Route::any('shop/staffRun/ajax_save_operate', 'Shop\StaffRunController@ajax_save_operate');// ajax保存数据-操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
 //Route::post('shop/staffRun/ajax_get_child', 'Shop\StaffRunController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
 //Route::post('shop/staffRun/ajax_get_areachild', 'Shop\StaffRunController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
 //Route::post('shop/staffRun/ajax_import_staff','Shop\StaffRunController@ajax_import'); // 导入员工
@@ -958,8 +962,23 @@ Route::any('wx/profile', 'WX\WeChatController@profile');// 需要授权才能访
 Route::any('wx/callback', 'WX\WeChatController@callback');// 授权回调页
 
 // 小程序相关的
+
+// 上传图片
+Route::post('upload', 'WX\UploadController@index');
+Route::post('upload/ajax_del', 'WX\UploadController@ajax_del');// 根据id删除文件
+
+
+// 搜索标签
+// Route::any('staff/ajax_alist', 'WX\StaffController@ajax_alist');//ajax获得列表数据
+Route::any('staff/ajax_info', 'WX\StaffController@ajax_info');//ajax获得详情数据
+Route::post('staff/ajax_save', 'WX\StaffController@ajax_save');// 新加/修改
+Route::any('staff/ajax_save_operate', 'WX\StaffController@ajax_save_operate');//ajax操作类型  operate_type 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
+
+
+
 Route::any('miniProgram/test', 'WX\MiniProgramController@test');// 测试
-Route::any('miniProgram/login', 'WX\MiniProgramController@ajax_login');// 登陆
+Route::any('miniProgram/login', 'WX\MiniProgramController@ajax_login');// 登陆-用户
+Route::any('miniProgram/login_run', 'WX\MiniProgramController@ajax_login_run');// 登陆-快跑人员小程序
 
 // 平台相关的
 // Route::any('platForm/getLabels', 'WX\platFormController@getLabels');// 获得店铺标签--有分页
@@ -1047,6 +1066,9 @@ Route::any('order/chState', 'WX\OrderController@chState');// 更新订单状态
 Route::any('order/getList', 'WX\OrderController@getList');// 订单--列表--有分页
 Route::any('order/ajax_alist', 'WX\OrderController@ajax_alist');//ajax获得列表数据--列表--有分页
 Route::any('order/ajax_getCountByStatus', 'WX\OrderController@ajax_getCountByStatus');//ajax获得统计数据
+Route::any('order/grabOrder', 'WX\OrderController@grabOrder');// 抢单
+Route::any('order/finishOrder', 'WX\OrderController@finishOrder');// 订单完成
+Route::any('order/eachDoOrder', 'WX\OrderController@eachDoOrder');// 每30秒或1分钟去执行一次的方法,获得这段时间内的待接订单
 
 // 订单支付相关的
 Route::any('orderPay/pay', 'WX\OrderPayController@pay');// 订单付款

@@ -707,4 +707,23 @@ class ShopGoodsDBBusiness extends BasePublicDBBusiness
         return $id;
     }
 
+    /**
+     * 订单完成统计商品
+     *
+     * @param int $goods_id 商品id
+     * @param int $amount 商品id的数量
+     * @param int $operate_staff_id 操作员工id
+     * @param int $operate_staff_id_history 操作员工历史id
+     * @return null
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function updateSaleVolume($goods_id, $amount, $operate_staff_id , $operate_staff_id_history){
+        $goodInfoObj = static::getInfo($goods_id);
+        if(!empty($goodInfoObj)){
+            $goodInfoObj->sales_volume += $amount;
+            $goodInfoObj->operate_staff_id = $operate_staff_id;
+            $goodInfoObj->operate_staff_id_history = $operate_staff_id_history;
+            $goodInfoObj->save();
+        }
+    }
 }

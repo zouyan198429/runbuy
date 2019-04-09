@@ -219,6 +219,18 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
                     , Tool::arrEqualKeyVal(['staff_id', 'nickname', 'gender', 'province', 'city', 'country', 'avatar_url', 'longitude', 'latitude', 'sex_text']), true );
             }
 
+            // 派送
+            if(isset($v['send_history']) && !empty($v['send_history'])){
+                $send_history = $v['send_history'] ?? [];
+                unset($data_list[$k]['send_history']);
+                $data_list[$k]['send'] = Tool::formatArrKeys($send_history
+                    , Tool::arrEqualKeyVal(['staff_id', 'nickname', 'gender', 'province', 'city', 'country', 'avatar_url', 'longitude', 'latitude', 'sex_text', 'mobile', 'tel', 'real_name']), true );
+                $data_list[$k]['send']['mobile_format'] = Tool::formatStr($data_list[$k]['send']['mobile'], [
+                    ['len' => 3, 'splitStr' => ' ']
+                    , ['len' => 4, 'splitStr' => ' ']
+                    , ['len' => 4, 'splitStr' => ' ']
+                ]);
+            }
             // 城市-省
             if(isset($v['province_history']) && !empty($v['province_history'])){
                 $province_history = $v['province_history'] ?? [];
@@ -729,6 +741,60 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
         ];
         $statusCountList = static::exeDBBusinessMethodCT($request, $controller, '', 'getGroupCount', $apiParams, $company_id, $notLog);
         return $statusCountList;
+    }
+
+    /**
+     * 根据订单号，抢单/派单
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param string $order_no 订单号,多个用逗号分隔
+     * @param string $send_staff_id 派送给的用户id
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function grabOrder(Request $request, Controller $controller, $order_no, $send_staff_id, $notLog = 0)
+    {
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+
+        // 调用新加或修改接口
+        $apiParams = [
+            'order_no' => $order_no,// 订单号,多个用逗号分隔, 可为空：所有的
+            'company_id' => $company_id,
+            'send_staff_id' => $send_staff_id,// 派送给的用户id
+            'operate_staff_id' => $user_id,
+        ];
+        $result = static::exeDBBusinessMethodCT($request, $controller, '', 'grabOrder', $apiParams, $company_id, $notLog);
+        return $result;
+    }
+
+    /**
+     * 根据订单号，订单完成
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param string $order_no 订单号,多个用逗号分隔
+     * @param string $send_staff_id 派送给的用户id
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function finishOrder(Request $request, Controller $controller, $order_no, $send_staff_id, $notLog = 0)
+    {
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+
+        // 调用新加或修改接口
+        $apiParams = [
+            'order_no' => $order_no,// 订单号,多个用逗号分隔, 可为空：所有的
+            'company_id' => $company_id,
+            // 'send_staff_id' => $send_staff_id,// 派送给的用户id
+            'operate_staff_id' => $user_id,
+        ];
+        $result = static::exeDBBusinessMethodCT($request, $controller, '', 'finishOrder', $apiParams, $company_id, $notLog);
+        return $result;
     }
 
     /**

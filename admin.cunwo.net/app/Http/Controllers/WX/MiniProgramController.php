@@ -49,7 +49,7 @@ class MiniProgramController extends BaseController
     }
 
     /**
-     * 登陆-- 小程序登陆专用
+     * 登陆-- 小程序登陆专用--用户小程序
      *
      * @param Request $request
      * @return mixed redis key
@@ -57,6 +57,33 @@ class MiniProgramController extends BaseController
      */
     public function ajax_login(Request $request)
     {
+        return $this->login($request, 64);
+
+    }
+
+    /**
+     * 登陆-- 小程序登陆专用--快跑人员小程序
+     *
+     * @param Request $request
+     * @return mixed redis key
+     * @author zouyan(305463219@qq.com)
+     */
+    public function ajax_login_run(Request $request)
+    {
+        return $this->login($request, 32);
+
+    }
+
+    /**
+     * 登陆-- 方法
+     *
+     * @param Request $request
+     * @param int $admin_type 用户类型 32快跑人员64用户
+     * @return mixed redis key
+     * @author zouyan(305463219@qq.com)
+     */
+
+    public function login(Request $request, $admin_type = 64){
         $preKey = CommonRequest::get($request, 'preKey');// 0 小程序 1后台
         if(!is_numeric($preKey)){
             $preKey = 0;
@@ -70,7 +97,9 @@ class MiniProgramController extends BaseController
         }else{
             Log::info('微信日志-不是ajax请求:',['']);
         }
-        $res = MiniProgram::login($code, $encryptedData, $iv);
+        $block = "default";
+        if($admin_type == 32) $block = "run";
+        $res = MiniProgram::login($code, $encryptedData, $iv, $block, 2);
         // 保存到数据库
         $wx_unionid = $res['unionId'] ?? '';
         $mini_openid = $res['openId'] ?? '';
@@ -78,7 +107,7 @@ class MiniProgramController extends BaseController
         // 获得用户id
         $id = 0;
         $saveData = [
-            'admin_type' => 64,
+            'admin_type' => $admin_type,// 64,
             'wx_unionid' => $wx_unionid,
             'mini_openid' => $mini_openid,
             // 'mp_openid' => $res['aaaa'] ?? '',
@@ -106,6 +135,5 @@ class MiniProgramController extends BaseController
         $userInfo['redisKey'] = $redisKey;
         Log::info('微信日志-登陆成功:',[$userInfo]);
         return ajaxDataArr(1, $redisKey, '');
-
     }
 }

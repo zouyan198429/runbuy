@@ -184,6 +184,20 @@ class StaffUserController extends WorksController
     }
 
     /**
+     * ajax保存数据-操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
+     *
+     * @param int $id
+     * @return Response
+     * @author zouyan(305463219@qq.com)
+     */
+    public function ajax_save_operate(Request $request)
+    {
+        $this->InitParams($request);
+        $resultDatas = CTAPIStaffBusiness::staffOperateById($request, $this, true);
+        return ajaxDataArr(1, $resultDatas, '');
+    }
+
+    /**
      * ajax获得列表数据
      *
      * @param Request $request

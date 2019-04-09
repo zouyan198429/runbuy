@@ -37,6 +37,7 @@ class StaffDBBusiness extends BasePublicDBBusiness
      * 根据id新加或修改单条数据-id 为0 新加，返回新的对象数组[-维],  > 0 ：修改对应的记录，返回true
      *
      * @param array $saveData 要保存或修改的数组
+     *   operate_type 可有 操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
      * @param int  $company_id 企业id
      * @param int $id id
      * @param int $operate_staff_id 操作人id
@@ -57,6 +58,9 @@ class StaffDBBusiness extends BasePublicDBBusiness
         if(isset($saveData['admin_username']) && empty($saveData['admin_username'])  ){
             throws('用户名不能为空！');
         }
+
+        $operateType = $saveData['operate_type'] ?? 0;// 操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻 6 上班 7 下班
+        if(isset($saveData['operate_type'])) unset($saveData['operate_type']);
 
         // 如果有经纬度信息
         if(isset($saveData['latitude'])){
@@ -101,6 +105,7 @@ class StaffDBBusiness extends BasePublicDBBusiness
             }
 
             $isModify = false;
+            $operate_staff_id_history = 0;
             if($id > 0){
                 $isModify = true;
                 // 判断权限
@@ -109,7 +114,8 @@ class StaffDBBusiness extends BasePublicDBBusiness
     //            ];
     //            $relations = '';
     //            static::judgePower($id, $judgeData , $company_id , [], $relations);
-                if($modifAddOprate) static::addOprate($saveData, $operate_staff_id);
+                // if($modifAddOprate) static::addOprate($saveData, $operate_staff_id, $operate_staff_id_history);
+                static::addOprate($saveData, $operate_staff_id, $operate_staff_id_history);
 
             }else {// 新加;要加入的特别字段
     //            $addNewData = [
@@ -117,23 +123,64 @@ class StaffDBBusiness extends BasePublicDBBusiness
     //            ];
     //            $saveData = array_merge($saveData, $addNewData);
                 // 加入操作人员信息
-                static::addOprate($saveData, $operate_staff_id);
+                static::addOprate($saveData, $operate_staff_id,$operate_staff_id_history);
             }
+            $logCount = '';
+            // 6 上班
+            if($operateType == 6) $saveData['on_time'] = date("Y-m-d H:i:s",time());
             // 新加或修改
             if($id <= 0){// 新加
                 $resultDatas = static::create($saveData);
                 $id = $resultDatas['id'] ?? 0;
                 $resultDatas = static::getInfo($id);
+                $logCount = '新加';
             }else{// 修改
                 $modelObj = null;
                 $saveBoolen = static::saveById($saveData, $id,$modelObj);
                 $resultDatas = static::getInfo($id);
-
+                $logCount = '修改';
             }
 
             if($isModify){
                 static::compareHistory($id, 1);
             }
+            // $operateType = $saveData['operate_type'] ?? 0;// 操作类型 1 提交申请修改信息 ;2 审核通过 3 审核不通过 4 冻结 5 解冻  6 上班 7 下班
+            $city_site_id = $resultDatas->city_site_id;
+            $on_line = $resultDatas->on_line;// 是否上班 1下班2上班
+            switch ($operateType)
+            {
+                case 1://  1 提交申请修改信息 ;
+                    $logCount = '修改信息，提交审核';
+                    if($on_line == 2)  StaffRecordOnlineDBBusiness::saveRecord($id, $city_site_id, $operate_staff_id , $operate_staff_id_history, 1, '修改信息，提交审核：下班');
+                    break;
+                case 2:// 2 审核通过
+                    $logCount = '审核通过';
+                    break;
+                case 3://  3 审核不通过
+                    $logCount = '审核不通过';
+                    if(isset($saveData['open_fail_reason'])) $logCount .= '；原因:' .  $saveData['open_fail_reason'];
+                    break;
+                case 4:// 4 冻结
+                    $logCount = '冻结';
+                    if(isset($saveData['frozen_fail_reason'])) $logCount .= '；原因:' .  $saveData['frozen_fail_reason'];
+                    if($on_line == 2)  StaffRecordOnlineDBBusiness::saveRecord($id, $city_site_id, $operate_staff_id , $operate_staff_id_history, 1, '冻结操作：下班');
+                    break;
+                case 5:// 5 解冻
+                    $logCount = '解冻';
+                    break;
+                case 6://  6 上班
+                    $logCount = '上班';
+                    StaffRecordOnlineDBBusiness::saveRecord($id, $city_site_id, $operate_staff_id , $operate_staff_id_history, 2, $logCount);
+                    break;
+                case 7:// 7 下班
+                    $logCount = '下班';
+                    StaffRecordOnlineDBBusiness::saveRecord($id, $city_site_id, $operate_staff_id , $operate_staff_id_history, 1, $logCount);
+                    break;
+                default:
+            }
+            // if(is_numeric($operateType) && $operateType > 0);
+             StaffRecordDBBusiness::saveLog($id , $operate_staff_id , $operate_staff_id_history, $logCount);// 保存操作记录
+
         } catch ( \Exception $e) {
             DB::rollBack();
             throws($e->getMessage());
@@ -163,12 +210,16 @@ class StaffDBBusiness extends BasePublicDBBusiness
         // 查询存在的 mini_openid
         if(is_numeric($id) &&  $id <= 0 &&  isset($saveData['mini_openid']) ){
             $otherWhere = [];
+            if(isset($saveData['admin_type'])  && $saveData['admin_type'] > 0 ) array_push($otherWhere, ['admin_type', $saveData['admin_type']]) ;
             if( isset($saveData['wx_unionid']) ) array_push($otherWhere, ['wx_unionid', $saveData['wx_unionid']]);
             $info = static::judgeFieldExist($company_id, 0 ,"mini_openid", $saveData['mini_openid']
                 , $otherWhere,2);
             if(!empty($info)) $id = $info['id'];
         }
 
+        if($id <= 0 && isset($saveData['admin_type']) && $saveData['admin_type'] == 32){
+            $saveData['open_status'] = 1;// 审核状态1待审核2审核通过3审核未通过--32快跑人员用
+        }
         $res = static::replaceById($saveData, $company_id,$id, $operate_staff_id, $modifAddOprate);
         return $res;
     }

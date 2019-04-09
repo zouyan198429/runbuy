@@ -35,9 +35,9 @@ class MiniProgram
      *
      * @author zouyan(305463219@qq.com)
      */
-    public static function login($jsCode, $encryptedData, $iv, $expiryMinutes = 2){
+    public static function login($jsCode, $encryptedData, $iv, $block = 'default', $expiryMinutes = 2){
         Log::info('微信日志-登陆参数:',[$jsCode, $iv, $encryptedData]);
-        $app = app('wechat.mini_program');
+        $app = app('wechat.mini_program.' . $block);
         $res = $app->auth->session($jsCode);// {"session_key":"TBZO81wdyaWEOEOnqBfuPQ==","openid":"owfFF4ydu2HmuvmSDS4goIoAIYEs"},可能还有unionId" -没有证实
         // json 转成数组
         jsonStrToArr($res , 1, '参数[data]格式有误!');

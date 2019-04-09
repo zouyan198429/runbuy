@@ -742,7 +742,7 @@ class APIBasicRequest
 //        $url = config('public.apiUrl') . config('apiUrl.common.getlistApi');
         $url = static::getUrl() . config('apiUrl.common.getlistApi');
         // 生成带参数的测试get请求
-        // $requestTesUrl = splicQuestAPI($url , $requestData);
+        $requestTesUrl = splicQuestAPI($url , $requestData);
         return HttpRequest::HttpRequestApi($url, $requestData, [], 'POST');
     }
 

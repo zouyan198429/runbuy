@@ -34,11 +34,24 @@ class Staff extends BasePublicModel
         '1' => '冻结',
     ];
 
+    // 审核状态1待审核2审核通过3审核未通过--32快跑人员用
+    public $openStatusArr = [
+        '1' => '待审核',
+        '2' => '已通过',
+        '3' => '未通过',
+    ];
+
     // 性别0未知1男2女
     public $sexArr = [
         '0' => '未知',
         '1' => '男',
         '2' => '女',
+    ];
+
+    // 是否上班 1下班2上班
+    public $onLineArr = [
+        '1' => '下班',
+        '2' => '上班',
     ];
 
     /**
@@ -49,7 +62,7 @@ class Staff extends BasePublicModel
     protected $hidden = ['admin_password'];
 
     // 表里没有的字段
-    protected $appends = ['admin_type_text', 'issuper_text', 'sex_text', 'account_status_text'];
+    protected $appends = ['admin_type_text', 'issuper_text', 'sex_text', 'account_status_text', 'open_status_text', 'on_line_text'];
 
     /**
      * 设置帐号的密码md5加密
@@ -93,6 +106,16 @@ class Staff extends BasePublicModel
     }
 
     /**
+     * 获取用户审核状态文字
+     *
+     * @return string
+     */
+    public function getOpenStatusTextAttribute()
+    {
+        return $this->openStatusArr[$this->open_status] ?? '';
+    }
+
+    /**
      * 获取用户性别文字
      *
      * @return string
@@ -100,6 +123,16 @@ class Staff extends BasePublicModel
     public function getSexTextAttribute()
     {
         return $this->sexArr[$this->sex] ?? '';
+    }
+
+    /**
+     * 获取用户上下班文字
+     *
+     * @return string
+     */
+    public function getOnLineTextAttribute()
+    {
+        return $this->onLineArr[$this->on_line] ?? '';
     }
 
     /**
@@ -140,6 +173,22 @@ class Staff extends BasePublicModel
     public function wallet()
     {
         return $this->hasOne('App\Models\RunBuy\Wallet', 'staff_id', 'id');
+    }
+
+    /**
+     * 获取员工对应的身份证正面--一维
+     */
+    public function face()
+    {
+        return $this->belongsTo('App\Models\RunBuy\Resource', 'face_resource_id', 'id');
+    }
+
+    /**
+     * 获取员工对应的身份证反面--一维
+     */
+    public function back()
+    {
+        return $this->belongsTo('App\Models\RunBuy\Resource', 'back_resource_id', 'id');
     }
 
     /**

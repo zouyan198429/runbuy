@@ -514,6 +514,8 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
 
                                 // $payStatus = 2;// 1失败  2 成功
                                 if($payStatus == 2){
+                                    // 更新订单饱和度
+                                    CityDBBusiness::cityOrdersOperate($orderInfo->city_site_id, 2, 1);// 增加订单
                                     $orderSaveData = [
                                         'status' => 2,
                                         'pay_run_price' => 1,
@@ -938,6 +940,7 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
                         $orderSaveData = [
                             'total_run_price' => $total_run_price - $refund_amount,
                             'has_refund' => 2,// 是否退费0未退费1已退费2待退费
+                            'cancel_time' => date("Y-m-d H:i:s",time()),// 作废时间
                         ];
                         $order_status = $orderInfo->status;// 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
                         if(!in_array($order_status, [2,4,8])) throws('订单[' . $order_no . '] 不可进行退款操作');
@@ -1361,6 +1364,8 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
                                 $orderSaveData['has_refund'] = 1;// 是否退费0未退费1已退费2待退费
                             }
                             if($total_run_price <= 0 && $wrPayInfo->amount_frozen <= 0){// 订单状态变为 取消状态  // 冻结<=0,才改状态
+                                // 更新订单饱和度
+                                CityDBBusiness::cityOrdersOperate($orderInfo->city_site_id, 1, 1);// 减订单
                                 if($operate_staff_id > 0){
                                     $orderSaveData['status'] = 32;
                                 }else{

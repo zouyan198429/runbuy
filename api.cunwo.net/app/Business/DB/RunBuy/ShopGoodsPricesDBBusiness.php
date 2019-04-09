@@ -100,4 +100,24 @@ class ShopGoodsPricesDBBusiness extends BasePublicDBBusiness
         DB::commit();
         return true;
     }
+
+    /**
+     * 订单完成统计商品
+     *
+     * @param int $prop_price_id 商品价格id
+     * @param int $amount 商品的数量
+     * @param int $operate_staff_id 操作员工id
+     * @param int $operate_staff_id_history 操作员工历史id
+     * @return null
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function updateSaleVolume($prop_price_id, $amount, $operate_staff_id , $operate_staff_id_history){
+        $infoObj = static::getInfo($prop_price_id);
+        if(!empty($infoObj)){
+            $infoObj->sales_volume += $amount;
+            $infoObj->operate_staff_id = $operate_staff_id;
+            $infoObj->operate_staff_id_history = $operate_staff_id_history;
+            $infoObj->save();
+        }
+    }
 }
