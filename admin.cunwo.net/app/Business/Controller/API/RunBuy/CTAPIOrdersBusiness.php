@@ -831,4 +831,39 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
         ];
         return static::getInfoByQuery($request, $controller, '', $company_id, $queryParams);
     }
+
+    /**
+     * 根据订单号，订单完成
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param int  $operate_type 操作类型 1 商家 或者 店铺 2 非商家 或者 店铺
+     * @param string  $status 状态, 多个用逗号,分隔 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
+     * @param string $city_site_id 城市id
+     * @param string $order_id 订单id
+     * @param array $other_where 其它条件
+     * @param string $send_staff_id 派送给的用户id
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getWaitOrder(Request $request, Controller $controller, $operate_type, $status, $city_site_id, $order_id, $other_where, $send_staff_id, $notLog = 0)
+    {
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+
+        // 调用新加或修改接口
+        $apiParams = [
+            'operate_type' => $operate_type,// 操作类型 1 商家 或者 店铺 2 非商家 或者 店铺
+            'status' => $status,// 状态, 多个用逗号,分隔 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
+            'city_site_id' => $city_site_id,// 订单号,多个用逗号分隔, 可为空：所有的
+            'order_id' => $order_id,
+            'other_where' => $other_where,// 其它条件
+            'company_id' => $company_id,
+            'send_staff_id' => $send_staff_id,// 派送给的用户id
+            'operate_staff_id' => $user_id,
+        ];
+        $result = static::exeDBBusinessMethodCT($request, $controller, '', 'getCityWaitOrder', $apiParams, $company_id, $notLog);
+        return $result;
+    }
 }

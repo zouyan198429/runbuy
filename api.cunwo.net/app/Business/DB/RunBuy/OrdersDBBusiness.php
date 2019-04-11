@@ -4,6 +4,7 @@ namespace App\Business\DB\RunBuy;
 
 use App\Models\RunBuy\Orders;
 use App\Models\RunBuy\OrdersDoing;
+use App\Services\Tool;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -567,5 +568,112 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         }
         DB::commit();
         return 1;
+    }
+
+
+    /**
+     * 获得最新的，待接单的订单数据
+     *
+     * @param int  $operate_type 操作类型 1 商家 或者 店铺 2 非商家 或者 店铺
+     * @param string  $status 状态, 多个用逗号,分隔 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
+     * @param int $city_site_id  城市id
+     * @param array $other_where 其它条件
+     * @param int $order_id  订单id
+     *            第一次为：0： 直接返回当前最大的订单id
+     *            最大订单id :  1：获得大于当前订单id的待接订单及数量，同时获得当前最大的订单id
+     * @param int  $company_id 企业id
+     * @param string $send_staff_id 派送给的用户id--请求数据，可能要接单的，可为0：  非0:主要记录最近一次访问
+     * @param int $operate_staff_id 操作人id
+     * @return  array
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getCityWaitOrder($operate_type, $status, $city_site_id, $other_where, $order_id, $company_id, $send_staff_id, $operate_staff_id = 0){
+        if(!is_numeric($city_site_id)) $city_site_id = 0;
+        if(!is_numeric($order_id)) $order_id = 0;
+        if(!is_numeric($send_staff_id)) $send_staff_id = 0;
+        if(!is_array($other_where)) $other_where = [];
+        // 获得缓存中最大的订单id
+        $maxOrderDoingId = Tool::getRedis('order:maxOrderDoingId', 3);
+        if(!is_numeric($maxOrderDoingId))  $maxOrderDoingId = 0;
+
+
+        $return = [
+          'order_id' => $maxOrderDoingId,// 最新的订单id
+          'city_site_id' => $city_site_id,// 城市id
+          'order_num' => 0,// 待处理的订单数量
+          'order_list' => [// 待处理的订单数组  ['id' => '订单id' , 'order_no'=> '订单号']
+          ],
+          'statusList'=> [],// 按状态订单数组 [ '状态值' => [ ['id' => '订单id' , 'order_no'=> '订单号'],... ] ]
+          'statusCount'=> [],// 按状态 ['状态值' => '数量',...]
+        ];
+
+        if($maxOrderDoingId <= 0){// 如果缓存中的最大订单id为0,则重新查库验证
+            $queryOrderParams = [
+                'where' => [
+                    // ['order_type', 1],// 订单类型1普通订单/父订单4子订单
+                    //['order_no', $order_no],
+                    //['pay_run_price', 1],// 是否支付跑腿费0未支付1已支付
+                    ['id', '>', $order_id],
+                ],
+                'select' => [
+                    'id'// ,'title','sort_num','volume'
+                ],
+                'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+            ];
+            $orderInfo = OrdersDoingDBBusiness::getInfoByQuery(1, $queryOrderParams, []);
+            if(!empty($orderInfo)){
+                $maxOrderDoingId = $orderInfo->id;
+                $return['order_id'] = $maxOrderDoingId;
+            }
+        }
+
+        // 请求 参数为0:第一次请求，直接返回当前最大的订单id
+        if($order_id <=0 ){
+            return $return;
+        }
+
+        // 获得最新的订单
+        $queryParams = [
+            'where' => [
+                // ['operate_type', 1],// 订单类型1普通订单/父订单4子订单
+                ['id', '>', $order_id],
+                // ['send_staff_id', 0],
+                // ['pay_order_no',$order_no],
+            ],
+            'select' => ['id', 'order_no', 'status'],// , 'order_type', 'has_son_order', 'is_order'
+            'orderBy' => [ 'id'=>'asc'],//'sort_num'=>'desc',
+        ];
+        if(!empty($other_where)) $queryParams['where'] = array_merge($queryParams['where'], $other_where);
+        if($operate_type == 1){// 操作类型 1 商家 或者 店铺 2 非商家 或者 店铺
+            array_push($queryParams['where'], ['is_order', 2]);
+        }else{
+            array_push($queryParams['where'], ['operate_type', 1]);// 订单类型1普通订单/父订单4子订单
+        }
+        if (strpos($status, ',') === false) { // 单条
+            array_push($queryParams['where'], ['status', $status]);
+        } else {
+            $queryParams['whereIn']['status'] = explode(',', $status);
+        }
+        $orderList = OrdersDoingDBBusiness::getAllList($queryParams, [])->toArray();
+        if(empty($orderList)) return $return;
+        $statusCount = [];
+        $statusList = [];
+        foreach($orderList as $v){
+            $statusList[$v['status']][] = $v;
+            if(isset($statusCount[$v['status']])){
+                $statusCount[$v['status']] += 1;
+            }else{
+                $statusCount[$v['status']] = 1;
+            }
+            if($maxOrderDoingId < $v['id']){
+                $maxOrderDoingId = $v['id'];
+                $return['order_id'] = $maxOrderDoingId;
+            }
+        }
+        $return['order_num'] = count($orderList);
+        $return['statusList'] = $statusList;
+        $return['statusCount'] = $statusCount;
+
+        return $return;
     }
 }

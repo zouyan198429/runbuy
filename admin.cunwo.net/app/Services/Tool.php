@@ -517,7 +517,7 @@ class Tool
      * @param string $key 键 null 自动生成
      * @param string 选填 $value 需要保存的值，如果是对象或数组，则序列化
      * @param int 选填 $expire 有效期 秒 <=0 长期有效
-     * @param int 选填 $operate 操作 1 转为json 2 序列化
+     * @param int 选填 $operate 操作 1 转为json 2 序列化 3 不转换
      * @return $key
      * @author zouyan(305463219@qq.com)
      */
@@ -555,7 +555,7 @@ class Tool
     /**
      * 获得key的redis值
      * @param string $key 键
-     * @param int 选填 $operate 操作 1 转为json 2 序列化
+     * @param int 选填 $operate 操作 1 转为json 2 序列化 3 不转换
      * @return $value ; false失败
      * @author zouyan(305463219@qq.com)
      */

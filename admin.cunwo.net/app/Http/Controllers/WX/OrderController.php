@@ -363,7 +363,10 @@ class OrderController extends BaseController
 
     /**
      * ajax 每30秒或1分钟去执行一次的方法,获得这段时间内的待接订单
-     *
+     *   参数 city_site_id 城市id
+     *        order_id 订单id
+     *            第一次为：0： 直接返回当前最大的订单id
+     *            最大订单id :  1：获得大于当前订单id的待接订单及数量，同时获得当前最大的订单id
      * @param Request $request
      * @return mixed 这段时间内的待接订单数量
      * @author zouyan(305463219@qq.com)
@@ -371,11 +374,14 @@ class OrderController extends BaseController
     public function eachDoOrder(Request $request)
     {
         $this->InitParams($request);
-
+        $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+        $order_id = CommonRequest::getInt($request, 'order_id');
+        $operate_type = CommonRequest::getInt($request, 'operate_type');// 操作类型 1 商家 或者 店铺 2 非商家 或者 店铺
+        $status = CommonRequest::get($request, 'status');// 状态, 多个用逗号,分隔 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
+        if(empty($status)) $status = 2;
         $send_staff_id = $this->user_id;
-        // $order_no = CommonRequest::get($request, 'order_no');// 订单号,多个用逗号分隔
-        // $result = CTAPIOrdersDoingBusiness::finishOrder($request, $this, $order_no, $send_staff_id);
-        $result = 1;
+        $other_where = [];
+        $result = CTAPIOrdersDoingBusiness::getWaitOrder($request, $this,$operate_type, $status, $city_site_id, $order_id, $other_where, $send_staff_id);
         return ajaxDataArr(1, $result, '');
     }
 }

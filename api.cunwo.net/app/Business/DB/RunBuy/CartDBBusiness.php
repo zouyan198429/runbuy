@@ -3,6 +3,7 @@
 namespace App\Business\DB\RunBuy;
 
 
+use App\Services\Tool;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -834,6 +835,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                 $parentOrderDoingObj = OrdersDoingDBBusiness::create($orders);// 父订单
                 array_push($parentOrderLogs, '创建父订单[' . $parent_order_no . ']');
             }
+            $maxOrderDoingId = 0;// 最大的订单id
             foreach($formatCartList as $vShop){
 
                 $city_site_id = $vShop['city_site_id'] ?? 0;// 城市分站id
@@ -959,6 +961,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                 // 创建订单
                 $orderObj = OrdersDBBusiness::create($orders);// 订单
                 $orderDoingObj = OrdersDoingDBBusiness::create($orders);// 订单
+                $maxOrderDoingId = $orderDoingObj->id;// 最大的订单id
 
                 $orderLogs = [];
                 if($shopCount > 1) {// 有多家店铺
@@ -1111,6 +1114,8 @@ class CartDBBusiness extends BasePublicDBBusiness
             CartGoodsPropsDBBusiness::del($propQueryParams);
             // 删除主表记录
             static::deleteByIds($cartIds);
+            // 缓存最大订订单id
+            Tool::setRedis('order:', 'maxOrderDoingId', $maxOrderDoingId, 0 , 3);
 
         } catch ( \Exception $e) {
             DB::rollBack();
