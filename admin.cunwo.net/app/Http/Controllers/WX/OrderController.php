@@ -381,7 +381,7 @@ class OrderController extends BaseController
         if(empty($status)) $status = 2;
         $send_staff_id = $this->user_id;
         $other_where = [];
-        $result = CTAPIOrdersDoingBusiness::getWaitOrder($request, $this,$operate_type, $status, $city_site_id, $order_id, $other_where, $send_staff_id);
+        $result = CTAPIOrdersDoingBusiness::getWaitOrder($request, $this, $operate_type, $status, $city_site_id, $order_id, $other_where, $send_staff_id);
         return ajaxDataArr(1, $result, '');
     }
 }

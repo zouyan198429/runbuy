@@ -647,7 +647,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         if($operate_type == 1){// 操作类型 1 商家 或者 店铺 2 非商家 或者 店铺
             array_push($queryParams['where'], ['is_order', 2]);
         }else{
-            array_push($queryParams['where'], ['operate_type', 1]);// 订单类型1普通订单/父订单4子订单
+            array_push($queryParams['where'], ['order_type', 1]);// 订单类型1普通订单/父订单4子订单
         }
         if (strpos($status, ',') === false) { // 单条
             array_push($queryParams['where'], ['status', $status]);

@@ -857,8 +857,8 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
             'operate_type' => $operate_type,// 操作类型 1 商家 或者 店铺 2 非商家 或者 店铺
             'status' => $status,// 状态, 多个用逗号,分隔 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
             'city_site_id' => $city_site_id,// 订单号,多个用逗号分隔, 可为空：所有的
-            'order_id' => $order_id,
             'other_where' => $other_where,// 其它条件
+            'order_id' => $order_id,
             'company_id' => $company_id,
             'send_staff_id' => $send_staff_id,// 派送给的用户id
             'operate_staff_id' => $user_id,
