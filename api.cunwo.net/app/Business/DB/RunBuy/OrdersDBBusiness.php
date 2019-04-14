@@ -593,7 +593,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         if(!is_numeric($send_staff_id)) $send_staff_id = 0;
         if(!is_array($other_where)) $other_where = [];
         // 获得缓存中最大的订单id
-        $maxOrderDoingId = Tool::getRedis('order:maxOrderDoingId', 3);
+        $maxOrderDoingId = 0;// Tool::getRedis('order:maxOrderDoingId', 3);
         if(!is_numeric($maxOrderDoingId))  $maxOrderDoingId = 0;
 
 
@@ -606,6 +606,14 @@ class OrdersDBBusiness extends BasePublicDBBusiness
           'statusList'=> [],// 按状态订单数组 [ '状态值' => [ ['id' => '订单id' , 'order_no'=> '订单号'],... ] ]
           'statusCount'=> [],// 按状态 ['状态值' => '数量',...]
         ];
+
+        $where = [];
+        if(!empty($other_where)) $where = array_merge($where, $other_where);
+        if($operate_type == 1){// 操作类型 1 商家 或者 店铺 2 非商家 或者 店铺
+            array_push($where, ['is_order', 2]);
+        }else{
+            array_push($where, ['order_type', 1]);// 订单类型1普通订单/父订单4子订单
+        }
 
         if($maxOrderDoingId <= 0){// 如果缓存中的最大订单id为0,则重新查库验证
             $queryOrderParams = [
@@ -620,6 +628,12 @@ class OrdersDBBusiness extends BasePublicDBBusiness
                 ],
                 'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
             ];
+            if(!empty($where)) $queryOrderParams['where'] = array_merge($queryOrderParams['where'], $where);
+            if (strpos($status, ',') === false) { // 单条
+                array_push($queryOrderParams['where'], ['status', $status]);
+            } else {
+                $queryOrderParams['whereIn']['status'] = explode(',', $status);
+            }
             $orderInfo = OrdersDoingDBBusiness::getInfoByQuery(1, $queryOrderParams, []);
             if(!empty($orderInfo)){
                 $maxOrderDoingId = $orderInfo->id;
@@ -643,17 +657,13 @@ class OrdersDBBusiness extends BasePublicDBBusiness
             'select' => ['id', 'order_no', 'status'],// , 'order_type', 'has_son_order', 'is_order'
             'orderBy' => [ 'id'=>'asc'],//'sort_num'=>'desc',
         ];
-        if(!empty($other_where)) $queryParams['where'] = array_merge($queryParams['where'], $other_where);
-        if($operate_type == 1){// 操作类型 1 商家 或者 店铺 2 非商家 或者 店铺
-            array_push($queryParams['where'], ['is_order', 2]);
-        }else{
-            array_push($queryParams['where'], ['order_type', 1]);// 订单类型1普通订单/父订单4子订单
-        }
+        if(!empty($where)) $queryParams['where'] = array_merge($queryParams['where'], $where);
         if (strpos($status, ',') === false) { // 单条
             array_push($queryParams['where'], ['status', $status]);
         } else {
             $queryParams['whereIn']['status'] = explode(',', $status);
         }
+
         $orderList = OrdersDoingDBBusiness::getAllList($queryParams, [])->toArray();
         if(empty($orderList)) return $return;
         $statusCount = [];
