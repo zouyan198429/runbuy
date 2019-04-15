@@ -521,6 +521,7 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
                                         'pay_run_price' => 1,
                                         'pay_order_no' => $transaction_id,
                                         'pay_time' => date("Y-m-d H:i:s",time()),
+                                        'pay_time_latest' => date("Y-m-d H:i:s",time()),
                                     ];
     //                                $orderInfo->status = 2;
     //                                $orderInfo->pay_run_price = 1;
@@ -551,6 +552,7 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
                                     $orderSaveData = [
                                         'total_run_price' =>  $orderInfo->total_run_price + $wrInfo->amount,
                                         'pay_run_amount'=>  $orderInfo->pay_run_amount + $wrInfo->amount,
+                                        'pay_time_latest' => date("Y-m-d H:i:s",time()),
                                     ];
                                     OrdersDoingDBBusiness::updateOrders($orderSaveData,  $order_no, 1 + 2 + 4, $wrInfo->staff_id, $operate_staff_id_history
                                         , '回调通知加价崔单付款成功！金额:' . $wrInfo->amount);
@@ -560,7 +562,6 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
 
                                 }
                             }
-
                             break;
                         case 5:// 5 冲值--钱包
                         case 7:// 7 压金或保证金

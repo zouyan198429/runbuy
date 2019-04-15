@@ -6,6 +6,7 @@ use App\Business\Controller\API\RunBuy\CTAPIOrdersBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIOrdersDoingBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIStaffBusiness;
 use App\Services\Request\CommonRequest;
+use App\Services\Tool;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -99,6 +100,9 @@ class OrderController extends BaseController
                 $requestParams['send_staff_id'] = 0;
                 break;
             case 3:// 3派送人员接的单
+                $oprateBit = 1;
+                $requestParams['send_staff_id'] = $user_id;
+                break;
             case 4:// 4 已完成 派送人员接的单
                 $requestParams['send_staff_id'] = $user_id;
                 break;
@@ -154,8 +158,41 @@ class OrderController extends BaseController
                 $data_list[$k]['shopList'][] = $v;
                 if(isset($v['orders_goods'])) unset($data_list[$k]['orders_goods']);
             }
+            $data_list[$k]['send_end_time_unix'] = judgeDate($v['send_end_time']);// 派送到期时间
+            $data_list[$k]['pay_time_latest_unix'] = judgeDate($v['pay_time_latest']);// 最新付款时间
         }
 
+        switch ($getType)
+        {
+            case 1:// 1用户的订单
+                break;
+            case 2:// 2 待接单的订单-- 所有的订单
+                $data_list = array_values($data_list);
+                $orderDistance = [
+                    ['key' => 'pay_time_latest_unix', 'sort' => 'desc', 'type' => 'numeric'],
+                    ['key' => 'id', 'sort' => 'desc', 'type' => 'numeric'],
+                ];
+                if(!empty($data_list)) {
+                    $data_list = Tool::php_multisort($data_list, $orderDistance);
+                    $data_list = array_values($data_list);
+                }
+                break;
+            case 3:// 3派送人员接的单
+                $data_list = array_values($data_list);
+                $orderDistance = [
+                    ['key' => 'send_end_time_unix', 'sort' => 'asc', 'type' => 'numeric'],
+                    ['key' => 'id', 'sort' => 'desc', 'type' => 'numeric'],
+                ];
+                if(!empty($data_list)) {
+                    $data_list = Tool::php_multisort($data_list, $orderDistance);
+                    $data_list = array_values($data_list);
+                }
+                break;
+            case 4:// 4 已完成 派送人员接的单
+                break;
+            default:
+
+        }
         $data_list = array_values($data_list);
         $result['result']['data_list'] = $data_list;
         return $result;
@@ -375,7 +412,7 @@ class OrderController extends BaseController
     {
         $this->InitParams($request);
         $city_site_id = CommonRequest::getInt($request, 'city_site_id');
-        $order_id = CommonRequest::getInt($request, 'order_id');
+        $order_id = CommonRequest::get($request, 'order_id');// 获得的最新的订单支付时间
         $operate_type = CommonRequest::getInt($request, 'operate_type');// 操作类型 1 商家 或者 店铺 2 非商家 或者 店铺
         $status = CommonRequest::get($request, 'status');// 状态, 多个用逗号,分隔 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
         if(empty($status)) $status = 2;

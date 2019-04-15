@@ -578,9 +578,10 @@ class OrdersDBBusiness extends BasePublicDBBusiness
      * @param string  $status 状态, 多个用逗号,分隔 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
      * @param int $city_site_id  城市id
      * @param array $other_where 其它条件
-     * @param int $order_id  订单id
+     * @param int $order_id  订单id  获得的最新的订单支付时间
      *            第一次为：0： 直接返回当前最大的订单id
-     *            最大订单id :  1：获得大于当前订单id的待接订单及数量，同时获得当前最大的订单id
+     *            [不用这个-改为最新的订单支付时间]最大订单id :  1：获得大于当前订单id的待接订单及数量，同时获得当前最大的订单id
+     *            最新的订单支付时间:
      * @param int  $company_id 企业id
      * @param string $send_staff_id 派送给的用户id--请求数据，可能要接单的，可为0：  非0:主要记录最近一次访问
      * @param int $operate_staff_id 操作人id
@@ -589,16 +590,19 @@ class OrdersDBBusiness extends BasePublicDBBusiness
      */
     public static function getCityWaitOrder($operate_type, $status, $city_site_id, $other_where, $order_id, $company_id, $send_staff_id, $operate_staff_id = 0){
         if(!is_numeric($city_site_id)) $city_site_id = 0;
-        if(!is_numeric($order_id)) $order_id = 0;
+        // if(!is_numeric($order_id)) $order_id = 0;
+
+        if(is_numeric($order_id)) $order_id = 0;
+
         if(!is_numeric($send_staff_id)) $send_staff_id = 0;
         if(!is_array($other_where)) $other_where = [];
         // 获得缓存中最大的订单id
-        $maxOrderDoingId = 0;// Tool::getRedis('order:maxOrderDoingId', 3);
-        if(!is_numeric($maxOrderDoingId))  $maxOrderDoingId = 0;
+        // $maxOrderDoingId = 0;// Tool::getRedis('order:maxOrderDoingId', 3);
+        // if(!is_numeric($maxOrderDoingId))  $maxOrderDoingId = 0;
 
 
         $return = [
-          'order_id' => $maxOrderDoingId,// 最新的订单id
+          'order_id' => 0,// $maxOrderDoingId,// 最新的订单id
           'city_site_id' => $city_site_id,// 城市id
           'order_num' => 0,// 待处理的订单数量
           'order_list' => [// 待处理的订单数组  ['id' => '订单id' , 'order_no'=> '订单号']
@@ -614,21 +618,29 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         }else{
             array_push($where, ['order_type', 1]);// 订单类型1普通订单/父订单4子订单
         }
+        if($city_site_id > 0 ){
+           array_push($where, ['city_site_id', '=', $city_site_id]);
+        }
 
-        if($maxOrderDoingId <= 0){// 如果缓存中的最大订单id为0,则重新查库验证
+        // if($maxOrderDoingId <= 0){// 如果缓存中的最大订单id为0,则重新查库验证
+        if(empty($order_id)){
             $queryOrderParams = [
                 'where' => [
                     // ['order_type', 1],// 订单类型1普通订单/父订单4子订单
                     //['order_no', $order_no],
                     //['pay_run_price', 1],// 是否支付跑腿费0未支付1已支付
-                    ['id', '>', $order_id],
+                    // ['id', '>', $order_id],
+                    // ['pay_time_latest', '>', $order_id],
                 ],
                 'select' => [
-                    'id'// ,'title','sort_num','volume'
+                    'id', 'pay_time_latest'// ,'title','sort_num','volume'
                 ],
-                'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+                'orderBy' => [ 'pay_time_latest'=>'desc', 'id' => 'desc'],// 'sort_num'=>'desc',
             ];
+
             if(!empty($where)) $queryOrderParams['where'] = array_merge($queryOrderParams['where'], $where);
+            if(!empty($order_id)) array_push($queryOrderParams['where'], ['pay_time_latest', '>', $order_id]);
+
             if (strpos($status, ',') === false) { // 单条
                 array_push($queryOrderParams['where'], ['status', $status]);
             } else {
@@ -636,26 +648,30 @@ class OrdersDBBusiness extends BasePublicDBBusiness
             }
             $orderInfo = OrdersDoingDBBusiness::getInfoByQuery(1, $queryOrderParams, []);
             if(!empty($orderInfo)){
-                $maxOrderDoingId = $orderInfo->id;
-                $return['order_id'] = $maxOrderDoingId;
+                // $maxOrderDoingId = $orderInfo->id;
+                // $return['order_id'] = $maxOrderDoingId;
+                $order_id = $orderInfo->pay_time_latest;
+                $return['order_id'] = $order_id;
             }
+            return $return;
         }
 
         // 请求 参数为0:第一次请求，直接返回当前最大的订单id
-        if($order_id <=0 ){
-            return $return;
-        }
+//        if($order_id <=0 ){
+//            return $return;
+//        }
 
         // 获得最新的订单
         $queryParams = [
             'where' => [
                 // ['operate_type', 1],// 订单类型1普通订单/父订单4子订单
-                ['id', '>', $order_id],
+                // ['id', '>', $order_id],
                 // ['send_staff_id', 0],
                 // ['pay_order_no',$order_no],
+                ['pay_time_latest', '>', $order_id],
             ],
-            'select' => ['id', 'order_no', 'status'],// , 'order_type', 'has_son_order', 'is_order'
-            'orderBy' => [ 'id'=>'asc'],//'sort_num'=>'desc',
+            'select' => ['id', 'order_no', 'status', 'pay_time_latest'],// , 'order_type', 'has_son_order', 'is_order'
+            'orderBy' => ['pay_time_latest'=>'asc', 'id'=>'asc'],//'sort_num'=>'desc',
         ];
         if(!empty($where)) $queryParams['where'] = array_merge($queryParams['where'], $where);
         if (strpos($status, ',') === false) { // 单条
@@ -675,11 +691,16 @@ class OrdersDBBusiness extends BasePublicDBBusiness
             }else{
                 $statusCount[$v['status']] = 1;
             }
-            if($maxOrderDoingId < $v['id']){
-                $maxOrderDoingId = $v['id'];
-                $return['order_id'] = $maxOrderDoingId;
+            if(Tool::diffDate($order_id, $v['pay_time_latest'], 1, '时间', 2) > 0){
+                $order_id = $v['pay_time_latest'];
+                $return['order_id'] = $order_id;
             }
+//            if($maxOrderDoingId < $v['id']){
+//                $maxOrderDoingId = $v['id'];
+//                $return['order_id'] = $maxOrderDoingId;
+//            }
         }
+        $return['order_list'] = $orderList;
         $return['order_num'] = count($orderList);
         $return['statusList'] = $statusList;
         $return['statusCount'] = $statusCount;

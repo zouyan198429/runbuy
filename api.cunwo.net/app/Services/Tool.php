@@ -1183,10 +1183,11 @@ class Tool
      * @param string $end_date 结束日期,默认当前时间
      * @param string $errDo 错误处理方式 1 throws 2直接返回错误
      * @param string $dateName 日期(默认); 时间
+     * @param int $reType  类型 1[默认]只返回正值 ; 2 $end_date - $begin_date ;3 $begin_date - $end_date
      * @return mixed  sting 具体错误 ； throws 错误
      * @author zouyan(305463219@qq.com)
      */
-    public static function diffDate($begin_date, $end_date = '', $errDo = 1, $dateName = '时间'){
+    public static function diffDate($begin_date, $end_date = '', $errDo = 1, $dateName = '时间', $reType = 1){
 
         if(empty($end_date)) $end_date = date('Y-m-d H:i:s');
 
@@ -1206,16 +1207,29 @@ class Tool
             return $errMsg;
         }
 
-        if($begin_date_unix <= $end_date_unix){
-            $starttime = $begin_date_unix;
-            $endtime = $end_date_unix;
-        }else{
-            $starttime = $end_date_unix;
-            $endtime = $begin_date_unix;
+        $starttime = $begin_date_unix;
+        $endtime = $end_date_unix;
+        switch($reType) {
+            case 2://  2 $end_date - $begin_date ;
+                break;
+            case 3:// 3 $begin_date - $end_date
+                $starttime = $end_date_unix;
+                $endtime = $begin_date_unix;
+                break;
+            case 1:// 1[默认]只返回正值 ;
+            default:
+                if($begin_date_unix <= $end_date_unix){
+                    $starttime = $begin_date_unix;
+                    $endtime = $end_date_unix;
+                }else{
+                    $starttime = $end_date_unix;
+                    $endtime = $begin_date_unix;
+                }
+                break;
         }
-
         //计算天数
         $timediff = $endtime - $starttime;
+
         return $timediff;
     }
 
