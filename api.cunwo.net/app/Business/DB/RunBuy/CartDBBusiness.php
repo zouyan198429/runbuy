@@ -413,7 +413,7 @@ class CartDBBusiness extends BasePublicDBBusiness
         if(!is_numeric($city_site_id) || $city_site_id <= 0) throws('城市id不能为空！');
 
         $tableware = $saveData['tableware'] ?? 0;
-        if(!is_numeric($tableware) || $tableware <= 0) throws('需要的餐具数不能为空！');
+        if(!is_numeric($tableware) || $tableware < 0) throws('需要的餐具数不能为空！');
 
         $second_num = $saveData['second_num'] ?? 0;
         if(!is_numeric($second_num) || $second_num <= 0) throws('送货速度不能为空！');
