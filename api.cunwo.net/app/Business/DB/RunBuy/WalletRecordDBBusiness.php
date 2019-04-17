@@ -940,8 +940,10 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
 
                         $orderSaveData = [
                             'total_run_price' => $total_run_price - $refund_amount,
+                            'refund_price_frozen' => $orderInfo->refund_price_frozen + $refund_amount,// 退费冻结[申请时冻结，成功/失败时减掉]
                             'has_refund' => 2,// 是否退费0未退费1已退费2待退费
                             'cancel_time' => date("Y-m-d H:i:s",time()),// 作废时间
+
                         ];
                         $order_status = $orderInfo->status;// 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
                         if(!in_array($order_status, [2,4,8])) throws('订单[' . $order_no . '] 不可进行退款操作');
@@ -1347,7 +1349,8 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
                         }
                         $total_run_price = $orderInfo->total_run_price;// 总跑腿费
 
-
+                        $refund_price_frozen = $orderInfo->refund_price_frozen - $refund_amount;// 退费冻结[申请时冻结，成功/失败时减掉]
+                        if($refund_price_frozen < 0) throws('订单[' . $order_no . '] 记录退费冻结异常');
                         // if($total_run_price < $refund_amount) throws('订单[' . $order_no . '] 总跑腿费金额不足');
                         // $leave_run_price = $total_run_price - $refund_amount;
                         $order_status = $orderInfo->status;// 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
@@ -1358,10 +1361,11 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
                             $orderSaveData = [
                                 // 'total_run_price' => $total_run_price - $refund_amount,
                                 // 'has_refund' => 1,// 是否退费0未退费1已退费2待退费
+                                'refund_price_frozen' => $refund_price_frozen,// 退费冻结[申请时冻结，成功/失败时减掉]
                                 'refund_price' =>$orderInfo->refund_price + $refund_amount,// 退费
                                 'refund_time' =>  date("Y-m-d H:i:s",time()),// 退费时间
                             ];
-                            if($wrPayInfo->amount_frozen <= 0){// 冻结<=0,才改是否退费状态
+                            if($wrPayInfo->amount_frozen <= 0 && $refund_price_frozen <= 0){// 冻结<=0,才改是否退费状态
                                 $orderSaveData['has_refund'] = 1;// 是否退费0未退费1已退费2待退费
                             }
                             if($total_run_price <= 0 && $wrPayInfo->amount_frozen <= 0){// 订单状态变为 取消状态  // 冻结<=0,才改状态
@@ -1381,10 +1385,13 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
                         }else {// 失败
                             $orderSaveData = [
                                 'total_run_price' => $total_run_price + $refund_amount,
+                                'refund_price_frozen' => $refund_price_frozen,// 退费冻结[申请时冻结，成功/失败时减掉]
                                 // 'has_refund' => 0,// 是否退费0未退费1已退费2待退费
                             ];
-                            if($wrPayInfo->amount_frozen <= 0 && $orderInfo->refund_price <= 0 ){// 冻结<=0,才改是否退费状态
+                            if($wrPayInfo->amount_frozen <= 0 && $orderInfo->refund_price <= 0 && $refund_price_frozen <= 0){// 冻结<=0,才改是否退费状态
                                 $orderSaveData['has_refund'] = 0;// 是否退费0未退费1已退费2待退费
+                            }else if($wrPayInfo->amount_frozen <= 0 && $orderInfo->refund_price > 0  && $refund_price_frozen <= 0) {
+                                $orderSaveData['has_refund'] = 1;// 是否退费0未退费1已退费2待退费
                             }
                             OrdersDBBusiness::updateOrders($orderSaveData,  $order_no, $update_type, $operate_staff_id, $operate_staff_id_history
                                 , '订单[' . $order_no . ']退款失败!' . $refund_recv_accout);

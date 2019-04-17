@@ -130,6 +130,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         // 如果有状态 待接单，则把退款中的也去掉 2等待接单
         if(strpos(',' . $status . ',', ',2,') !== false){
             array_push($where, ['has_refund', '!=', 2]); // 是否退费0未退费1已退费2待退费
+            array_push($where, ['refund_price_frozen', '<=', 0]);
         }
 
         // 数字或单条
@@ -434,6 +435,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
             if($orderInfoObj->status != 2 ) throws('订单[' . $temOrderNo . '] 非待接单状态!');
             // has_refund 是否退费0未退费1已退费2待退费
             if($orderInfoObj->has_refund == 2 ) throws('订单[' . $temOrderNo . ']待退费中 !');
+            if($orderInfoObj->refund_price_frozen > 0 ) throws('订单[' . $temOrderNo . ']还有未完成的退费!');
         }
 
         DB::beginTransaction();
@@ -461,6 +463,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
                 if($orderInfoObj->status != 2 ) throws('订单[' . $temOrderNo . '] 非待接单状态!');
                 // has_refund 是否退费0未退费1已退费2待退费
                 if($orderInfoObj->has_refund == 2 ) throws('订单[' . $temOrderNo . ']待退费中 !');
+                if($orderInfoObj->refund_price_frozen > 0 ) throws('订单[' . $temOrderNo . ']还有未完成的退费!');
 
                 $orderSaveData = [
                      'send_staff_id' => $send_staff_id,// 派送用户id
@@ -529,6 +532,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
             if($orderInfoObj->send_staff_id <= 0 ) throws('订单[' . $temOrderNo . '] 未指定派送人员!');
             if($orderInfoObj->status != 4 ) throws('订单[' . $temOrderNo . '] 非取货或配送中状态!');
             if($orderInfoObj->has_refund == 2 ) throws('订单[' . $temOrderNo . ']待退费中 !');
+            if($orderInfoObj->refund_price_frozen > 0 ) throws('订单[' . $temOrderNo . ']还有未完成的退费!');
         }
 
         DB::beginTransaction();
@@ -545,6 +549,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
                 if($orderInfoObj->send_staff_id <= 0 ) throws('订单[' . $temOrderNo . '] 未指定派送人员!');
                 if($orderInfoObj->status != 4 ) throws('订单[' . $temOrderNo . '] 非取货或配送中状态!');
                 if($orderInfoObj->has_refund == 2 ) throws('订单[' . $temOrderNo . ']待退费中 !');
+                if($orderInfoObj->refund_price_frozen > 0 ) throws('订单[' . $temOrderNo . ']还有未完成的退费!');
                 array_push($order_no_arr, $orderInfoObj->order_no);
                 // 订单统计数据
                 CountOrdersGrabDBBusiness::createOrderGrab($orderInfoObj, $operate_staff_id , $operate_staff_id_history);
