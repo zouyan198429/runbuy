@@ -199,6 +199,40 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
             $data_list[$k]['parent_order_no_format'] = Tool::formatStrMiddle($parent_order_no, ' ', 4);
             if($has_son_order == 1 ) array_push($parentOrderNos, $order_no);
 
+            if(isset($v['total_price'])) $data_list[$k]['total_price_format'] = Tool::formatMoney($v['total_price'], 2, '');
+            if(isset($v['total_run_price'])) $data_list[$k]['total_run_price_format'] = Tool::formatMoney($v['total_run_price'], 2, '');
+            if(isset($v['pay_run_amount'])) $data_list[$k]['pay_run_amount_format'] = Tool::formatMoney($v['pay_run_amount'], 2, '');
+
+            $send_end_time_format = '';
+            if(isset($v['send_end_time']) && !empty($v['send_end_time'])){
+                $send_end_time_format = judgeDate($v['send_end_time'],'m-d H:i');
+            }
+            $data_list[$k]['send_end_time_format'] = $send_end_time_format;
+
+            $created_at_format = '';
+            if(isset($v['created_at']) && !empty($v['created_at'])){
+                $created_at_format = judgeDate($v['created_at'],'m-d H:i');
+            }
+            $data_list[$k]['created_at_format'] = $created_at_format;
+
+            $order_time_format = '';
+            if(isset($v['order_time']) && !empty($v['order_time'])){
+                $order_time_format = judgeDate($v['order_time'],'m-d H:i');
+            }
+            $data_list[$k]['order_time_format'] = $order_time_format;
+
+            $receipt_time_format = '';
+            if(isset($v['receipt_time']) && !empty($v['receipt_time'])){
+                $receipt_time_format = judgeDate($v['receipt_time'],'m-d H:i');
+            }
+            $data_list[$k]['receipt_time_format'] = $receipt_time_format;
+
+            $finish_time_format = '';
+            if(isset($v['finish_time']) && !empty($v['finish_time'])){
+                $finish_time_format = judgeDate($v['finish_time'],'m-d H:i');
+            }
+            $data_list[$k]['finish_time_format'] = $finish_time_format;
+
             // 收货地址
             if(isset($v['addr_history']) && !empty($v['addr_history'])){
                 $addr_history = $v['addr_history'] ?? [];
@@ -278,13 +312,15 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
                 $data_list[$k]['shop'] = Tool::formatArrKeys($shop_history
                     , Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile', 'tel', 'addr', 'longitude', 'latitude']), true );
             }
-
             // 商品
             if(isset($v['orders_goods']) && !empty($v['orders_goods'])) {
                 $formatGoods = [];
                 $orders_goods = $v['orders_goods'] ?? [];
                 unset($data_list[$k]['orders_goods']);
                 foreach($orders_goods as $gK =>$goodInfo){
+                    $goodInfo['price_format'] = Tool::formatMoney($goodInfo['price'], 2, '');
+
+                    $goodInfo['total_price_format'] = Tool::formatMoney($goodInfo['total_price'], 2, '');
                     // 商品名称
                     if(isset($goodInfo['goods_history']) && !empty($goodInfo['goods_history'])) {
                         $goodsHistory = $goodInfo['goods_history'] ?? [];
@@ -323,8 +359,10 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
                     $goodInfo['prop'] = array_values($formatProps);
 
                     array_push($formatGoods, Tool::formatArrKeys($goodInfo
-                        , Tool::arrEqualKeyVal(['goods_id', 'goods_name', 'price', 'amount', 'total_price', 'resource_url'
+                        , Tool::arrEqualKeyVal(['goods_id', 'goods_name', 'price', 'price_format', 'amount', 'total_price', 'total_price_format', 'resource_url'
                             , 'pricePropName', 'pricePropValName', 'prop']), true ));
+
+
                     $data_list[$k]['orders_goods'] = $formatGoods;
                 }
 
