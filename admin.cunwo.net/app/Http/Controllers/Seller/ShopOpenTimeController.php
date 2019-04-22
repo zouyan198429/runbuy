@@ -110,14 +110,12 @@ class ShopOpenTimeController extends WorksController
         $id = CommonRequest::getInt($request, 'id');
         // CommonRequest::judgeEmptyParams($request, 'id', $id);
         $shop_id = CommonRequest::getInt($request, 'shop_id');
-        $type_name = CommonRequest::get($request, 'type_name');
-        $sort_num = CommonRequest::getInt($request, 'sort_num');
+        $is_open = CommonRequest::get($request, 'is_open');
         $range_time = CommonRequest::get($request, 'range_time');
 
         $saveData = [
             'shop_id' => $shop_id,
-            'type_name' => $type_name,
-            'sort_num' => $sort_num,
+            'is_open' => $is_open,
         ];
         // 经营时间
         $timeArr = explode('-',$range_time);

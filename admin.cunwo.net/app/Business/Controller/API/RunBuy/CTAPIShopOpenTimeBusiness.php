@@ -337,40 +337,48 @@ class CTAPIShopOpenTimeBusiness extends BasicPublicCTAPIBusiness
     public static function replaceById(Request $request, Controller $controller, $saveData, &$id, $modifAddOprate = false, $notLog = 0){
         $company_id = $controller->company_id;
         $user_id = $controller->user_id;
-        throws('正在处理保存！');
-        if(isset($saveData['type_name']) && empty($saveData['type_name'])  ){
-            throws('类型名称不能为空！');
-        }
-
-        // 调用新加或修改接口
-        $apiParams = [
-            'saveData' => $saveData,
-            'company_id' => $company_id,
-            'id' => $id,
-            'operate_staff_id' => $user_id,
-            'modifAddOprate' => 0,
-        ];
-        $id = static::exeDBBusinessMethodCT($request, $controller, '',  'replaceById', $apiParams, $company_id, $notLog);
-        return $id;
-//        if($id > 0){
-//            // 判断权限
-////            $judgeData = [
-////                'company_id' => $company_id,
-////            ];
-////            $relations = '';
-////            static::judgePower($request, $controller, $id, $judgeData, '', $company_id, $relations, $notLog);
-//            if($modifAddOprate) static::addOprate($request, $controller, $saveData);
-//
-//        }else {// 新加;要加入的特别字段
-//            $addNewData = [
-//             //   'company_id' => $company_id,
-//            ];
-//            $saveData = array_merge($saveData, $addNewData);
-//            // 加入操作人员信息
-//            static::addOprate($request, $controller, $saveData);
+//        throws('正在处理保存！');
+//        if(isset($saveData['type_name']) && empty($saveData['type_name'])  ){
+//            throws('类型名称不能为空！');
 //        }
-//        // 新加或修改
-//        return static::replaceByIdBase($request, $controller, '', $saveData, $id, $notLog);
+//
+//        // 调用新加或修改接口
+//        $apiParams = [
+//            'saveData' => $saveData,
+//            'company_id' => $company_id,
+//            'id' => $id,
+//            'operate_staff_id' => $user_id,
+//            'modifAddOprate' => 0,
+//        ];
+//        $id = static::exeDBBusinessMethodCT($request, $controller, '',  'replaceById', $apiParams, $company_id, $notLog);
+//        return $id;
+        $shop_id = $saveData['shop_id'] ?? 0;
+        if($shop_id > 0){
+            $shopInfo = CTAPIShopBusiness::getInfoData($request, $controller, $shop_id,['id', 'city_site_id', 'city_partner_id', 'seller_id']);
+            if(empty($shopInfo)) throws('店铺不存在！');
+            $saveData['city_site_id'] = $shopInfo['city_site_id'];
+            $saveData['city_partner_id'] = $shopInfo['city_partner_id'];
+            $saveData['seller_id'] = $shopInfo['seller_id'];
+        }
+        if($id > 0){
+            // 判断权限
+//            $judgeData = [
+//                'company_id' => $company_id,
+//            ];
+//            $relations = '';
+//            static::judgePower($request, $controller, $id, $judgeData, '', $company_id, $relations, $notLog);
+            if($modifAddOprate) static::addOprate($request, $controller, $saveData);
+
+        }else {// 新加;要加入的特别字段
+            $addNewData = [
+             //   'company_id' => $company_id,
+            ];
+            $saveData = array_merge($saveData, $addNewData);
+            // 加入操作人员信息
+            static::addOprate($request, $controller, $saveData);
+        }
+        // 新加或修改
+        return static::replaceByIdBase($request, $controller, '', $saveData, $id, $notLog);
     }
 
     // ***********导入***开始************************************************************
