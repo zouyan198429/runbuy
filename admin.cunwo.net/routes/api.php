@@ -188,6 +188,7 @@ Route::post('admin/shopGoods/import', 'Admin\ShopGoodsController@import');// 导
 Route::post('admin/shopGoods/ajax_get_ids', 'Admin\ShopGoodsController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
 Route::any('admin/shopGoods/ajax_selected', 'Admin\ShopGoodsController@ajax_selected');//ajax选择中记录/更新记录
+
 //店铺商品分类[一级分类]
 Route::post('admin/shopGoodsType/ajax_alist', 'Admin\ShopGoodsTypeController@ajax_alist');//ajax获得列表数据
 Route::post('admin/shopGoodsType/ajax_del', 'Admin\ShopGoodsTypeController@ajax_del');// 删除
@@ -199,6 +200,19 @@ Route::any('admin/shopGoodsType/ajax_get_kv', 'Admin\ShopGoodsTypeController@aja
 
 Route::post('admin/shopGoodsType/import', 'Admin\ShopGoodsTypeController@import');// 导入excel
 Route::post('admin/shopGoodsType/ajax_get_ids', 'Admin\ShopGoodsTypeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
+
+//店铺营业时间
+Route::post('admin/shopOpenTime/ajax_alist', 'Admin\ShopOpenTimeController@ajax_alist');//ajax获得列表数据
+Route::post('admin/shopOpenTime/ajax_del', 'Admin\ShopOpenTimeController@ajax_del');// 删除
+Route::post('admin/shopOpenTime/ajax_save', 'Admin\ShopOpenTimeController@ajax_save');// 新加/修改
+Route::post('admin/shopOpenTime/ajax_get_child', 'Admin\ShopOpenTimeController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('admin/shopOpenTime/ajax_get_areachild', 'Admin\ShopOpenTimeController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('admin/shopOpenTime/ajax_import_staff','Admin\ShopOpenTimeController@ajax_import'); // 导入员工
+Route::any('admin/shopOpenTime/ajax_get_kv', 'Admin\ShopOpenTimeController@ajax_get_kv');// 根据店铺id，获得店铺分类信息
+
+Route::post('admin/shopOpenTime/import', 'Admin\ShopOpenTimeController@import');// 导入excel
+Route::post('admin/shopOpenTime/ajax_get_ids', 'Admin\ShopOpenTimeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
 //站点介绍
 Route::post('admin/siteIntro/ajax_alist', 'Admin\SiteIntroController@ajax_alist');//ajax获得列表数据
@@ -452,6 +466,18 @@ Route::any('city/shopGoodsType/ajax_get_kv', 'City\ShopGoodsTypeController@ajax_
 Route::post('city/shopGoodsType/import', 'City\ShopGoodsTypeController@import');// 导入excel
 Route::post('city/shopGoodsType/ajax_get_ids', 'City\ShopGoodsTypeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
+//店铺营业时间
+Route::post('city/shopOpenTime/ajax_alist', 'City\ShopOpenTimeController@ajax_alist');//ajax获得列表数据
+Route::post('city/shopOpenTime/ajax_del', 'City\ShopOpenTimeController@ajax_del');// 删除
+Route::post('city/shopOpenTime/ajax_save', 'City\ShopOpenTimeController@ajax_save');// 新加/修改
+Route::post('city/shopOpenTime/ajax_get_child', 'City\ShopOpenTimeController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('city/shopOpenTime/ajax_get_areachild', 'City\ShopOpenTimeController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('city/shopOpenTime/ajax_import_staff','City\ShopOpenTimeController@ajax_import'); // 导入员工
+Route::any('city/shopOpenTime/ajax_get_kv', 'City\ShopOpenTimeController@ajax_get_kv');// 根据店铺id，获得店铺分类信息
+
+Route::post('city/shopOpenTime/import', 'City\ShopOpenTimeController@import');// 导入excel
+Route::post('city/shopOpenTime/ajax_get_ids', 'City\ShopOpenTimeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
 //站点介绍
 //Route::post('city/siteIntro/ajax_alist', 'City\SiteIntroController@ajax_alist');//ajax获得列表数据
 //Route::post('city/siteIntro/ajax_del', 'City\SiteIntroController@ajax_del');// 删除
@@ -676,6 +702,19 @@ Route::any('seller/shopGoodsType/ajax_get_kv', 'Seller\ShopGoodsTypeController@a
 
 Route::post('seller/shopGoodsType/import', 'Seller\ShopGoodsTypeController@import');// 导入excel
 Route::post('seller/shopGoodsType/ajax_get_ids', 'Seller\ShopGoodsTypeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
+//店铺营业时间
+Route::post('seller/shopOpenTime/ajax_alist', 'Seller\ShopOpenTimeController@ajax_alist');//ajax获得列表数据
+Route::post('seller/shopOpenTime/ajax_del', 'Seller\ShopOpenTimeController@ajax_del');// 删除
+Route::post('seller/shopOpenTime/ajax_save', 'Seller\ShopOpenTimeController@ajax_save');// 新加/修改
+Route::post('seller/shopOpenTime/ajax_get_child', 'Seller\ShopOpenTimeController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('seller/shopOpenTime/ajax_get_areachild', 'Seller\ShopOpenTimeController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('seller/shopOpenTime/ajax_import_staff','Seller\ShopOpenTimeController@ajax_import'); // 导入员工
+Route::any('seller/shopOpenTime/ajax_get_kv', 'Seller\ShopOpenTimeController@ajax_get_kv');// 根据店铺id，获得店铺分类信息
+
+Route::post('seller/shopOpenTime/import', 'Seller\ShopOpenTimeController@import');// 导入excel
+Route::post('seller/shopOpenTime/ajax_get_ids', 'Seller\ShopOpenTimeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
 
 //站点介绍
 //Route::post('seller/siteIntro/ajax_alist', 'Seller\SiteIntroController@ajax_alist');//ajax获得列表数据
@@ -902,6 +941,20 @@ Route::any('shop/shopGoodsType/ajax_get_kv', 'Shop\ShopGoodsTypeController@ajax_
 
 Route::post('shop/shopGoodsType/import', 'Shop\ShopGoodsTypeController@import');// 导入excel
 Route::post('shop/shopGoodsType/ajax_get_ids', 'Shop\ShopGoodsTypeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
+
+//店铺营业时间
+Route::post('shop/shopOpenTime/ajax_alist', 'Shop\ShopOpenTimeController@ajax_alist');//ajax获得列表数据
+Route::post('shop/shopOpenTime/ajax_del', 'Shop\ShopOpenTimeController@ajax_del');// 删除
+Route::post('shop/shopOpenTime/ajax_save', 'Shop\ShopOpenTimeController@ajax_save');// 新加/修改
+Route::post('shop/shopOpenTime/ajax_get_child', 'Shop\ShopOpenTimeController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('shop/shopOpenTime/ajax_get_areachild', 'Shop\ShopOpenTimeController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('shop/shopOpenTime/ajax_import_staff','Shop\ShopOpenTimeController@ajax_import'); // 导入员工
+Route::any('shop/shopOpenTime/ajax_get_kv', 'Shop\ShopOpenTimeController@ajax_get_kv');// 根据店铺id，获得店铺分类信息
+
+Route::post('shop/shopOpenTime/import', 'Shop\ShopOpenTimeController@import');// 导入excel
+Route::post('shop/shopOpenTime/ajax_get_ids', 'Shop\ShopOpenTimeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
 
 //站点介绍
 //Route::post('shop/siteIntro/ajax_alist', 'Shop\SiteIntroController@ajax_alist');//ajax获得列表数据

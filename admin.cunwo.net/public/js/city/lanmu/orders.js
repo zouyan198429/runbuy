@@ -87,12 +87,18 @@ function initPic(){
 function ajax_status_count(from_id ,staff_id, operate_staff_id){
     // if (!SUBMIT_FORM) return false;//false，则返回
 
+    append_sure_form(SURE_FRM_IDS,FRM_IDS);//把搜索表单值转换到可以查询用的表单中
+    //获得表单各name的值
+    var data = get_frm_values(SURE_FRM_IDS);
     // 验证通过
     // SUBMIT_FORM = false;//标记为已经提交过
-    var data = {
-        'staff_id': staff_id,
-        'operate_staff_id': operate_staff_id,
-    };
+    // var data = {
+    //     'staff_id': staff_id,
+    //     'operate_staff_id': operate_staff_id,
+    // };
+    data.staff_id = staff_id;
+    data.operate_staff_id = operate_staff_id;
+    delete data.status;
     console.log(SATUS_COUNT_URL);
     console.log(data);
     if( from_id == 0)  var layer_count_index = layer.load();
@@ -226,8 +232,8 @@ function cancelOrder(order_no,pay_type){
     document.write("            <span><%=item.created_at%><\/span>");
     document.write("            <span>订单号:<%=item.order_no_format%><\/span>");
     document.write("            <span class=\"shop\"><%=item.addr.addr%>  <%=item.addr.real_name%>(<%=item.addr.mobile_format%>)<\/span>");
-    document.write("            <span>餐具数量:<%=item.tableware%>份<\/span>");
-    document.write("            <span>希望速度:<%=item.second_num%>分钟<\/span>");
+    // document.write("            <span>餐具数量:<%=item.tableware%>份<\/span>");
+    document.write("            <span>希望速度:<%=item.second_num%>分钟(<%=item.send_end_time%>)<\/span>");
     document.write("            <span>商品金额:<%=item.total_price%>元(共<%=item.total_amount%>份)<\/span>");
     document.write("            <span>跑腿费:<%=item.pay_run_amount%>元(<%=item.pay_run_price_text%>)<\/span>");
     document.write("            <span>退费:<%=item.refund_price%>元(<%=item.has_refund_text%>)<\/span>");

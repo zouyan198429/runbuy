@@ -613,7 +613,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
 
 
         $return = [
-          'order_id' => 0,// $maxOrderDoingId,// 最新的订单id
+          'order_id' => date("Y-m-d H:i:s",time()),// $maxOrderDoingId,// 最新的订单id
           'city_site_id' => $city_site_id,// 城市id
           'order_num' => 0,// 待处理的订单数量
           'order_list' => [// 待处理的订单数组  ['id' => '订单id' , 'order_no'=> '订单号']
@@ -658,11 +658,13 @@ class OrdersDBBusiness extends BasePublicDBBusiness
                 $queryOrderParams['whereIn']['status'] = explode(',', $status);
             }
             $orderInfo = OrdersDoingDBBusiness::getInfoByQuery(1, $queryOrderParams, []);
-            if(!empty($orderInfo)){
+            if(!empty($orderInfo)){//  有记录
                 // $maxOrderDoingId = $orderInfo->id;
                 // $return['order_id'] = $maxOrderDoingId;
                 $order_id = $orderInfo->pay_time_latest;
                 $return['order_id'] = $order_id;
+            //}else{// 没有记录,则当前时间
+            //    $return['order_id'] = date("Y-m-d H:i:s",time());
             }
             return $return;
         }
@@ -692,7 +694,10 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         }
 
         $orderList = OrdersDoingDBBusiness::getAllList($queryParams, [])->toArray();
-        if(empty($orderList)) return $return;
+        if(empty($orderList)){ // 没有记录,则当前时间
+            // $return['order_id'] = date("Y-m-d H:i:s",time());
+            return $return;
+        }
         $statusCount = [];
         $statusList = [];
         foreach($orderList as $v){
@@ -715,6 +720,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         $return['order_num'] = count($orderList);
         $return['statusList'] = $statusList;
         $return['statusCount'] = $statusCount;
+
 
         return $return;
     }

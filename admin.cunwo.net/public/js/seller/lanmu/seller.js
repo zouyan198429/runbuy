@@ -87,8 +87,8 @@ var otheraction = {
         return false;
     },
     orders: function(obj, city_site_id, city_partner_id, seller_id, text){// 订单管理
-        layer_alert("正在开发中...",3,0);
-        return false;
+        // layer_alert("正在开发中...",3,0);
+        // return false;
         var obj = $(obj);
         var href = ORDERS_LIST_URL + '?city_site_id=' + city_site_id + '&city_partner_id=' + city_partner_id + '&seller_id=' + seller_id;//
         layuiGoIframe(href, text);

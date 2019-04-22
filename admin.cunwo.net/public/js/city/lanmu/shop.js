@@ -98,10 +98,16 @@ var otheraction = {
         return false;
     },
     orders: function(obj, city_site_id, city_partner_id, seller_id, shop_id, text){// 订单管理
-        layer_alert("正在开发中...",3,0);
-        return false;
+        // layer_alert("正在开发中...",3,0);
+        // return false;
         var obj = $(obj);
         var href = ORDERS_LIST_URL + '?city_site_id=' + city_site_id + '&city_partner_id=' + city_partner_id + '&seller_id=' + seller_id + '&shop_id=' + shop_id;//
+        layuiGoIframe(href, text);
+        return false;
+    },
+    openTime: function(obj, city_site_id, city_partner_id, seller_id, shop_id, text){// 营业时间管理
+        var obj = $(obj);
+        var href = OPEN_TIME_LIST_URL + '?city_site_id=' + city_site_id + '&city_partner_id=' + city_partner_id + '&seller_id=' + seller_id + '&shop_id=' + shop_id;//
         layuiGoIframe(href, text);
         return false;
     },
@@ -147,8 +153,12 @@ var otheraction = {
     document.write("           <\/td>");
     // document.write("            <td><%=item.type_name%><\/td>");
     document.write("            <td><%=item.type_name%><hr/><%=item.labelNnames%><\/td>");
-    document.write("            <td><%=item.sales_volume%><hr/><%=item.mon_sales_volume%><\/td>");
-    document.write("            <td><%=item.open_time%><hr/><%=item.close_time%><hr/><%=item.last_update%><\/td>");
+    document.write("            <td><%=item.sales_volume%><hr/><%=item.mon_sales_volume%><hr/><%=item.last_update%><\/td>");
+    document.write("           <td>");
+    document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.openTime(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.seller_id%>,<%=item.id%>,'<%=item.shop_name%>-营业时间管理')\">");
+    document.write("                    <i class=\"ace-icon fa fa-clock-o bigger-60\"> 营业时间<\/i>");
+    document.write("                <\/a>");
+    document.write("           <\/td>");
     document.write("            <td><%=item.sort_num%><hr/><%=item.per_price%><\/td>");
     // document.write("            <td><%=item.intro%><\/td>");
     document.write("            <td>");

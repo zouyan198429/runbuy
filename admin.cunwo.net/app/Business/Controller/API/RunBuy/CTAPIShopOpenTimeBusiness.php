@@ -1,19 +1,22 @@
 <?php
-// 钱包操作记录
+// 店铺营业时间
 namespace App\Business\Controller\API\RunBuy;
 
 use App\Services\Excel\ImportExport;
-use App\Services\pay\weixin\easyWechatPay;
 use App\Services\Request\API\HttpRequest;
 use App\Services\Tool;
 use Illuminate\Http\Request;
 use App\Services\Request\CommonRequest;
 use App\Http\Controllers\BaseController as Controller;
-use Illuminate\Support\Facades\Log;
-
-class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
+class CTAPIShopOpenTimeBusiness extends BasicPublicCTAPIBusiness
 {
-    public static $model_name = 'API\RunBuy\WalletRecordAPI';
+    public static $model_name = 'API\RunBuy\ShopOpenTimeAPI';
+
+    // 是否开启1未开启2已开启
+    public static $isOpenArr = [
+        '1' => '未开启',
+        '2' => '已开启',
+    ];
 
     /**
      * 获得列表数据--所有数据
@@ -54,7 +57,7 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
 //                //,'operate_staff_id','operate_staff_id_history'
 //                ,'created_at'
 //            ],
-            'orderBy' => [ 'id'=>'desc'],// 'sort_num'=>'desc',
+            'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],//
         ];// 查询条件参数
         if(empty($queryParams)){
             $queryParams = $defaultQueryParams;
@@ -74,56 +77,21 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
             // $params = self::formatListParams($request, $controller, $queryParams);
 //            $province_id = CommonRequest::getInt($request, 'province_id');
 //            if($province_id > 0 )  array_push($queryParams['where'], ['city_ids', 'like', '' . $province_id . ',%']);
-            $staff_id = CommonRequest::getInt($request, 'staff_id');
-            if($staff_id > 0 )  array_push($queryParams['where'], ['staff_id', '=', $staff_id]);
 
-            $operate_type = CommonRequest::get($request, 'operate_type');
-            if (!empty($operate_type)) {
-                if (strpos($operate_type, ',') === false) { // 单条
-                    array_push($queryParams['where'], ['operate_type', $operate_type]);
-                } else {
-                    $queryParams['whereIn']['operate_type'] = explode(',', $operate_type);
-                }
-            }
+            $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+            if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
 
-            $pay_config_id = CommonRequest::getInt($request, 'pay_config_id');
-            if($pay_config_id > 0 )  array_push($queryParams['where'], ['pay_config_id', '=', $pay_config_id]);
+            $city_partner_id = CommonRequest::getInt($request, 'city_partner_id');
+            if($city_partner_id > 0 )  array_push($queryParams['where'], ['city_partner_id', '=', $city_partner_id]);
 
-            $pay_type = CommonRequest::get($request, 'pay_type');
-            if (!empty($pay_type)) {
-                if (strpos($pay_type, ',') === false) { // 单条
-                    array_push($queryParams['where'], ['pay_type', $pay_type]);
-                } else {
-                    $queryParams['whereIn']['pay_type'] = explode(',', $pay_type);
-                }
-            }
+            $seller_id = CommonRequest::getInt($request, 'seller_id');
+            if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);
 
-            $pay_order_no = CommonRequest::get($request, 'pay_order_no');
-            if(!empty($pay_order_no))  array_push($queryParams['where'], ['pay_order_no', '=', $pay_order_no]);
+            $shop_id = CommonRequest::getInt($request, 'shop_id');
+            if($shop_id > 0 )  array_push($queryParams['where'], ['shop_id', '=', $shop_id]);
 
-            $my_order_no_old = CommonRequest::get($request, 'my_order_no_old');
-            if(!empty($my_order_no_old))  array_push($queryParams['where'], ['my_order_no_old', '=', $my_order_no_old]);
-
-            $my_order_no = CommonRequest::get($request, 'my_order_no');
-            if(!empty($my_order_no))  array_push($queryParams['where'], ['my_order_no', '=', $my_order_no]);
-
-            $third_order_no_old = CommonRequest::get($request, 'third_order_no_old');
-            if(!empty($third_order_no_old))  array_push($queryParams['where'], ['third_order_no_old', '=', $third_order_no_old]);
-
-            $third_order_no = CommonRequest::get($request, 'third_order_no');
-            if(!empty($third_order_no))  array_push($queryParams['where'], ['third_order_no', '=', $third_order_no]);
-
-            $status = CommonRequest::get($request, 'status');
-            if (!empty($status)) {
-                if (strpos($status, ',') === false) { // 单条
-                    array_push($queryParams['where'], ['status', $status]);
-                } else {
-                    $queryParams['whereIn']['status'] = explode(',', $status);
-                }
-            }
-
-            $operate_staff_id = CommonRequest::getInt($request, 'operate_staff_id');
-            if($operate_staff_id > 0 )  array_push($queryParams['where'], ['operate_staff_id', '=', $operate_staff_id]);
+            $is_open = CommonRequest::getInt($request, 'is_open');
+            if($is_open > 0 )  array_push($queryParams['where'], ['is_open', '=', $is_open]);
 
 
             $field = CommonRequest::get($request, 'field');
@@ -148,17 +116,27 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
         $result = static::getBaseListData($request, $controller, '', $queryParams, $relations , $oprateBit, $notLog);
 
         // 格式化数据
-//        $data_list = $result['data_list'] ?? [];
-//        foreach($data_list as $k => $v){
-//            // 所属人员
-//            $data_list[$k]['nickname'] = $v['staff']['nickname'] ?? '';
-//            $data_list[$k]['staff_id'] = $v['staff']['id'] ?? 0;
-//            if(isset($data_list[$k]['staff'])) unset($data_list[$k]['staff']);
-//            // 公司名称
-//            $data_list[$k]['company_name'] = $v['company_info']['company_name'] ?? '';
-//            if(isset($data_list[$k]['company_info'])) unset($data_list[$k]['company_info']);
-//        }
-//        $result['data_list'] = $data_list;
+        $data_list = $result['data_list'] ?? [];
+        foreach($data_list as $k => $v){
+            // 城市分站名称
+            $data_list[$k]['site_name'] = $v['city']['city_name'] ?? '';
+            // $data_list[$k]['site_id'] = $v['city']['id'] ?? 0;
+            if(isset($data_list[$k]['city'])) unset($data_list[$k]['city']);
+            // 城市城市合伙人
+            $data_list[$k]['partner_name'] = $v['city_partner']['partner_name'] ?? '';
+            // $data_list[$k]['partner_id'] = $v['city_partner']['id'] ?? 0;
+            if(isset($data_list[$k]['city_partner'])) unset($data_list[$k]['city_partner']);
+
+            // 商家
+            $data_list[$k]['seller_name'] = $v['seller']['seller_name'] ?? '';
+            // $data_list[$k]['seller_id'] = $v['seller']['id'] ?? 0;
+            if(isset($data_list[$k]['seller'])) unset($data_list[$k]['seller']);
+            // 铺店
+            $data_list[$k]['shop_name'] = $v['shop']['shop_name'] ?? '';
+            // $data_list[$k]['shop_id'] = $v['shop']['id'] ?? 0;
+            if(isset($data_list[$k]['shop'])) unset($data_list[$k]['shop']);
+        }
+        $result['data_list'] = $data_list;
         // 导出功能
         if($isExport == 1){
 //            $headArr = ['work_num'=>'工号', 'department_name'=>'部门'];
@@ -192,6 +170,23 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
 //            'id' => $company_id,
 //        ];
 //        static::judgePowerByObj($request, $controller, $info, $judgeData );
+        // 店铺
+        $shop_name = $info['shop_history']['shop_name'] ?? '';
+        if(empty($shop_name)) $shop_name = $info['shop']['shop_name'] ?? '';
+        $info['shop_name'] = $shop_name;
+        $now_shop_state = 0;// 最新的商家 0没有变化 ;1 已经删除  2 试卷不同
+        if(isset($info['shop_history']) && isset($info['shop'])){
+            $history_version_num = $info['shop_history']['version_num'] ?? '';
+            $version_num = $info['shop']['version_num'] ?? '';
+            if(empty($info['shop'])){
+                $now_shop_state = 1;
+            }elseif($version_num != '' && $history_version_num != $version_num){
+                $now_shop_state = 2;
+            }
+        }
+        if(isset($info['shop_history'])) unset($info['shop_history']);
+        if(isset($info['shop'])) unset($info['shop']);
+        $info['now_shop_state'] = $now_shop_state;
         return $info;
     }
 
@@ -246,7 +241,7 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
         // 前**条[默认]
         $defaultQueryParams = [
             'where' => [
-                //  ['company_id', $company_id],
+                // ['company_id', $company_id],
 //                ['id', '>', $id],
             ],
 //            'select' => [
@@ -342,9 +337,10 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
     public static function replaceById(Request $request, Controller $controller, $saveData, &$id, $modifAddOprate = false, $notLog = 0){
         $company_id = $controller->company_id;
         $user_id = $controller->user_id;
-//        if(isset($saveData['real_name']) && empty($saveData['real_name'])  ){
-//            throws('联系人不能为空！');
-//        }
+        throws('正在处理保存！');
+        if(isset($saveData['type_name']) && empty($saveData['type_name'])  ){
+            throws('类型名称不能为空！');
+        }
 
         // 调用新加或修改接口
         $apiParams = [
@@ -356,7 +352,6 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
         ];
         $id = static::exeDBBusinessMethodCT($request, $controller, '',  'replaceById', $apiParams, $company_id, $notLog);
         return $id;
-//        $company_id = $controller->company_id;
 //        if($id > 0){
 //            // 判断权限
 ////            $judgeData = [
@@ -368,7 +363,7 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
 //
 //        }else {// 新加;要加入的特别字段
 //            $addNewData = [
-//                //  'company_id' => $company_id,
+//             //   'company_id' => $company_id,
 //            ];
 //            $saveData = array_merge($saveData, $addNewData);
 //            // 加入操作人员信息
@@ -451,11 +446,11 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
     // 根据父id,获得子数据kv数组
     public static function getCityByPid(Request $request, Controller $controller, $parent_id = 0, $notLog = 0){
         $company_id = $controller->company_id;
-        $kvParams = ['key' => 'id', 'val' => 'type_name'];
+        $kvParams = ['key' => 'id', 'val' => 'city_name'];
         $queryParams = [
             'where' => [
                 // ['id', '&' , '16=16'],
-                //    ['parent_id', '=', $parent_id],
+                ['parent_id', '=', $parent_id],
                 //['mobile', $keyword],
                 //['admin_type',self::$admin_type],
             ],
@@ -465,7 +460,7 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
 //            'select' => [
 //                'id','company_id','type_name','sort_num'
 //            ],
-            'orderBy' => [ 'id'=>'desc'],// 'sort_num'=>'desc',
+            'orderBy' => ['sort_num'=>'desc', 'id'=>'asc'],
         ];
         return static::getKVCT( $request,  $controller, '', $kvParams, [], $queryParams, $company_id, $notLog);
     }
@@ -473,6 +468,7 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
     // 根据父id,获得子数据kv数组
     public static function getListKV(Request $request, Controller $controller, $notLog = 0){
         $company_id = $controller->company_id;
+
         $kvParams = ['key' => 'id', 'val' => 'type_name'];
         $queryParams = [
             'where' => [
@@ -487,8 +483,14 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
 //            'select' => [
 //                'id','company_id','type_name','sort_num'
 //            ],
-            'orderBy' => [ 'id'=>'desc'],// 'sort_num'=>'desc',
+            'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],
         ];
+        $seller_id = CommonRequest::getInt($request, 'seller_id');
+        if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);
+
+        $shop_id = CommonRequest::getInt($request, 'shop_id');
+        if($shop_id > 0 )  array_push($queryParams['where'], ['shop_id', '=', $shop_id]);
+
         return static::getKVCT( $request,  $controller, '', $kvParams, [], $queryParams, $company_id, $notLog);
     }
     // ***********获得kv***结束************************************************************
@@ -531,10 +533,10 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
                 ['parent_id', $pid],
             ],
             'select' => [
-                'id','city_name'// ,'sort_num'
+                'id','city_name','sort_num'
                 //,'operate_staff_id','operate_staff_history_id'
             ],
-            'orderBy' => ['id'=>'asc'],// 'sort_num'=>'desc',
+            'orderBy' => ['sort_num'=>'desc','id'=>'asc'],
         ];// 查询条件参数
         // $relations = ['CompanyInfo'];// 关系
         $relations = '';//['CompanyInfo'];// 关系
@@ -551,306 +553,5 @@ class CTAPIWalletRecordBusiness extends BasicPublicCTAPIBusiness
     }
     // ***********通过组织条件获得kv***结束************************************************************
 
-    /**
-     * 支付订单跑腿费或追加订单跑腿费
-     *
-     * @param Request $request 请求信息
-     * @param Controller $controller 控制对象
-     * @param array $params 参数
-        $params = [
-            'pay_type' => 1, // 支付类型 1 订单支付跑腿费 2 订单追加跑腿费
-            'amount' => 10,// 追加跑腿费 单位元
-        ];
-     * @param string $order_no 订单号
-     * @param int $notLog 是否需要登陆 0需要1不需要
-     * @return  array
-        $returnArr = [
-            'body' => '支付说明',
-            'total_fee' => '支付金额，单位元',
-            'out_trade_no' => '支付单号-我方',
-        ];
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function payOrder(Request $request, Controller $controller, $params, $order_no, $notLog = 0)
-    {
-        $company_id = $controller->company_id;
-        $user_id = $controller->user_id;
-//        if(isset($saveData['real_name']) && empty($saveData['real_name'])  ){
-//            throws('联系人不能为空！');
-//        }
-
-        // 调用新加或修改接口
-        $apiParams = [
-            'params' => $params,
-            'company_id' => $company_id,
-            'order_no' => $order_no,
-            'operate_staff_id' => $user_id,
-        ];
-        $result = static::exeDBBusinessMethodCT($request, $controller, '', 'payOrder', $apiParams, $company_id, $notLog);
-        return $result;
-    }
-
-    /**
-     * 支付回调--微信
-     *
-     * @param Request $request 请求信息
-     * @param Controller $controller 控制对象
-     * @param array $message 参数
-     * @param array $queryMessage
-     * @param int $notLog 是否需要登陆 0需要1不需要
-     * @return  string 正常返回 已经处理好，不用再通知了 or  throws string :错误信息，还要再通知我
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function payWXNotify(Request $request, Controller $controller, $message = [], $queryMessage = [], $notLog = 0)
-    {
-        $company_id = 0;// $controller->company_id;
-        // $user_id = $controller->user_id;
-//        if(isset($saveData['real_name']) && empty($saveData['real_name'])  ){
-//            throws('联系人不能为空！');
-//        }
-
-        // 调用新加或修改接口
-        $apiParams = [
-            'message' => $message,
-            'queryMessage' => $queryMessage,
-            // 'company_id' => $company_id,
-        ];
-        $result = static::exeDBBusinessMethodCT($request, $controller, '', 'payWXNotify', $apiParams, $company_id, $notLog);
-        return $result;
-    }
-
-    /**
-     * 申请退款--微信
-     *
-     * @param Request $request 请求信息
-     * @param Controller $controller 控制对象
-     * @param array $params 参数
-        $params = [
-            [
-                'order_no' => '', // 订单号 , 如果是订单操作必传-- order_no 或 my_order_no 之一不能为空
-                'my_order_no' => '',//付款 我方单号--与第三方对接用 -- order_no 或 my_order_no 之一不能为空
-                'refund_amount' => 0,// 需要退款的金额--0为全退---单位元
-                'refund_reason' => '',// 退款的原因--:为空，则后台自己组织内容
-            ]
-        ];
-     * @param int $notLog 是否需要登陆 0需要1不需要
-     * @return  array
-        $returnArr = [
-            [
-                'pay_order_no' => '',// 我方的付款单号
-                'refund_order_no' => '',// 我方生成的退款单号
-                'pay_amount' => 0,// 我方付款的总金额[当前付款单]--单位元
-                'refund_amount' => 0,// 需要退款的金额---单位元
-                'config'=> [// 其它退款参数
-                    'refund_desc' => '',// 退款的原因
-                ]
-            ],
-        ];
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function refundApplyWX(Request $request, Controller $controller, $params,  $notLog = 0)
-    {
-        $company_id = $controller->company_id;
-        $user_id = $controller->user_id;
-//        if(isset($saveData['real_name']) && empty($saveData['real_name'])  ){
-//            throws('联系人不能为空！');
-//        }
-
-        // 调用新加或修改接口
-        $apiParams = [
-            'params' => $params,
-            'company_id' => $company_id,
-            'operate_staff_id' => $user_id,
-        ];
-        $result = static::exeDBBusinessMethodCT($request, $controller, '', 'refundApplyWX', $apiParams, $company_id, $notLog);
-        return $result;
-    }
-
-    /**
-     * 申请退款--微信 --成功/失败手动修改数据
-     *
-     * @param Request $request 请求信息
-     * @param Controller $controller 控制对象
-     * @param string $out_refund_no 我方退款单号
-     * @param string $refund_status 业务结果  SUCCESS/FAIL SUCCESS/FAIL  SUCCESS退款申请接收成功，结果通过退款查询接口查询  FAIL 提交业务失败
-     * @param string $return_msg 失败原因
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function refundApplyWXFail(Request $request, Controller $controller, $out_refund_no, $refund_status, $return_msg, $notLog = 0)
-    {
-        $company_id = $controller->company_id;
-        $user_id = $controller->user_id;
-//        if(isset($saveData['real_name']) && empty($saveData['real_name'])  ){
-//            throws('联系人不能为空！');
-//        }
-
-        // 调用新加或修改接口
-        $apiParams = [
-            'out_refund_no' => $out_refund_no,
-            'refund_status' => $refund_status,
-            'return_msg' => $return_msg,
-            'company_id' => $company_id,
-            'operate_staff_id' => $user_id,
-        ];
-        $result = static::exeDBBusinessMethodCT($request, $controller, '', 'refundApplyWXFail', $apiParams, $company_id, $notLog);
-        return $result;
-    }
-
-    /**
-     * 支付退款回调--微信
-     *
-     * @param Request $request 请求信息
-     * @param Controller $controller 控制对象
-     * @param array $reqInfo
-     * @param int $notLog 是否需要登陆 0需要1不需要
-     * @return  正常返回字符 已经处理好，不用再通知了 or throws 异常 string :错误信息，还要再通知我
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function refundWXNotify(Request $request, Controller $controller, $reqInfo = [], $notLog = 0)
-    {
-        $company_id = 0;// $controller->company_id;
-        // $user_id = $controller->user_id;
-//        if(isset($saveData['real_name']) && empty($saveData['real_name'])  ){
-//            throws('联系人不能为空！');
-//        }
-
-        // 调用新加或修改接口
-        $apiParams = [
-            'reqInfo' => $reqInfo,
-            // 'company_id' => $company_id,
-        ];
-        $result = static::exeDBBusinessMethodCT($request, $controller, '', 'refundWXNotify', $apiParams, $company_id, $notLog);
-        return $result;
-    }
-
-    /**
-     * 根据订单号取消订单--
-     *
-     * @param Request $request 请求信息  order_no 订单号 、 my_order_no 付款 我方单号 二选一;  amount 需要退款的金额--0为全退---单位元;  refund_reason  退款的原因--:为空，则后台自己组织内容
-     * @param Controller $controller 控制对象
-     * @return  mixed
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function cancelOrder(Request $request, Controller $controller){
-
-        // $pay_type = CommonRequest::getInt($request, 'pay_type');// 支付类型 1 订单支付跑腿费 2 订单追加跑腿费
-        // if(!in_array($pay_type, [1,2])) throws('支付类型有误!');
-
-        $order_no = CommonRequest::get($request, 'order_no');// 订单号 , 如果是订单操作必传-- order_no 或 my_order_no 之一不能为空
-        $my_order_no = CommonRequest::get($request, 'my_order_no');//付款 我方单号--与第三方对接用 -- order_no 或 my_order_no 之一不能为空
-
-
-        if(empty($order_no) && empty($my_order_no)) throws('订单号或付款单号不能为空!');
-
-        // 如果是订单，则判断订单状态
-        if(!empty($order_no)){
-            $company_id = $controller->company_id;
-
-            $queryParams = [
-                'where' => [
-                    ['order_type', '=', 1],
-                    // ['staff_id', '=', $user_id],
-                    ['order_no', '=', $order_no],
-                    // ['id', '&' , '16=16'],
-                    // ['company_id', $company_id],
-                    // ['admin_type',self::$admin_type],
-                ],
-                // 'whereIn' => [
-                //   'id' => $subjectHistoryIds,
-                //],
-            'select' => ['id', 'status'],
-                // 'orderBy' => ['is_default'=>'desc', 'id'=>'desc'],
-            ];
-            $orderInfo = CTAPIOrdersDoingBusiness::getInfoByQuery($request, $controller, '', $company_id, $queryParams);
-            if(empty($orderInfo)) throws('订单记录不存在!');
-            if($orderInfo['status'] != 2) throws('订单记录非待接单状态，不可取消!');
-        }
-
-        $amount = CommonRequest::get($request, 'amount');// 需要退款的金额--0为全退---单位元
-        if(!is_numeric($amount)) $amount = 0;
-        if(!is_numeric($amount) && $amount < 0) throws('费用不能小于0!');
-
-        $refund_reason = CommonRequest::get($request, 'refund_reason');// 退款的原因--:为空，则后台自己组织内容
-
-        $params = [
-            [
-                'order_no' => $order_no, // 订单号 , 如果是订单操作必传-- order_no 或 my_order_no 之一不能为空
-                'my_order_no' => $my_order_no,//付款 我方单号--与第三方对接用 -- order_no 或 my_order_no 之一不能为空
-                'refund_amount' => $amount,// 需要退款的金额--0为全退---单位元
-                'refund_reason' => $refund_reason,// 退款的原因--:为空，则后台自己组织内容
-            ]
-        ];
-
-        Log::info('微信支付日志 退款申请-->' . __FUNCTION__,$params);
-        $out_refund_nos = [];
-        try{
-
-            $returnArr = CTAPIWalletRecordBusiness::refundApplyWX($request, $controller, $params);
-
-            Log::info('微信支付日志 退款申请返回参数-->' . __FUNCTION__,$returnArr);
-            $config = [
-                'refund_desc' => '',// $refund_desc,//'测试退款',// 退款原因 若商户传入，会在下发给用户的退款消息中体现退款原因  ；注意：若订单退款金额≤1元，且属于部分退款，则不会在退款消息中体现退款原因
-                'notify_url' => config('public.wxNotifyURL') . 'api/pay/refundNotify' ,// 退款结果通知的回调地址
-            ];
-            Log::info('微信支付日志 退款申请参数config-->' . __FUNCTION__,$config);
-            // 根据商户订单号退款
-            $app = app('wechat.payment');
-            foreach($returnArr as $v){
-                $out_refund_no = $v['refund_order_no'];//  我方生成的退款单号
-                $pay_order_no = $v['pay_order_no'];//我方的付款单号
-
-                $out_trade_no =  $pay_order_no;//我方的付款单号
-                $refundNumber = $out_refund_no;//我方生成的退款单号
-                $totalFee = floor($v['pay_amount'] * 100);//我方付款的总金额[当前付款单]--单位元
-                $refundFee = floor($v['refund_amount'] * 100);// 需要退款的金额---单位元
-                $refund_desc = $v['config']['refund_desc'];// 其它退款参数  退款的原因
-                $config['refund_desc'] = $refund_desc ;
-                $result = easyWechatPay::refundByOutTradeNumber($app, $out_trade_no, $refundNumber, $totalFee, $refundFee, $config);
-                // $result['result_code'] = 'FAIL';
-                Log::info('微信支付日志 退款申请返回结果-->' . __FUNCTION__,[$result]);
-                // 业务结果  SUCCESS/FAIL SUCCESS/FAIL  SUCCESS退款申请接收成功，结果通过退款查询接口查询  FAIL 提交业务失败
-                $result_code = $result['result_code'];
-                if($result_code != 'SUCCESS'){// FAIL 提交业务失败,回退
-                    $return_msg = $result['return_msg'] ?? '';// 失败原因
-                    $err_code = $result['err_code'] ?? '';// 错误代码
-                    $err_code_des = $result['err_code_des'] ?? '';// 错误代码描述
-                    $errMsg = '错误代码[' . $err_code . '];错误代码描述[' . $err_code_des . ']';
-                    $resultFail = CTAPIWalletRecordBusiness::refundApplyWXFail($request, $controller, $out_refund_no, $result_code, $errMsg);
-                    Log::info('微信支付日志 退款申请业务失败回退$resultFail-->' . __FUNCTION__,[$resultFail]);
-                    throws('退款申请失败:' . $errMsg);
-                }else{// 成功，查询是否成功
-                    // 重试 3次 6秒
-//                    $queryNum = 0;
-//                    while(true)   #循环获取锁
-//                    {
-//                        $queryNum++;
-//                        $delay = mt_rand(2 * 1000 * 1000, 3 * 1000 * 1000);
-//                        usleep($delay);//usleep($delay * 1000);
-
-//                        $resultQuery = easyWechatPay::queryByOutRefundNumber($app, $out_refund_no);
-//                        Log::info('微信支付日志 退款结果查询情况$resultQuery-->' . __FUNCTION__,[$resultQuery]);
-//                        // 如果成功，则修改退款单为成功
-//                        $quest_result_code = $resultQuery['result_code'] ?? '';
-//                        $quest_refund_status = $resultQuery['refund_status_0'] ?? '';
-//                        Log::info('微信支付日志 退款结果查询情况 $quest_result_code-->' . __FUNCTION__,[$quest_result_code]);
-//                        Log::info('微信支付日志 退款结果查询情况 $quest_refund_status-->' . __FUNCTION__,[$quest_refund_status]);
-//                        if($quest_result_code == 'SUCCESS' && $quest_refund_status == 'SUCCESS' ) {
-//                            $quest_return_msg = $resultQuery['return_msg'] ?? '';// 失败原因
-//                            $resultSuccess = CTAPIWalletRecordBusiness::refundApplyWXFail($request, $controller, $out_refund_no, $quest_refund_status, $quest_return_msg);
-//                            Log::info('微信支付日志 退款申请业务成功自动更新记录-->' . __FUNCTION__,[$resultSuccess]);
-//                        }
-//                        if($quest_refund_status == 'SUCCESS' || $queryNum >= 3) break;
-//                    }
-
-                }
-                array_push($out_refund_nos, $out_refund_no);
-                // 根据微信订单号退款
-                // $result = easyWechatPay::refundByTransactionId($app, $transactionId, $refundNumber, $totalFee, $refundFee, $config);
-            }
-        } catch ( \Exception $e) {
-            throws('失败；信息[' . $e->getMessage() . ']');
-        }
-        return ajaxDataArr(1, $out_refund_nos, '');
-    }
 
 }

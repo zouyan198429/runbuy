@@ -290,6 +290,14 @@ Route::get('admin/shopGoodsType/export', 'Admin\ShopGoodsTypeController@export')
 Route::get('admin/shopGoodsType/import_template', 'Admin\ShopGoodsTypeController@import_template');// 导入模版
 
 
+// 店铺营业时间
+Route::get('admin/shopOpenTime', 'Admin\ShopOpenTimeController@index');// 列表
+Route::get('admin/shopOpenTime/add/{id}', 'Admin\ShopOpenTimeController@add');// 添加
+// Route::get('admin/shopOpenTime/select', 'Admin\ShopOpenTimeController@select');// 选择-弹窗
+Route::get('admin/shopOpenTime/export', 'Admin\ShopOpenTimeController@export');// 导出
+Route::get('admin/shopOpenTime/import_template', 'Admin\ShopOpenTimeController@import_template');// 导入模版
+
+
 // 站点介绍
 Route::get('admin/siteIntro', 'Admin\SiteIntroController@index');// 列表
 Route::get('admin/siteIntro/add/{id}', 'Admin\SiteIntroController@add');// 添加
@@ -443,6 +451,14 @@ Route::get('city/shopGoodsType/export', 'City\ShopGoodsTypeController@export');/
 Route::get('city/shopGoodsType/import_template', 'City\ShopGoodsTypeController@import_template');// 导入模版
 
 
+// 店铺营业时间
+Route::get('city/shopOpenTime', 'City\ShopOpenTimeController@index');// 列表
+Route::get('city/shopOpenTime/add/{id}', 'City\ShopOpenTimeController@add');// 添加
+// Route::get('city/shopOpenTime/select', 'City\ShopOpenTimeController@select');// 选择-弹窗
+Route::get('city/shopOpenTime/export', 'City\ShopOpenTimeController@export');// 导出
+Route::get('city/shopOpenTime/import_template', 'City\ShopOpenTimeController@import_template');// 导入模版
+
+
 // 站点介绍
 //Route::get('city/siteIntro', 'City\SiteIntroController@index');// 列表
 //Route::get('city/siteIntro/add/{id}', 'City\SiteIntroController@add');// 添加
@@ -580,6 +596,13 @@ Route::get('seller/shopGoodsType/add/{id}', 'Seller\ShopGoodsTypeController@add'
 // Route::get('seller/shopGoodsType/select', 'Seller\ShopGoodsTypeController@select');// 选择-弹窗
 Route::get('seller/shopGoodsType/export', 'Seller\ShopGoodsTypeController@export');// 导出
 Route::get('seller/shopGoodsType/import_template', 'Seller\ShopGoodsTypeController@import_template');// 导入模版
+
+// 店铺营业时间
+Route::get('seller/shopOpenTime', 'Seller\ShopOpenTimeController@index');// 列表
+Route::get('seller/shopOpenTime/add/{id}', 'Seller\ShopOpenTimeController@add');// 添加
+// Route::get('seller/shopOpenTime/select', 'Seller\ShopOpenTimeController@select');// 选择-弹窗
+Route::get('seller/shopOpenTime/export', 'Seller\ShopOpenTimeController@export');// 导出
+Route::get('seller/shopOpenTime/import_template', 'Seller\ShopOpenTimeController@import_template');// 导入模版
 
 
 // 站点介绍
@@ -720,6 +743,13 @@ Route::get('shop/shopGoodsType/add/{id}', 'Shop\ShopGoodsTypeController@add');//
 // Route::get('shop/shopGoodsType/select', 'Shop\ShopGoodsTypeController@select');// 选择-弹窗
 Route::get('shop/shopGoodsType/export', 'Shop\ShopGoodsTypeController@export');// 导出
 Route::get('shop/shopGoodsType/import_template', 'Shop\ShopGoodsTypeController@import_template');// 导入模版
+
+// 店铺营业时间
+Route::get('shop/shopOpenTime', 'Shop\ShopOpenTimeController@index');// 列表
+Route::get('shop/shopOpenTime/add/{id}', 'Shop\ShopOpenTimeController@add');// 添加
+// Route::get('shop/shopOpenTime/select', 'Shop\ShopOpenTimeController@select');// 选择-弹窗
+Route::get('shop/shopOpenTime/export', 'Shop\ShopOpenTimeController@export');// 导出
+Route::get('shop/shopOpenTime/import_template', 'Shop\ShopOpenTimeController@import_template');// 导入模版
 
 
 // 站点介绍

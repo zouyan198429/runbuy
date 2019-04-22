@@ -93,8 +93,8 @@
       <th>手机<hr/>电话</th>
       <th>所在地址<hr/>经纬度<hr/>图片</th>
       <th>分类<hr/>标签</th>
-      <th>总销量<hr/>月销量</th>
-      <th>营业开始时间<hr/>营业结束时间<hr/>更新时间</th>
+      <th>总销量<hr/>月销量<hr/>更新时间</th>
+      <th>营业开始时间<hr/>营业结束时间</th>
       <th>综合排序<hr/>人均</th>
       {{--<th>介绍</th>--}}
       <th style="width: 150px;">操作</th>
@@ -150,6 +150,7 @@
       var PROP_LIST_URL = "{{ url('seller/prop') }}"; // 商品属性管理
       var GOODS_LIST_URL = "{{ url('seller/shopGoods') }}"; // 商品管理
       var ORDERS_LIST_URL = "{{ url('seller/order') }}"; // 订单管理
+      var OPEN_TIME_LIST_URL = "{{ url('seller/shopOpenTime') }}"; // 营业时间管理
   </script>
 
 <link rel="stylesheet" href="{{asset('js/baguetteBox.js/baguetteBox.min.css')}}">
