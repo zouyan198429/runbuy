@@ -76,6 +76,13 @@ class Shop extends BasePublicModel
         return $this->hasMany('App\Models\RunBuy\Staff', 'shop_id', 'id');
     }
 
+    /**
+     * 获取店铺的营业时间-二维
+     */
+    public function openTimes()
+    {
+        return $this->hasMany('App\Models\RunBuy\ShopOpenTime', 'shop_id', 'id');
+    }
 
     /**
      * 获取店铺的店铺商品-二维

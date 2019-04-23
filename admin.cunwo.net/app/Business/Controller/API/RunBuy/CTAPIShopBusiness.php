@@ -189,6 +189,12 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
                 if(isset($data_list[$k]['labels'])) unset($data_list[$k]['labels']);
             //}
 
+            // 营业时间
+//            if(isset($data_list[$k]['open_times'])){
+//                $openTimes = $data_list[$k]['open_times'] ?? [];
+//                $data_list[$k]['open_times'] = Tool::formatTwoArrKeys($openTimes, Tool::arrEqualKeyVal(['id', 'shop_id', 'open_time', 'close_time', 'is_open', 'sort_num', 'is_open_text']), false);
+//                if(isset($data_list[$k]['open_times'])) unset($data_list[$k]['open_times']);
+//            }
             // 资源url
             $resource_list = [];
             if(isset($v['site_resources'])){

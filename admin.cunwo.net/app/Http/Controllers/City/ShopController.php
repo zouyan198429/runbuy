@@ -68,7 +68,7 @@ class ShopController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIShopBusiness::getInfoData($request, $this, $id, [], ['shopSeller', 'labels', 'siteResources']);
+            $info = CTAPIShopBusiness::getInfoData($request, $this, $id, [], ['shopSeller', 'labels', 'siteResources', 'openTimes']);
             $intro = $info['intro'] ?? '';
             $info['intro'] = replace_enter_char($intro,2);
             $range_time = '';
@@ -264,7 +264,7 @@ class ShopController extends WorksController
      */
     public function ajax_alist(Request $request){
         $this->InitParams($request);
-        return  CTAPIShopBusiness::getList($request, $this, 2 + 4, [], ['province', 'city', 'area', 'shopCity', 'shopCityPartner', 'shopSeller', 'shopType', 'labels', 'siteResources']);
+        return  CTAPIShopBusiness::getList($request, $this, 2 + 4, [], ['province', 'city', 'area', 'shopCity', 'shopCityPartner', 'shopSeller', 'shopType', 'labels', 'siteResources', 'openTimes']);
     }
 
     /**

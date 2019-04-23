@@ -122,6 +122,7 @@ var otheraction = {
     document.write("        <%for(var i = 0; i<data_list.length;i++){");
     document.write("        var item = data_list[i];");
     document.write("        var resource_list = item.resource_list;");
+    document.write("        var open_times = item.open_times;");
     //document.write("        var can_modify = false;");
    // document.write("        if( item.issuper==0 ){");
     document.write("        can_modify = true;");
@@ -154,6 +155,13 @@ var otheraction = {
     document.write("            <td><%=item.type_name%><hr/><%=item.labelNnames%><\/td>");
     document.write("            <td><%=item.sales_volume%><hr/><%=item.mon_sales_volume%><hr/><%=item.last_update%><\/td>");
     document.write("           <td>");
+    document.write("            <%for(var k = 0; k < open_times.length; k++){");
+    document.write("                var kitem = open_times[k];");
+    document.write("                 %>");
+    document.write("               <p >");
+    document.write("                <%=kitem.open_time%>-<%=kitem.close_time%><br/>(<%=kitem.is_open_text%>)");
+    document.write("              </p><hr/>");
+    document.write("            <%}%>");
     document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.openTime(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.seller_id%>,<%=item.id%>,'<%=item.shop_name%>-营业时间管理')\">");
     document.write("                    <i class=\"ace-icon fa fa-clock-o bigger-60\"> 营业时间<\/i>");
     document.write("                <\/a>");
