@@ -372,7 +372,7 @@ class CityDBBusiness extends BasePublicDBBusiness
     }
 
     /**
-     * 跑店铺营业中脚本
+     * 跑城市店铺营业中脚本
      *
      * @param int $id
      * @return mixed
