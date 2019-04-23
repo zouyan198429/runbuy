@@ -99,8 +99,8 @@ Route::get('users', function () {
 
 
 Route::get('test/runbuy', 'TestbController@runbuy');// 测试
-Route::get('test/index', 'TestbController@index');// 测试
-//Route::any('test/index', 'TestController@index');//测试
+//Route::get('test/index', 'TestbController@index');// 测试
+Route::any('test/index', 'TestController@index');//测试
 Route::post('file/upload', function(\Illuminate\Http\Request $request) {
     if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
         $photo = $request->file('photo');

@@ -23,6 +23,11 @@ use S2\SmokeTest;
 class TestController extends CompController
 {
 
+    public  function  index(Request $request){
+        echo 'aaa';
+        CityDBBusiness::autoCityOnLine();// 跑城市店铺营业中脚本
+
+    }
     /**
      * geoHash
      *

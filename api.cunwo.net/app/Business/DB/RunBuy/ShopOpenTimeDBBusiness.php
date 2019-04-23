@@ -40,6 +40,8 @@ class ShopOpenTimeDBBusiness extends BasePublicDBBusiness
         $shopIdsNeed = array_values(array_unique(array_column($openTimeList, 'shop_id')));
         // 获得已上线的店铺id
         $shopIdsOnLine = Tool::getRedis('shop:online' . $city_site_id, 1);
+        // if(!empty($shopIdsOnLine)) pr($shopIdsOnLine);
+        if(!is_array($shopIdsOnLine)) $shopIdsOnLine = [];
         // 获得所有的店铺id
         // $shopIdsOperateAll = array_values(array_unique(array_merge($shopIdsNeed,$shopIdsOnLine)));
 
