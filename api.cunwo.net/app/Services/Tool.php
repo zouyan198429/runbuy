@@ -1786,4 +1786,20 @@ class Tool
         $format_money = strrev($format_money);
         return $sign.$negative.$format_money.$decimal;
     }
+
+    /**
+     *
+     * 时间比较
+     * @details
+     * @param $beginTime 开始时间 05:00:00
+     * @param $endTime 结束时间 15:00:00
+     * @return boolean  true:结束时间 >= 开始时间 或 false:结束时间 >= 开始时间
+     *
+     */
+    public static function timeDomparison($beginTime, $endTime){
+        $beginDate = date('Y-m-d') . ' ' . $beginTime;
+        $endDate = date('Y-m-d') . ' ' . $endTime;
+        $diffNum = Tool::diffDate($beginDate, $endDate, 1, '时间', 2);
+        return $diffNum >= 0 ? true : false;
+    }
 }

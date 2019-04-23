@@ -360,6 +360,8 @@ class CTAPIShopOpenTimeBusiness extends BasicPublicCTAPIBusiness
             $saveData['city_partner_id'] = $shopInfo['city_partner_id'];
             $saveData['seller_id'] = $shopInfo['seller_id'];
         }
+        if(!Tool::timeDomparison($saveData['open_time'], $saveData['close_time'])) throws('结束时间不能大于开始时间！');
+
         if($id > 0){
             // 判断权限
 //            $judgeData = [

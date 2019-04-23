@@ -575,7 +575,7 @@ if ( ! function_exists('judge_date'))
  */
 if ( ! function_exists('day_format_time'))
 {
-    function day_format_time($re_type=1,$unix_time="",$day=0){
+    function day_format_time($re_type = 1,$unix_time = "",$day = 0){
         $unix_time = judge_date($unix_time);
         if( $unix_time == false){
             $unix_time = time();
@@ -587,5 +587,3 @@ if ( ! function_exists('day_format_time'))
         }
     }
 }
-
-
