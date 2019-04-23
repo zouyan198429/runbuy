@@ -190,11 +190,19 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
             //}
 
             // 营业时间
-//            if(isset($data_list[$k]['open_times'])){
-//                $openTimes = $data_list[$k]['open_times'] ?? [];
-//                $data_list[$k]['open_times'] = Tool::formatTwoArrKeys($openTimes, Tool::arrEqualKeyVal(['id', 'shop_id', 'open_time', 'close_time', 'is_open', 'sort_num', 'is_open_text']), false);
-//                if(isset($data_list[$k]['open_times'])) unset($data_list[$k]['open_times']);
-//            }
+            if(isset($data_list[$k]['open_times'])){
+                $openTimes = $data_list[$k]['open_times'] ?? [];
+                $openTimes = Tool::formatTwoArrKeys($openTimes, Tool::arrEqualKeyVal(['id', 'shop_id', 'open_time', 'close_time', 'is_open', 'sort_num', 'is_open_text']), false);
+                foreach($openTimes as $o_k => $o_v){
+                    $range_time = '';
+                    $open_time = $o_v['open_time'] ?? '';
+                    $close_time = $o_v['close_time'] ?? '';
+                    if(!empty($open_time) && !empty($close_time)) $range_time = $open_time . ' - ' . $close_time;
+                    $openTimes[$o_k]['range_time'] = $range_time;
+                }
+                $data_list[$k]['open_times'] = $openTimes;
+                // if(isset($data_list[$k]['open_times'])) unset($data_list[$k]['open_times']);
+            }
             // 资源url
             $resource_list = [];
             if(isset($v['site_resources'])){
@@ -266,6 +274,20 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
             if(isset($info['labels'])) unset($info['labels']);
         // }
 
+        // 营业时间
+            if(isset($info['open_times'])){
+                $openTimes = $info['open_times'] ?? [];
+                $openTimes = Tool::formatTwoArrKeys($openTimes, Tool::arrEqualKeyVal(['id', 'shop_id', 'open_time', 'close_time', 'is_open', 'sort_num', 'is_open_text']), false);
+                foreach($openTimes as $o_k => $o_v){
+                    $range_time = '';
+                    $open_time = $o_v['open_time'] ?? '';
+                    $close_time = $o_v['close_time'] ?? '';
+                    if(!empty($open_time) && !empty($close_time)) $range_time = $open_time . ' - ' . $close_time;
+                    $openTimes[$o_k]['range_time'] = $range_time;
+                }
+                $info['open_times'] = $openTimes;
+                // if(isset($info['open_times'])) unset($info['open_times']);
+            }
         // 分类
         $info['type_name'] = $info['shop_type']['type_name'] ?? '';
         // $info['type_id'] = $info['shop_type']['id'] ?? 0;

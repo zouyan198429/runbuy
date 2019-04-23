@@ -13,6 +13,7 @@
     @include('admin.layout_public.pagehead')
     <link rel="stylesheet" href="{{asset('layui-admin-v1.2.1/src/layuiadmin/layui/css/layui.css')}}" media="all">
     <link rel="stylesheet" href="{{asset('layui-admin-v1.2.1/src/layuiadmin/style/admin.css')}}" media="all">
+    <script language="javascript" type="text/javascript" src="{{asset('My97DatePicker/WdatePicker.js')}}"></script>
 </head>
 <body>
 
@@ -84,7 +85,11 @@
             <tr>
                 <th>营业时间<span class="must">*</span></th>
                 <td>
-                    <input type="text" class="inp wnormal range_time"  readonly name="range_time" value="" placeholder="请选择营业时间范围"  />
+                    <input type="text" class="inp wnormal Wdate " style="width:100px;" id="open_time" name="open_time[]" value="" placeholder="请选择上班时间"  onclick="" />
+                    <input type="text"  id="open_time_seled"  name="open_time_seled" value="" />
+                           -
+                    <input type="text" class="inp wnormal Wdate " style="width:100px;" id="close_time" name="close_time[]" value="" placeholder="请选择下班时间"  onclick="" />
+                    <input type="text" id="close_time_seled" name="close_time_seled" value="" />
                 </td>
             </tr>
             <tr>
@@ -234,6 +239,45 @@
     var RESOURCE_LIST = @json($info['resource_list'] ?? []) ;
     var PIC_LIST_JSON =  {'data_list': RESOURCE_LIST };// piclistJson 数据列表json对象格式  {‘data_list’:[{'id':1,'resource_name':'aaa.jpg','resource_url':'picurl','created_at':'2018-07-05 23:00:06'}]}
 
+    $(function(){
+        // 上班时间快捷选择
+        let openQuickSel = ['8:30:00','9:00:00','10:00:00','14:30:00','15:00:00'];
+        // 下班时间快捷选择
+        let closeQuickSel = ['13:30:00','14:00:00','15:00:00','18:00:00','22:00:00'];
+        // ,quickSel:['8:30:00','9:00:00','10:00:00','18:00:00','22:00:00']
+        let pickConfig ={
+                skin:'blue',isShowClear:false,readOnly:true,isShowToday:false
+                ,dateFmt:'H:mm:ss',qsEnabled:false
+                // ,minTime:'09:00:00',maxTime:'17:30:00'
+            };
+        // 上班时间
+        // $(document).on("click",'input[name="open_time[]"]',function(){
+        $(document).on("click",'#open_time',function(){
+            let obj = $(this);
+            let openConfig = copy(pickConfig,true);// JSON.parse(JSON.stringify(pickConfig));
+            openConfig.el = this;
+            openConfig.quickSel = openQuickSel;
+            openConfig.maxTime = '#F{$dp.$D(\'close_time\') || \'23:59:59\'}';
+            openConfig.vel = 'open_time_seled';
+            console.log('-----openConfig--------',openConfig);
+            WdatePicker(openConfig);// openConfig
+        });
+        // 下班时间
+       // $(document).on("click",'input[name="close_time[]"]',function(){
+         $(document).on("click",'#close_time',function(){
+            let obj = $(this);
+            let closeConfig = copy(pickConfig,true);// JSON.parse(JSON.stringify(pickConfig))
+            closeConfig.el = this;
+            closeConfig.quickSel = closeQuickSel;
+            closeConfig.minTime = '#F{$dp.$D(\'open_time\') || \'00:01:59\'}';
+            closeConfig.vel = 'close_time_seled';
+            console.log('-----closeConfig--------',closeConfig);
+            WdatePicker(closeConfig);
+        });
+
+
+
+    });
 </script>
 <link rel="stylesheet" href="{{asset('js/baguetteBox.js/baguetteBox.min.css')}}">
 <script src="{{asset('js/baguetteBox.js/baguetteBox.min.js')}}" async></script>

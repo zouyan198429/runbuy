@@ -49,7 +49,7 @@ window.onload = function() {
 
     $('.search_frm').trigger("click");// 触发搜索事件
     ajax_status_count(0, 0, 0);//ajax工单状态统计
-    // reset_list_self(false, false, true);
+    // reset_list_self(false, false, true, 2);
     // 自动更新数据
     var autoObj = new Object();
     autoObj.orderProcessList = function(){
@@ -64,11 +64,11 @@ window.onload = function() {
 //is_read_page 是否读取当前页,否则为第一页 true:读取,false默认第一页
 // ajax_async ajax 同步/导步执行 //false:同步;true:异步  需要列表刷新同步时，使用自定义方法reset_list_self；异步时没有必要自定义
 // reset_total 是否重新从数据库获取总页数 true:重新获取,false不重新获取  ---ok
-function reset_list_self(is_read_page, ajax_async, reset_total){
+function reset_list_self(is_read_page, ajax_async, reset_total, do_num){
     console.log('is_read_page', typeof(is_read_page));
     console.log('ajax_async', typeof(ajax_async));
     var layer_index = layer.load();
-    reset_list(is_read_page, false, reset_total);
+    reset_list(is_read_page, false, reset_total, do_num);
     // initList();
     initPic();
     layer.close(layer_index)//手动关闭
@@ -141,7 +141,7 @@ function ajax_status_count(from_id ,staff_id, operate_staff_id){
                         if( from_id == 1 && selected_status == temStatus){
                             console.log('刷新列表-当前页');
                             // reset_list(true, true);
-                            reset_list_self(true,false,true);
+                            reset_list_self(true,false,true, 2);
                         }
                     }
                 }
@@ -213,7 +213,7 @@ function cancelOrder(order_no,pay_type){
                 err_alert(ret.errorMsg);
             }else{//成功
                 ajax_status_count(0, 0, 0);//ajax工单状态统计
-                reset_list_self(true,false,true);
+                reset_list_self(true,false,true, 2);
             }
             layer.close(layer_index)//手动关闭
         }

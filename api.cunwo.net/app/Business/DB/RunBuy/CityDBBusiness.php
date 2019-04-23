@@ -370,4 +370,26 @@ class CityDBBusiness extends BasePublicDBBusiness
         $infoObj->save();
         return $infoObj->order_saturation;
     }
+
+    /**
+     * 跑店铺营业中脚本
+     *
+     * @param int $id
+     * @return mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function autoCityOnLine(){
+        $queryParams = [
+            'where' => [
+                ['is_city_site', '=', 1],
+            ],
+            'select' => ['id'],
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        $cityList = static::getAllList($queryParams, '')->toArray();
+        foreach($cityList as $v){
+            $city_site_id = $v['id'];
+            ShopOpenTimeDBBusiness::autoShopOnLine($city_site_id);
+        }
+    }
 }

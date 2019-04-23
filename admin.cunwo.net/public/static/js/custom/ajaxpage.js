@@ -104,9 +104,9 @@ function ajaxPageList(dynamic_id,baidu_template_page,ajax_url,is_read_page,frm_i
                                     $('#'+page_id).val(pg);
                                 }
                                 // 调用ajax重载数据
-                                // reset_list(true, ajax_async, false);
+                                // reset_list(true, ajax_async, false, 2);
                                 console.log(LIST_FUNCTION_NAME);
-                                eval( LIST_FUNCTION_NAME + '(' + true +', ' + ajax_async +', false)');
+                                eval( LIST_FUNCTION_NAME + '(' + true +', ' + ajax_async +', false, 2)');
                                 // ajaxPageList(
                                 //     dynamic_id,baidu_template_page,ajax_url,true,frm_ids,
                                 //     false,baidu_template,body_data_id,baidu_template_loding,baidu_template_empty,
@@ -133,9 +133,9 @@ function ajaxPageList(dynamic_id,baidu_template_page,ajax_url,is_read_page,frm_i
                                 $('#'+page_id).val(page);
                             }
                             // 根据页数据更新数据
-                            // reset_list(true, ajax_async, false);
+                            // reset_list(true, ajax_async, false, 2);
                             console.log(LIST_FUNCTION_NAME);
-                            eval( LIST_FUNCTION_NAME + '(' + true +', ' + ajax_async +', false)');
+                            eval( LIST_FUNCTION_NAME + '(' + true +', ' + ajax_async +', false, 2)');
                             // ajaxPageList(
                             //     dynamic_id,baidu_template_page,ajax_url,true,frm_ids,
                             //     false,baidu_template,body_data_id,baidu_template_loding,baidu_template_empty,

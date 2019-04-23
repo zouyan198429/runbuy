@@ -1162,7 +1162,7 @@ function layeriframe(weburl,tishi,heightnum,widthnum,operate_num,sure_close_tish
                                           break;
                                     case 2:
                                         //刷新当前列表页面
-                                        parent.reset_list(true, true, false);
+                                        parent.reset_list(true, true, false, 2);
                                         break;
                                     default:
                             }
@@ -1980,11 +1980,11 @@ function upLoadFileSingle(fileObj, ajaxUrl, operate_num, otherParams) {
                             break;
                         case 2:
                             //刷新当前列表页面--当前页
-                            reset_list(true, true, false);
+                            reset_list(true, true, false, 2);
                             break;
                         case 4:
                             //刷新当前列表页面-第一页
-                            reset_list(false, true, true);
+                            reset_list(false, true, true, 2);
                             break;
                         default:
                     }
@@ -2059,6 +2059,46 @@ function GetDistance( lat1,  lng1,  lat2,  lng2){
     s = s *6378.137 ;
     s = Math.round(s * 10000) / 10000;
     return s;
+}
+// 自己实现一个copy，可以传入deep参数表示是否执行深复制：https://www.cnblogs.com/tracylin/p/5346314.html 也来谈一谈js的浅复制和深复制
+//util作为判断变量具体类型的辅助模块
+var util = (function(){
+    var class2type = {};
+    ["Null","Undefined","Number","Boolean","String","Object","Function","Array","RegExp","Date"].forEach(function(item){
+        class2type["[object "+ item + "]"] = item.toLowerCase();
+    })
+
+    function isType(obj, type){
+        return getType(obj) === type;
+    }
+    function getType(obj){
+        return class2type[Object.prototype.toString.call(obj)] || "object";
+    }
+    return {
+        isType:isType,
+        getType:getType
+    }
+})();
+// 深度复制对象
+// deep参数表示是否执行深复制
+function copy(obj,deep){
+    //如果obj不是对象，那么直接返回值就可以了
+    if(obj === null || typeof obj !== "object"){
+        return obj;
+    }
+    //定义需要的局部变脸，根据obj的类型来调整target的类型
+    var i, target = util.isType(obj,"array") ? [] : {},value,valueType;
+    for(i in obj){
+        value = obj[i];
+        valueType = util.getType(value);
+        //只有在明确执行深复制，并且当前的value是数组或对象的情况下才执行递归复制
+        if(deep && (valueType === "array" || valueType === "object")){
+            target[i] = copy(value);
+        }else{
+            target[i] = value;
+        }
+    }
+    return target;
 }
 
 (function() {
