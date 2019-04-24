@@ -316,4 +316,28 @@ class ShopDBBusiness extends BasePublicDBBusiness
             ShopOpenTimeDBBusiness::firstOrCreate($mainObj, $searchConditon, $updateFields );
         }
     }
+
+    /**
+     * 获得营业中的店铺id
+     *
+     * @param int  $city_site_id 城市id
+     * @param int $status 状态0待审核1审核通过2审核未通过4冻结(禁用)
+     * @param int  $status_business 经营状态  1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]
+     * @return null
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getBusinessShopIds($city_site_id = 0, $status = 1, $status_business = 1){
+        $queryParams = [
+            'where' => [
+                ['status', '=', $status],
+                ['status_business', '=', $status_business],
+            ],
+            'select' => ['id'],
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+        $shopList = static::getAllList($queryParams, '')->toArray();
+        $shopIds = array_values(array_column($shopList, 'id'));
+        return $shopIds;
+    }
 }
