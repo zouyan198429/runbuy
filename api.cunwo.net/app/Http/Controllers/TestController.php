@@ -9,6 +9,7 @@ namespace App\Http\Controllers;
 use App\Business\DB\RunBuy\CityDBBusiness;
 use App\Business\DB\RunBuy\LrChinaCityDBBusiness;
 // use App\Models\LrChinaCity;
+use App\Business\DB\RunBuy\ShopDBBusiness;
 use App\Services\GetPingYing;
 use App\Services\Map\Map;
 use App\Services\Map\S2;
@@ -25,7 +26,9 @@ class TestController extends CompController
 
     public  function  index(Request $request){
         echo 'aaa';
-        CityDBBusiness::autoCityOnLine();// 跑城市店铺营业中脚本
+//        CityDBBusiness::autoCityOnLine();// 跑城市店铺营业中脚本
+        ShopDBBusiness::initOpenTime();
+
 
     }
     /**

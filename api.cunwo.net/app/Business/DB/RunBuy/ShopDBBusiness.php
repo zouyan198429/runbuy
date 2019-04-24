@@ -278,4 +278,42 @@ class ShopDBBusiness extends BasePublicDBBusiness
             $infoObj->save();
         }
     }
+
+    /**
+     * 临时执行，把店铺表中的营业时间，刷新到营业时间表中
+     *
+     * @return null
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function initOpenTime(){
+
+        $queryParams = [
+            'where' => [
+            ],
+//            'select' => [
+//                'id','title','sort_num','volume'
+//            ],
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        $queryParams['select'] = ['id', 'city_site_id', 'city_partner_id', 'seller_id', 'open_time', 'close_time'];
+        $shopList = static::getAllList($queryParams, '')->toArray();
+        foreach($shopList as $v){
+            $shop_id = $v['id'];
+
+            // 订单统计
+            $searchConditon = [
+                'city_site_id' => $v['city_site_id'],
+                'city_partner_id' => $v['city_partner_id'],
+                'seller_id' => $v['seller_id'],
+                'shop_id' => $shop_id,
+            ];
+            $updateFields = [
+                'open_time' => $v['open_time'],
+                'close_time' => $v['close_time'],
+                'is_open' => 2,
+            ];
+            $mainObj = null;
+            ShopOpenTimeDBBusiness::firstOrCreate($mainObj, $searchConditon, $updateFields );
+        }
+    }
 }
