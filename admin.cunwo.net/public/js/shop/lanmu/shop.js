@@ -170,7 +170,7 @@ var otheraction = {
     document.write("                    <i class=\"ace-icon fa fa-clock-o bigger-60\"> 营业时间<\/i>");
     document.write("                <\/a>");
     document.write("           <\/td>");
-    document.write("            <td><%=item.sort_num%><hr/><%=item.per_price%><\/td>");
+    document.write("            <td><%=item.sort_num%><hr/><%=item.per_price%><hr/><%=item.status_text%><hr/><%=item.status_business_text%><\/td>");
     // document.write("            <td><%=item.intro%><\/td>");
     document.write("            <td>");
     document.write("                <%if( false){%>");
