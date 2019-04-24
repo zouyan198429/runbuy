@@ -207,7 +207,7 @@ class ShopController extends WorksController
         $resource_ids = implode(',', $resource_id);
         if(!empty($resource_ids)) $resource_ids = ',' . $resource_ids . ',';
 
-        $range_time = CommonRequest::get($request, 'range_time');
+//        $range_time = CommonRequest::get($request, 'range_time');
 
         $saveData = [
             'seller_id' => $seller_id,
@@ -235,10 +235,42 @@ class ShopController extends WorksController
             'resourceIds' => $resource_id,// 此下标为图片资源关系
         ];
         // 经营时间
-        $timeArr = explode('-',$range_time);
-        if(count($timeArr) >= 2){
-            $saveData['open_time'] = trim($timeArr[0]);
-            $saveData['close_time'] = trim($timeArr[1]);
+//        $timeArr = explode('-',$range_time);
+//        if(count($timeArr) >= 2){
+//            $saveData['open_time'] = trim($timeArr[0]);
+//            $saveData['close_time'] = trim($timeArr[1]);
+//        }
+
+        $open_time_ids = CommonRequest::get($request, 'open_time_ids');// 店铺营业时间 id
+        if(is_string($open_time_ids) || !is_array($open_time_ids)) $open_time_ids = explode(',', $open_time_ids);
+        $open_time = CommonRequest::get($request, 'open_time');// 营业开始时间
+        if(is_string($open_time) || !is_array($open_time)) $open_time = explode(',', $open_time);
+        $close_time = CommonRequest::get($request, 'close_time');// 营业结束时间
+        if(is_string($close_time) || !is_array($close_time)) $close_time = explode(',', $close_time);
+        $is_open = CommonRequest::get($request, 'is_open');// 是否开启1未开启2已开启
+        if(is_string($is_open) || !is_array($is_open)) $is_open = explode(',', $is_open);
+
+        $openTimeList = [];
+        $pCount = count($open_time_ids);
+        foreach ($open_time_ids as $k => $tId){
+            if(!is_numeric($tId)) continue;
+            $temOpenTime = [
+                'id' => $tId,
+                'open_time' => $open_time[$k],
+                'close_time' => $close_time[$k],
+                'is_open' => $is_open[$k],
+                'sort_num' => $pCount--,
+            ];
+            array_push($openTimeList, $temOpenTime);
+        }
+        if(!empty($openTimeList)){
+            // 营业时间验证
+            $resultTime = Tool::timesJudgeDo($openTimeList, '', 2 + 4 + 8 + 64, 1, 'open_time', 'close_time', '营业开始时间', '营业结束时间');
+//            if (is_string($resultTime)) {
+//                return $resultTime;
+//            }
+            // 判断时间是否合格
+            $saveData['open_time_list'] = $openTimeList;
         }
 
         if($id <= 0){

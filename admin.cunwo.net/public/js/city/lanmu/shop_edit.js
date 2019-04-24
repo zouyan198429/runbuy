@@ -56,15 +56,15 @@ function initPic(){
 $(function(){
     //执行一个laydate实例
     // 开始日期
-    layui.laydate.render({
-        elem: '.range_time' //指定元素
-        ,type: 'time'
-        ,range: true
-        ,value: RANGE_TIME// '2018-08-18' //必须遵循format参数设定的格式
-       // ,min: get_now_format()//'2017-1-1'
-        //,max: get_now_format()//'2017-12-31'
-        // ,calendar: true//是否显示公历节日
-    });
+    // layui.laydate.render({
+    //     elem: '.range_time' //指定元素
+    //     ,type: 'time'
+    //     ,range: true
+    //     ,value: RANGE_TIME// '2018-08-18' //必须遵循format参数设定的格式
+    //    // ,min: get_now_format()//'2017-1-1'
+    //     //,max: get_now_format()//'2017-12-31'
+    //     // ,calendar: true//是否显示公历节日
+    // });
 
     //当前市
     if(PROVINCE_ID > 0){
@@ -105,8 +105,53 @@ $(function(){
         // }, function(){
         //});
         return false;
-    })
+    });
 
+    // 上班时间快捷选择
+    let openQuickSel = ['8:30:00','9:00:00','10:00:00','14:30:00','15:00:00'];
+    // 下班时间快捷选择
+    let closeQuickSel = ['13:30:00','14:00:00','15:00:00','18:00:00','22:00:00'];
+    // ,quickSel:['8:30:00','9:00:00','10:00:00','18:00:00','22:00:00']
+    let pickConfig ={
+        skin:'blue',isShowClear:false,readOnly:true,isShowToday:false
+        ,dateFmt:'H:mm:ss',qsEnabled:false
+        // ,minTime:'09:00:00',maxTime:'17:30:00'
+    };
+    // 上班时间
+    // $(document).on("click",'input[name="open_time_input[]"]',function(){
+    $(document).on("click",'#open_time_input',function(){
+        let obj = $(this);
+        let openConfig = copy(pickConfig,true);// JSON.parse(JSON.stringify(pickConfig));
+        openConfig.el = this;
+        openConfig.quickSel = openQuickSel;
+        openConfig.maxTime = '#F{$dp.$D(\'close_time_input\') || \'23:59:59\'}';
+        openConfig.vel = 'open_time_seled';
+        openConfig.onpicking = function(dp){
+            // if(!confirm('日期框原来的值为: '+dp.cal.getDateStr()+', 要用新选择的值:' + dp.cal.getNewDateStr() + '覆盖吗?'))
+            //     return true;
+        };
+        openConfig.onpicked = function(){
+            //  d5222.click();
+            $('#close_time_input').trigger("click");// 触发搜索事件
+        };
+        console.log('-----openConfig--------',openConfig);
+        WdatePicker(openConfig);// openConfig
+    });
+    // 下班时间
+    // $(document).on("click",'input[name="close_time_input[]"]',function(){
+    $(document).on("click",'#close_time_input',function(){
+        let obj = $(this);
+        let closeConfig = copy(pickConfig,true);// JSON.parse(JSON.stringify(pickConfig))
+        closeConfig.el = this;
+        closeConfig.quickSel = closeQuickSel;
+        closeConfig.minTime = '#F{$dp.$D(\'open_time_input\') || \'00:01:59\'}';
+        closeConfig.vel = 'close_time_seled';
+        console.log('-----closeConfig--------',closeConfig);
+        WdatePicker(closeConfig);
+    });
+
+    // 初始化营业时间列表
+    initOpenTime();
 });
 
 //ajax提交表单
@@ -158,13 +203,23 @@ function ajax_form(){
         return false;
     }
 
-    var range_time = $('input[name=range_time]').val();
-    var judge_seled = judge_validate(1,'营业时间',range_time,true,'length',8,30);
-    if(judge_seled != ''){
-        layer_alert("请选择营业时间",3,0);
-        //err_alert('<font color="#000000">' + judge_seled + '</font>');
+    // var range_time = $('input[name=range_time]').val();
+    // var judge_seled = judge_validate(1,'营业时间',range_time,true,'length',8,30);
+    // if(judge_seled != ''){
+    //     layer_alert("请选择营业时间",3,0);
+    //     //err_alert('<font color="#000000">' + judge_seled + '</font>');
+    //     return false;
+    // }
+
+    // 营业时间判断
+
+    var timeCount = $('.open_time_list').find('tr').length;
+    console.log('---timeCount----',timeCount);
+    if(timeCount <= 0){
+        layer_alert('请添加营业时间！',3,0);
         return false;
     }
+
 
     var per_price = $('input[name=per_price]').val();
     if(!judge_validate(4,'人均',per_price,true,'doublepositive','','')){
@@ -379,6 +434,177 @@ var otheraction = {
         layeriframe(weburl,tishi,900,450,0);
         return false;
     },
+    seledAll:function(obj, parentTag){
+        var checkAllObj =  $(obj);
+        /*
+        checkAllObj.closest('#' + DYNAMIC_TABLE).find('input:checkbox').each(function(){
+            if(!$(this).prop('disabled')){
+                $(this).prop('checked', checkAllObj.prop('checked'));
+            }
+        });
+        */
+        checkAllObj.closest(parentTag).find('.check_item').each(function(){
+            if(!$(this).prop('disabled')){
+                $(this).prop('checked', checkAllObj.prop('checked'));
+            }
+        });
+    },
+    seledSingle:function(obj, parentTag) {// 单选点击
+        var checkObj = $(obj);
+        var allChecked = true;
+        /*
+         checkObj.closest('#' + DYNAMIC_TABLE).find('input:checkbox').each(function () {
+            if (!$(this).prop('disabled') && $(this).val() != '' &&  !$(this).prop('checked') ) {
+                // $(this).prop('checked', checkAllObj.prop('checked'));
+                allChecked = false;
+                return false;
+            }
+        });
+        */
+        checkObj.closest(parentTag).find('.check_item').each(function () {
+            if (!$(this).prop('disabled') && $(this).val() != '' &&  !$(this).prop('checked') ) {
+                // $(this).prop('checked', checkAllObj.prop('checked'));
+                allChecked = false;
+                return false;
+            }
+        });
+        // 全选复选操选中/取消选中
+        /*
+        checkObj.closest('#' + DYNAMIC_TABLE).find('input:checkbox').each(function () {
+            if (!$(this).prop('disabled') && $(this).val() == ''  ) {
+                $(this).prop('checked', allChecked);
+                return false;
+            }
+        });
+        */
+        checkObj.closest(parentTag).find('.check_all').each(function () {
+            $(this).prop('checked', allChecked);
+        });
+
+    },
+    del : function(obj, parentTag){// 删除
+        var recordObj = $(obj);
+        var index_query = layer.confirm('确定移除当前记录？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            var trObj = recordObj.closest(parentTag);// 'tr'
+            trObj.remove();
+            layer.close(index_query);
+        }, function(){
+        });
+        return false;
+    },
+    batchDel:function(obj, parentTag, delTag) {// 批量删除
+        var recordObj = $(obj);
+        var index_query = layer.confirm('确定移除选中记录？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            var hasDel = false;
+            recordObj.closest(parentTag).find('.check_item').each(function () {
+                if (!$(this).prop('disabled') && $(this).val() != '' &&  $(this).prop('checked') ) {
+                    // $(this).prop('checked', checkAllObj.prop('checked'));
+                    var trObj = $(this).closest(delTag);// 'tr'
+                    trObj.remove();
+                    hasDel = true;
+                }
+            });
+            if(!hasDel){
+                err_alert('请选择需要操作的数据');
+            }
+            layer.close(index_query);
+        }, function(){
+        });
+        return false;
+    },
+    moveUp : function(obj, parentTag){// 上移
+        var recordObj = $(obj);
+        var current = recordObj.closest(parentTag);//获取当前<tr>  'tr'
+        var prev = current.prev();  //获取当前<tr>前一个元素
+        console.log('index', current.index());
+        if (current.index() > 0) {
+            current.insertBefore(prev); //插入到当前<tr>前一个元素前
+        }else{
+            layer_alert("已经是第一个，不能移动了。",3,0);
+        }
+        return false;
+    },
+    moveDown : function(obj, parentTag){// 下移
+        var recordObj = $(obj);
+        var current = recordObj.closest(parentTag);//获取当前<tr>'tr'
+        var next = current.next(); //获取当前<tr>后面一个元素
+        console.log('length', next.length);
+        console.log('next', next);
+        if (next.length > 0 && next) {
+            current.insertAfter(next);  //插入到当前<tr>后面一个元素后面
+        }else{
+            layer_alert("已经是最后一个，不能移动了。",3,0);
+        }
+        return false;
+    },
+    propOpenChange : function(obj, parentTag){// 是否开启
+        var obj = $(obj);
+        var checkboxVal = obj.prop('checked');
+        console.log('checkboxVal', checkboxVal);
+        var is_open = 1;
+        if(checkboxVal)  is_open = 2;
+        console.log('is_open', is_open);
+        var trObj = obj.closest(parentTag);//获取当前<tr>  'tr'
+        trObj.find('input[name="is_open[]"]').val(is_open);
+    },
+    addTime:function () {// 添加时间
+        // 开始时间
+        var open_time = $('input[name=open_time_seled]').val();
+        console.log('-----open_time----',open_time);
+        if(open_time == ''){
+            layer_alert("请选择开始时间",3,0);
+            //err_alert('<font color="#000000">' + judge_seled + '</font>');
+            return false;
+        }
+        // 结束时间
+        var close_time = $('input[name=close_time_seled]').val();
+        console.log('-----close_time----',close_time);
+        if(close_time == ''){
+            layer_alert("请选择结束时间",3,0);
+            //err_alert('<font color="#000000">' + judge_seled + '</font>');
+            return false;
+        }
+        // 比较时间
+        var difSecond = compare_time(1, open_time, close_time, "开始时间", "结束时间");
+        console.log('-----difSecond----',difSecond);
+        if(typeof difSecond == 'string' ){
+            layer_alert(difSecond,3,0);
+            return false;
+        }
+        if(difSecond < 0){
+            layer_alert("开始时间不能大于结束时间",3,0);
+            return false;
+        }
+
+        var judge_open_ok = judgeInTimeList(open_time, "开始时间");
+        if(!judge_open_ok) return false;
+
+        var judge_close_ok = judgeInTimeList(close_time, "结束时间");
+        if(!judge_close_ok) return false;
+
+        // alert('通过验证');
+        // 添加新的营业时间
+        var data_list = {
+            'data_list': [{
+                id:0,
+                open_time:open_time,
+                close_time:close_time,
+                is_open:2,
+                range_time:open_time + ' - ' + close_time,
+            }],
+        };
+        // 解析数据
+        initAnswer('open_time_td', data_list, 2);
+        // 清空时间数据
+        $('input[name=open_time_input]').val('');
+        $('input[name=open_time_seled]').val('');
+        $('input[name=close_time_input]').val('');
+        $('input[name=close_time_seled]').val('');
+    }
 };
 
 // 选择经纬度
@@ -446,3 +672,109 @@ function addSeller(seller_id){
         }
     });
 }
+
+// 初始化营业时间列表
+function  initOpenTime() {
+    var data_list = {
+        'data_list': OPEN_TIMES_LIST,
+    };
+    initAnswer('open_time_td', data_list, 1);
+}
+// 初始化答案列表
+// data_list 数据对象 {'data_list':[{}]}
+// type类型 1 全替换 2 追加到后面 3 返回html
+function initAnswer(class_name, data_list, type){
+    var htmlStr = resolve_baidu_template(DYNAMIC_BAIDU_TEMPLATE,data_list,'');//解析
+    if(type == 3) return htmlStr;
+    //alert(htmlStr);
+    //alert(body_data_id);
+    if(type == 1){
+        $('.'+ class_name).find('.' + DYNAMIC_TABLE_BODY).html(htmlStr);
+    }else if(type == 2){
+        $('.'+ class_name).find('.' + DYNAMIC_TABLE_BODY).append(htmlStr);
+    }
+}
+// 判断开始/结束时间，是否在已有营业时间列表内
+// judge_time 需要判断的时间
+// time_name 判断的时间名称 如：开始时间
+// 返回值 true:没有错误, false：有错误
+function judgeInTimeList(judge_time, time_name) {
+    // 验证开始时间与已有的时间列表是否有冲突
+    var hasTimeOK = true;
+    $('.open_time_list').find('tr').each(function () {
+        var trObj = $(this);
+
+        // 开始时间
+        var open_time_val = trObj.find('input[name="open_time[]"]').val();
+        console.log('-----open_time_val----',open_time_val);
+        // 结束时间
+        var close_time_val = trObj.find('input[name="close_time[]"]').val();
+        console.log('-----close_time_val----',close_time_val);
+
+        var time_name_tishi = "营业时间[" + open_time_val + "-" + close_time_val + "]";
+        // 开始时间判断
+        let open_begin_diff = compare_time(1, judge_time, open_time_val, time_name, time_name_tishi + "开始时间");
+        console.log('-----open_begin_diff----',open_begin_diff);
+        let open_end_diff = compare_time(1, judge_time, close_time_val, time_name, time_name_tishi + "结束时间");
+        console.log('-----open_end_diff----',open_end_diff);
+        if(typeof open_begin_diff == 'string' ){
+            layer_alert(open_begin_diff,3,0);
+            hasTimeOK = false;
+            return false;
+        }
+        if(typeof open_end_diff == 'string' ){
+            layer_alert(open_end_diff,3,0);
+            hasTimeOK = false;
+            return false;
+        }
+        // 在某一段中间
+        if( open_begin_diff <= 0 &&  open_end_diff >= 0){
+            layer_alert(time_name + "[" + judge_time + "]不能在" + time_name_tishi + "段内",3,0);
+            hasTimeOK = false;
+            return false;
+        }
+
+    });
+    return hasTimeOK;
+}
+
+(function() {
+    document.write("<!-- 前端模板部分 -->");
+    document.write("<!-- 列表模板部分 开始  <! -- 模板中可以用HTML注释 -- >  或  <%* 这是模板自带注释格式 *%>-->");
+    document.write("<script type=\"text\/template\"  id=\"baidu_template_data_list\">");
+    document.write("    <%for(var i = 0; i<data_list.length;i++){");
+    document.write("    var item = data_list[i];");
+    document.write("    var pv_list = item.pv_list;");
+    document.write("    var now_prop = item.now_prop;");
+    document.write("    can_modify = true;");
+    document.write("    %>");
+    document.write("    <tr>");
+    document.write("        <td>");
+    document.write("            <label class=\"pos-rel\">");
+    document.write("                <input onclick=\"otheraction.seledSingle(this , \'.table2\')\" type=\"checkbox\" class=\"ace check_item\" value=\"<%=item.id%>\">");
+    document.write("                <span class=\"lbl\"><\/span>");
+    document.write("            <\/label>");
+    document.write("            <input type=\"hidden\" name=\"open_time_ids[]\" value=\"<%=item.id%>\"\/>");
+    document.write("            <input type=\"hidden\" name=\"open_time[]\" value=\"<%=item.open_time%>\"\/>");
+    document.write("           <input type=\"hidden\" name=\"close_time[]\" value=\"<%=item.close_time%>\"\/>");
+    document.write("           <input type=\"hidden\" name=\"is_open[]\" value=\"<%=item.is_open%>\"\/>");
+    document.write("        <\/td>");
+    document.write("        <td><%=item.range_time%><\/td>");
+    document.write("        <td><input type=\"checkbox\" class=\"is_open\"  onchange=\"otheraction.propOpenChange(this, 'tr')\"  <%if( item.is_open == 2){%> checked <%}%> value=\"2\"/><\/td>");
+    document.write("        <td>");
+    document.write("            <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-info\" onclick=\"otheraction.moveUp(this, \'tr\')\">");
+    document.write("                <i class=\"ace-icon fa fa-arrow-up bigger-60\"> 上移<\/i>");
+    document.write("            <\/a>");
+    document.write("            <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-info\" onclick=\"otheraction.moveDown(this, \'tr\')\">");
+    document.write("                <i class=\"ace-icon fa fa-arrow-down bigger-60\"> 下移<\/i>");
+    document.write("            <\/a>");
+    document.write("            <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-info\" onclick=\"otheraction.del(this, \'tr\')\">");
+    document.write("                <i class=\"ace-icon fa fa-trash-o bigger-60\"> 移除<\/i>");
+    document.write("            <\/a>");
+    document.write("        <\/td>");
+    document.write("    <\/tr>");
+    document.write("    <%}%>");
+    document.write("<\/script>");
+    document.write("<!-- 列表模板部分 结束-->");
+    document.write("<!-- 前端模板结束 -->");
+}).call();

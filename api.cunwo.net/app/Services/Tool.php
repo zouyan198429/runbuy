@@ -1802,4 +1802,129 @@ class Tool
         $diffNum = Tool::diffDate($beginDate, $endDate, 1, '时间', 2);
         return $diffNum >= 0 ? true : false;
     }
+
+    // 参数如下方法 timesJudge
+    public static function timesJudgeDo($timeList, $judgeRangeTime = '', $judgeType = 0, $errDo = 1, $beginTimeKey = 'begin_time', $endTimeKey = 'end_time', $beginTimeName = '开始时间', $endTimeName = '结束时间', $judgeRangeTimeName = '', $level = 1){
+        // 先执行条件数据验证
+        $temJudgeType = $judgeType & (1 + 2 + 4);
+        if($temJudgeType > 0){
+            $result = Tool::timesJudge($timeList, $judgeRangeTime, $temJudgeType, $errDo, $beginTimeKey, $endTimeKey, $beginTimeName, $endTimeName, $judgeRangeTimeName, $level);
+            if (is_string($result)) {
+                return $result;
+            }
+        }
+        // 再执行时间段数据验证
+        $temJudgeType = $judgeType & (8 + 16 + 32 + 64 + 128 + 256);
+        if($temJudgeType > 0){
+            $result = Tool::timesJudge($timeList, $judgeRangeTime, $temJudgeType, $errDo, $beginTimeKey, $endTimeKey, $beginTimeName, $endTimeName, $judgeRangeTimeName, $level);
+            if (is_string($result)) {
+                return $result;
+            }
+        }
+        return true;
+    }
+
+    /**
+     *
+     * 多时间段验证 ;具体使用，请用方法 timesJudgeDo
+     * @details
+     * @param array $timeList 需要验证的时间列表 一维或二维数组 ['begin_time' => '05:00:00', 'end_time'=> '15:00:00']
+     * @param string $judgeRangeTime 需要验证范围的时间, 为空：则不做范围验证
+     * @param int $judgeType 判断类型  [满足就是错误]
+     *                           1 开始时间 < 结束时间 ; 2 开始时间 = 结束时间 ; 4开始时间 > 结束时间
+     *
+     *                           8 开始时间不能在其它的范围内[不可含任一端] -----需要验证范围的时间
+     *                           16 开始时间不能在其它的范围内[不可含左端]  -----需要验证范围的时间
+     *                           32 开始时间不能在其它的范围内[不可含右端] -----需要验证范围的时间
+     *
+     *                          64 结束时间不能在其它的范围内[不可含任一端]  -----需要验证范围的时间
+     *                          128 结束时间不能在其它的范围内[不可含左端]  -----需要验证范围的时间
+     *                          256 结束时间不能在其它的范围内[不可含右端]   -----需要验证范围的时间
+     * @param int $errDo 错误处理方式 1 throws 2直接返回错误
+     * @param string $beginTimeKey 开始时间下标
+     * @param string $endTimeKey 结束时间下标
+     * @param string $beginTimeName 开始时间名称
+     * @param string $endTimeName 结束时间名称
+     * @param string $judgeRangeTimeName 需要验证范围的时间名称
+     * @param string $level 层数 1 :初始调用 2 :第二次调用;最多2层 ；主要作用是不要递卡尔集递归
+     * @return mixed  true:成功; string:具体错误
+     *
+     */
+    public static function timesJudge($timeList, $judgeRangeTime = '', $judgeType = 0, $errDo = 1, $beginTimeKey = 'begin_time', $endTimeKey = 'end_time', $beginTimeName = '开始时间', $endTimeName = '结束时间', $judgeRangeTimeName = '', $level = 1){
+        if($level > 2) return true;
+        // 如果是一维，则变为二维
+        if(isset($timeList[$beginTimeKey]) && isset($timeList[$endTimeKey]))  $timeList = [$timeList];
+        $timeList = array_values($timeList);
+        foreach($timeList as $k => $v){
+            $beginTime = $v[$beginTimeKey] ?? '';
+            $endTime = $v[$endTimeKey] ?? '';
+            // 判断
+            if(($judgeType & (1 + 2 + 4 ) ) > 0) {
+                $result = compare_time($beginTime, $endTime, $beginTimeName, $endTimeName, $errDo);
+                if (is_string($result) && !is_numeric($result)) return $result;// 有错误
+                // 1 开始时间 < 结束时间
+                if (($judgeType & 1) == 1 && $result > 0) {
+                    $errMsg = $beginTimeName . "[" . $beginTime . "]不能小于" . $endTimeName . "[" . $endTime . "]";
+                    if ($errDo == 1) throws($errMsg);
+                    return $errMsg;
+                }
+                // 2 开始时间 = 结束时间
+                if (($judgeType & 2) == 2 && $result == 0) {
+                    $errMsg = $beginTimeName . "[" . $beginTime . "]不能等于" . $endTimeName . "[" . $endTime . "]";
+                    if ($errDo == 1) throws($errMsg);
+                    return $errMsg;
+                }
+                // 4开始时间 > 结束时间
+                if (($judgeType & 4) == 4 && $result < 0) {
+                    $errMsg = $beginTimeName . "[" . $beginTime . "]不能大于" . $endTimeName . "[" . $endTime . "]";
+                    if ($errDo == 1) throws($errMsg);
+                    return $errMsg;
+                }
+            }
+
+            // 8 开始时间不能在其它的范围内 -----需要验证范围的时间
+            // 16 结束时间不能在其它的范围内 -----需要验证范围的时间
+            if( ($judgeType & (8 + 16 + 32 + 64 + 128 + 256) ) > 0  && !empty($judgeRangeTime)  ){
+                // 开始时间-判断时间
+                $beginRangeDiff = compare_time($judgeRangeTime, $beginTime, $judgeRangeTimeName, $beginTimeName, $errDo);
+                if(is_string($beginRangeDiff) && !is_numeric($beginRangeDiff)) return $beginRangeDiff;// 有错误
+                // 结束时间-判断时间
+                $endRangeDiff = compare_time($judgeRangeTime, $endTime, $judgeRangeTimeName, $endTimeName, $errDo);
+                if(is_string($endRangeDiff) && !is_numeric($endRangeDiff)) return $endRangeDiff;// 有错误
+                if( ( ($judgeType & (8 + 64) ) > 0 &&  $beginRangeDiff <= 0 && $endRangeDiff >= 0 )
+                    ||  ( ($judgeType & (16 + 128) ) > 0 &&  $beginRangeDiff <= 0 && $endRangeDiff > 0 )
+                    ||  ( ($judgeType & (32 + 256) ) > 0 &&  $beginRangeDiff < 0 && $endRangeDiff >= 0 )
+                ){
+                    $errMsg = $judgeRangeTimeName . "[" . $judgeRangeTime . "]不能在时间范围[" . $beginTime . " - " . $endTime . "]";
+                    if($errDo == 1) throws($errMsg);
+                    return $errMsg;
+                }
+            }
+            // if(empty($judgeRangeTime)) continue;
+            if(($judgeType & (8 + 16 + 32 + 64 + 128 + 256) ) <= 0 ) continue;
+            if($level >= 2) continue;
+            $temOpenTimeList = $timeList;
+            for($n = 0; $n <= $k; $n++ ){
+                unset($temOpenTimeList[$n]);
+            }
+            if(empty($temOpenTimeList)) continue;
+            // 比较开始时间是否在时间范围
+            if(($judgeType & (8 + 16 + 32 ) ) > 0){
+                $rangeBegin = Tool::timesJudge($temOpenTimeList, $beginTime, ($judgeType & (8 + 16 + 32 ) ) , $errDo
+                    , $beginTimeKey, $endTimeKey, $beginTimeName, $endTimeName, $beginTimeName, 2);
+                if(is_string($rangeBegin)){
+                    return $rangeBegin;
+                }
+            }
+            // 比较结束时间是否在时间范围
+            if(($judgeType & (64 + 128 + 256 ) ) > 0) {
+                $rangeEnd = Tool::timesJudge($temOpenTimeList, $endTime, ($judgeType & (64 + 128 + 256)), $errDo
+                    , $beginTimeKey, $endTimeKey, $beginTimeName, $endTimeName, $endTimeName, 2);
+                if (is_string($rangeEnd)) {
+                    return $rangeEnd;
+                }
+            }
+        }
+        return true;
+    }
 }

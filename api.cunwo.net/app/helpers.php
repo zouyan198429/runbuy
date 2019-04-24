@@ -507,6 +507,73 @@ if ( ! function_exists('judgeDate'))
     }
 }
 
+//判断时间格式 返回值 true:是正确的时间;false：时间格式不正确
+//$time 时间格式 23:59:59
+if ( ! function_exists('judgeTime'))
+{
+    function judgeTime($time = ''){
+        if(empty($time)) return false;
+        //匹配时间格式为2012-02-16或2012-02-16 23:59:59前面为0的时候可以不写
+        $patten = '/^(0?[0-9]|1[0-9]|2[0-3]):(0?[0-9]|[1-5][0-9]):(0?[0-9]|[1-5][0-9])$/';
+        if(preg_match($patten,$time))  return true;
+        return false;
+    }
+}
+
+//时间转换为当天的秒数 返回值 >=0：秒值 正确-通过; 字符 :失败-有误;
+// $time 时间格式 23:59:59
+// $timeName 时间名称 如 开始时间
+// $errDo 错误处理方式 1 throws 2直接返回错误
+if ( ! function_exists('timeToDaySecond'))
+{
+    function timeToDaySecond($time = '', $timeName = "时间", $errDo = 1){
+        $intDaySecnd = -1;
+        if(judgeTime($time)){
+            $timeArr = explode(":", $time);
+            if(count($timeArr) == 3){
+                $intDaySecnd = intval($timeArr[0]) * 3600 + intval($timeArr[1]) * 60 + intval($timeArr[2]);
+            }else{
+                $errMsg = $timeName . "格式错误";
+                if($errDo == 1) throws($errMsg);
+                return $errMsg;
+            }
+        }else{
+            $errMsg = $timeName . "格式错误";
+            if($errDo == 1) throws($errMsg);
+            return $errMsg;
+        }
+        return $intDaySecnd;
+    }
+}
+
+//比较两个时间,返回  end_time 结束时间 - begin_time 开始时间 返回值：字符：错误信息;数字：时间差
+// begin_time 开始时间
+// end_time 结束时间
+// begin_time_name 时间名称 如 开始时间
+// end_time_name 时间名称 如 结束时间
+// $errDo 错误处理方式 1 throws 2直接返回错误
+if ( ! function_exists('compare_time'))
+{
+    function compare_time($begin_time, $end_time, $begin_time_name, $end_time_name, $errDo = 1){
+        $beginDaySecond = timeToDaySecond($begin_time, $begin_time_name, $errDo);
+        if(is_string($beginDaySecond) ){// 有错
+                return $beginDaySecond;
+            }
+        if($beginDaySecond < 0){
+            return $begin_time_name . '有误';
+        }
+
+        $endDaySecond = timeToDaySecond($end_time, $end_time_name, $errDo);
+        if(is_string($endDaySecond) ){// 有错
+            return $endDaySecond;
+        }
+        if($endDaySecond < 0){
+            return $endDaySecond . '有误';
+        }
+        return $endDaySecond - $beginDaySecond;
+    }
+}
+
 
 // 获得请求的地址及参数。方便测试接口
 function splicQuestAPI($url , $params = []){

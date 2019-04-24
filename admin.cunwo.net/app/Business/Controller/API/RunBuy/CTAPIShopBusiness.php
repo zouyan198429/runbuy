@@ -192,6 +192,13 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
             // 营业时间
             if(isset($data_list[$k]['open_times'])){
                 $openTimes = $data_list[$k]['open_times'] ?? [];
+                // 排序
+                $openTimeDistance = [
+                    ['key' => 'sort_num', 'sort' => 'desc', 'type' => 'numeric'],
+                    ['key' => 'id', 'sort' => 'desc', 'type' => 'numeric'],
+                ];
+                $openTimes = Tool::php_multisort($openTimes, $openTimeDistance);
+                $openTimes = array_values($openTimes);
                 $openTimes = Tool::formatTwoArrKeys($openTimes, Tool::arrEqualKeyVal(['id', 'shop_id', 'open_time', 'close_time', 'is_open', 'sort_num', 'is_open_text']), false);
                 foreach($openTimes as $o_k => $o_v){
                     $range_time = '';
@@ -277,6 +284,13 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
         // 营业时间
             if(isset($info['open_times'])){
                 $openTimes = $info['open_times'] ?? [];
+                // 排序
+                $openTimeDistance = [
+                    ['key' => 'sort_num', 'sort' => 'desc', 'type' => 'numeric'],
+                    ['key' => 'id', 'sort' => 'desc', 'type' => 'numeric'],
+                ];
+                $openTimes = Tool::php_multisort($openTimes, $openTimeDistance);
+                $openTimes = array_values($openTimes);
                 $openTimes = Tool::formatTwoArrKeys($openTimes, Tool::arrEqualKeyVal(['id', 'shop_id', 'open_time', 'close_time', 'is_open', 'sort_num', 'is_open_text']), false);
                 foreach($openTimes as $o_k => $o_v){
                     $range_time = '';

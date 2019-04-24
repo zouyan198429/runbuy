@@ -3,6 +3,7 @@
 namespace App\Business\DB\RunBuy;
 
 use App\Services\Map\Map;
+use App\Services\Tool;
 use Illuminate\Support\Facades\DB;
 /**
  *
@@ -127,6 +128,19 @@ class ShopDBBusiness extends BasePublicDBBusiness
             $resourceIds = $saveData['resourceIds'];
             unset($saveData['resourceIds']);
         }
+        // 营业时间
+        $open_time_list = [];
+        if(isset($saveData['open_time_list'])){
+            $open_time_list = $saveData['open_time_list'];
+            unset($saveData['open_time_list']);
+        }
+        // 营业时间验证
+        if(!empty($open_time_list)){
+            $resultTime = Tool::timesJudgeDo($open_time_list, '', 2 + 4 + 8 + 64, 1, 'open_time', 'close_time', '营业开始时间', '营业结束时间');
+//            if (is_string($resultTime)) {
+//                return $resultTime;
+//            }
+        }
 
         $staffInfo = [];
         if( $id <= 0 ){
@@ -218,6 +232,12 @@ class ShopDBBusiness extends BasePublicDBBusiness
                 $modelObj = null;
                 $saveBoolen = static::saveById($saveData, $id,$modelObj);
                 // $resultDatas = static::getInfo($id);
+
+            }
+
+            // 更新营业时间
+            if(!empty($open_time_list)){
+                ShopOpenTimeDBBusiness::saveData($city_site_id, $city_partner_id, $seller_id, $id, $open_time_list, $operate_staff_id, $operate_staff_id_history);
 
             }
 

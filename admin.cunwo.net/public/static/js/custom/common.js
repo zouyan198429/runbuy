@@ -388,6 +388,7 @@ function decimal_numxs(obj){
         //positive_int >0正整数[全是数字且>0] judge_positive_int(value)
         //digit:0+正整数 judge_judge_digit(value)
         //date [见意用这个]判断日期格式是否正确 judge_date(dateTime) 日期格式 2012-02-16或2012-02-16 23:59:59 2012-2-8或2012-02-16 23:59:59
+        //time 判断时间格式是否正确 true正确 false 有误  时间格式 23:59:59
 //min_length 最小长度;为空则不判断
 //max_length 最大长度;为空则不判断
 //返回值 true：正确-通过;false:失败-有误
@@ -581,6 +582,11 @@ function judge_validate(err_type,tishi_name,value,is_must,reg_msg,min_length,max
                    back_err = "格式不是有效的日期格式!"; 
                 }
                 break;
+            case "time"://time 判断时间格式是否正确 true正确 false 有误  时间格式 23:59:59
+                if(!judge_time(tem_value)){
+                    back_err = "格式不是有效的时间格式!";
+                }
+                break;
             default://其它正则表达式
                 if(!judge_reg(tem_value,reg_msg)){
                    back_err = "格式有误!"; 
@@ -747,6 +753,78 @@ function judge_date(dateTime){
 	   return false;
    }
 }
+
+// 判断时间格式是否正确 true正确 false 有误
+//time 时间格式 23:59:59
+function judge_time(timeVal){
+    var reg2 = /^(0?[0-9]|1[0-9]|2[0-3]):(0?[0-9]|[1-5][0-9]):(0?[0-9]|[1-5][0-9])$/;
+    if(reg2.test(timeVal)){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+// 时间转换为当天的秒数
+//err_type 错误误返回类型
+//  1返回错误字符串,>=0:没有错误;
+//  2返回值 >=0：秒值 正确-通过; <0 :失败-有误;
+//  4返回2的同时，弹出错误提示窗
+// time 时间格式 23:59:59
+// timeName 时间名称 如 开始时间
+function timeToDaySecond(err_type, timeVal, timeName){
+    let intDaySecnd = -1;
+    let errText = '';
+    if(typeof timeVal == 'string' && timeVal.constructor == String && judge_time(timeVal)){
+        let  timeArr = timeVal.split(":");
+        if(timeArr.length == 3){
+            intDaySecnd = parseInt(timeArr[0]) * 3600 + parseInt(timeArr[1]) * 60 + parseInt(timeArr[2]);
+        }else{
+            errText = timeName + "格式错误";
+        }
+    }else{
+        errText = timeName + "格式错误";
+    }
+    if(errText != ''){
+        if(err_type == 4){
+            err_alert(errText);
+        }
+        if(err_type == 1){
+            return errText;
+        }
+    }
+    return intDaySecnd;
+}
+
+// 比较两个时间,返回  end_time 结束时间 - begin_time 开始时间
+//err_type 错误误返回类型
+//  1返回错误字符串,数字:没有错误;
+//  2返回值 数字：秒值 正确-通过; 字符 :失败-有误;
+//  4返回2的同时，弹出错误提示窗  --  不推荐
+// begin_time 开始时间
+// end_time 结束时间
+// begin_time_name 时间名称 如 开始时间
+// end_time_name 时间名称 如 结束时间
+function compare_time(err_type, begin_time, end_time, begin_time_name, end_time_name){
+    let beginDaySecond = timeToDaySecond(err_type, begin_time, begin_time_name);
+    if(typeof beginDaySecond == 'string' ){// 有错
+        return beginDaySecond;
+    }
+    if(beginDaySecond < 0){
+        return begin_time_name + '有误';
+    }
+
+    let endDaySecond = timeToDaySecond(err_type, end_time, end_time_name);
+    if(typeof endDaySecond == 'string' ){// 有错
+        return endDaySecond;
+    }
+    if(endDaySecond < 0){
+        return end_time_name + '有误';
+    }
+    return endDaySecond - beginDaySecond;
+}
+
+
 //判断字符长度
 //str 需要验证的字符串
 //min_length 最小长度;为空则不判断

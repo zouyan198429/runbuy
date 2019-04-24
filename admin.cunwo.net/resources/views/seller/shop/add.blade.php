@@ -13,6 +13,7 @@
     @include('seller.layout_public.pagehead')
     <link rel="stylesheet" href="{{asset('layui-admin-v1.2.1/src/layuiadmin/layui/css/layui.css')}}" media="all">
     <link rel="stylesheet" href="{{asset('layui-admin-v1.2.1/src/layuiadmin/style/admin.css')}}" media="all">
+    <script language="javascript" type="text/javascript" src="{{asset('My97DatePicker/WdatePicker.js')}}"></script>
 </head>
 <body>
 
@@ -83,8 +84,48 @@
             </tr>
             <tr>
                 <th>营业时间<span class="must">*</span></th>
-                <td>
-                    <input type="text" class="inp wnormal range_time"  readonly name="range_time" value="" placeholder="请选择营业时间范围"  />
+                {{--<td>--}}
+                    {{--<input type="text" class="inp wnormal range_time"  readonly name="range_time" value="" placeholder="请选择营业时间范围"  />--}}
+                {{--</td>--}}
+
+                <td  class="open_time_td">
+
+                    <div class="table-header">
+                        <button  type="button" class="btn btn-danger  btn-xs ace-icon fa fa-trash-o bigger-60"  onclick="otheraction.batchDel(this, '.open_time_td', 'tr')">批量删除</button>
+                    </div>
+                    <table class=" table2"  >
+                        <thead>
+                        <tr>
+                            <th style="width: 90px;">
+                                <label class="pos-rel">
+                                    <input type="checkbox" class="ace check_all" value="" onclick="otheraction.seledAll(this,'.table2')">
+                                    <span class="lbl">全选</span>
+                                </label>
+                            </th>
+                            <th>营业时间</th>
+                            <th>是否开启</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody class="data_list open_time_list">
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="4">
+                                <input type="text" class="inp wnormal Wdate " style="width:120px;" id="open_time_input" name="open_time_input" value="" placeholder="请选择上班时间"  onclick="" />
+                                <input type="hidden"  id="open_time_seled"  name="open_time_seled" value="" />
+                                -
+                                <input type="text" class="inp wnormal Wdate " style="width:120px;" id="close_time_input" name="close_time_input" value="" placeholder="请选择下班时间"  onclick="" />
+                                <input type="hidden" id="close_time_seled" name="close_time_seled" value="" />
+
+                                <a href="javascript:void(0);" class="btn btn-mini btn-info" onclick="otheraction.addTime()">
+                                    <i class="ace-icon fa fa-plus-square bigger-60"> 添加</i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tfoot>
+
+                    </table>
                 </td>
             </tr>
             <tr>
@@ -201,6 +242,10 @@
 
     var SELECT_SELLER_URL = "{{ url('seller/seller/select') }}";// 选择商家地址
     var AJAX_SELLER_SELECTED_URL = "{{ url('api/seller/seller/ajax_selected') }}";// ajax选中商家地址
+
+    var DYNAMIC_BAIDU_TEMPLATE = "baidu_template_data_list";//百度模板id
+    var DYNAMIC_TABLE_BODY = "data_list";//数据列表class
+    var OPEN_TIMES_LIST = @json($info['open_times'] ?? []) ;
 
 
     var RANGE_TIME = "{{ $info['range_time'] or '' }}" ;//开考时间

@@ -84,12 +84,44 @@
             </tr>
             <tr>
                 <th>营业时间<span class="must">*</span></th>
-                <td>
-                    <input type="text" class="inp wnormal Wdate " style="width:100px;" id="open_time" name="open_time[]" value="" placeholder="请选择上班时间"  onclick="" />
-                    <input type="text"  id="open_time_seled"  name="open_time_seled" value="" />
-                           -
-                    <input type="text" class="inp wnormal Wdate " style="width:100px;" id="close_time" name="close_time[]" value="" placeholder="请选择下班时间"  onclick="" />
-                    <input type="text" id="close_time_seled" name="close_time_seled" value="" />
+                <td  class="open_time_td">
+
+                    <div class="table-header">
+                        <button  type="button" class="btn btn-danger  btn-xs ace-icon fa fa-trash-o bigger-60"  onclick="otheraction.batchDel(this, '.open_time_td', 'tr')">批量删除</button>
+                    </div>
+                    <table class=" table2"  >
+                        <thead>
+                        <tr>
+                            <th style="width: 90px;">
+                                <label class="pos-rel">
+                                    <input type="checkbox" class="ace check_all" value="" onclick="otheraction.seledAll(this,'.table2')">
+                                    <span class="lbl">全选</span>
+                                </label>
+                            </th>
+                            <th>营业时间</th>
+                            <th>是否开启</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody class="data_list open_time_list">
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4">
+                                    <input type="text" class="inp wnormal Wdate " style="width:120px;" id="open_time_input" name="open_time_input" value="" placeholder="请选择上班时间"  onclick="" />
+                                    <input type="hidden"  id="open_time_seled"  name="open_time_seled" value="" />
+                                    -
+                                    <input type="text" class="inp wnormal Wdate " style="width:120px;" id="close_time_input" name="close_time_input" value="" placeholder="请选择下班时间"  onclick="" />
+                                    <input type="hidden" id="close_time_seled" name="close_time_seled" value="" />
+
+                                    <a href="javascript:void(0);" class="btn btn-mini btn-info" onclick="otheraction.addTime()">
+                                     <i class="ace-icon fa fa-plus-square bigger-60"> 添加</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tfoot>
+
+                    </table>
                 </td>
             </tr>
             <tr>
@@ -213,6 +245,10 @@
     var SELECT_SELLER_URL = "{{ url('admin/seller/select') }}";// 选择商家地址
     var AJAX_SELLER_SELECTED_URL = "{{ url('api/admin/seller/ajax_selected') }}";// ajax选中商家地址
 
+    var DYNAMIC_BAIDU_TEMPLATE = "baidu_template_data_list";//百度模板id
+    var DYNAMIC_TABLE_BODY = "data_list";//数据列表class
+    var OPEN_TIMES_LIST = @json($info['open_times'] ?? []) ;
+
 
     var RANGE_TIME = "{{ $info['range_time'] or '' }}" ;//开考时间
 
@@ -239,45 +275,6 @@
     var RESOURCE_LIST = @json($info['resource_list'] ?? []) ;
     var PIC_LIST_JSON =  {'data_list': RESOURCE_LIST };// piclistJson 数据列表json对象格式  {‘data_list’:[{'id':1,'resource_name':'aaa.jpg','resource_url':'picurl','created_at':'2018-07-05 23:00:06'}]}
 
-    $(function(){
-        // 上班时间快捷选择
-        let openQuickSel = ['8:30:00','9:00:00','10:00:00','14:30:00','15:00:00'];
-        // 下班时间快捷选择
-        let closeQuickSel = ['13:30:00','14:00:00','15:00:00','18:00:00','22:00:00'];
-        // ,quickSel:['8:30:00','9:00:00','10:00:00','18:00:00','22:00:00']
-        let pickConfig ={
-                skin:'blue',isShowClear:false,readOnly:true,isShowToday:false
-                ,dateFmt:'H:mm:ss',qsEnabled:false
-                // ,minTime:'09:00:00',maxTime:'17:30:00'
-            };
-        // 上班时间
-        // $(document).on("click",'input[name="open_time[]"]',function(){
-        $(document).on("click",'#open_time',function(){
-            let obj = $(this);
-            let openConfig = copy(pickConfig,true);// JSON.parse(JSON.stringify(pickConfig));
-            openConfig.el = this;
-            openConfig.quickSel = openQuickSel;
-            openConfig.maxTime = '#F{$dp.$D(\'close_time\') || \'23:59:59\'}';
-            openConfig.vel = 'open_time_seled';
-            console.log('-----openConfig--------',openConfig);
-            WdatePicker(openConfig);// openConfig
-        });
-        // 下班时间
-       // $(document).on("click",'input[name="close_time[]"]',function(){
-         $(document).on("click",'#close_time',function(){
-            let obj = $(this);
-            let closeConfig = copy(pickConfig,true);// JSON.parse(JSON.stringify(pickConfig))
-            closeConfig.el = this;
-            closeConfig.quickSel = closeQuickSel;
-            closeConfig.minTime = '#F{$dp.$D(\'open_time\') || \'00:01:59\'}';
-            closeConfig.vel = 'close_time_seled';
-            console.log('-----closeConfig--------',closeConfig);
-            WdatePicker(closeConfig);
-        });
-
-
-
-    });
 </script>
 <link rel="stylesheet" href="{{asset('js/baguetteBox.js/baguetteBox.min.css')}}">
 <script src="{{asset('js/baguetteBox.js/baguetteBox.min.js')}}" async></script>

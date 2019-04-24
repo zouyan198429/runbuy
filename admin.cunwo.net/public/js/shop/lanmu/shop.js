@@ -166,9 +166,9 @@ var otheraction = {
     document.write("                <%=kitem.open_time%>-<%=kitem.close_time%><br/>(<%=kitem.is_open_text%>)");
     document.write("              </p><hr/>");
     document.write("            <%}%>");
-    document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.openTime(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.seller_id%>,<%=item.id%>,'<%=item.shop_name%>-营业时间管理')\">");
-    document.write("                    <i class=\"ace-icon fa fa-clock-o bigger-60\"> 营业时间<\/i>");
-    document.write("                <\/a>");
+    // document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.openTime(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.seller_id%>,<%=item.id%>,'<%=item.shop_name%>-营业时间管理')\">");
+    // document.write("                    <i class=\"ace-icon fa fa-clock-o bigger-60\"> 营业时间<\/i>");
+    // document.write("                <\/a>");
     document.write("           <\/td>");
     document.write("            <td><%=item.sort_num%><hr/><%=item.per_price%><hr/><%=item.status_text%><hr/><%=item.status_business_text%><\/td>");
     // document.write("            <td><%=item.intro%><\/td>");
