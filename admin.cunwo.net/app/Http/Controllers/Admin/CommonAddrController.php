@@ -88,6 +88,9 @@ class CommonAddrController extends WorksController
         $mobile = CommonRequest::get($request, 'mobile');
         $addr_name = CommonRequest::get($request, 'addr_name');
         $addr = CommonRequest::get($request, 'addr');
+        if($addr_name == $addr){
+            $addr_name = "";
+        }
         $is_default = CommonRequest::getInt($request, 'is_default');
         $latitude = CommonRequest::get($request, 'latitude');
         $longitude = CommonRequest::get($request, 'longitude');
