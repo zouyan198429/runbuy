@@ -169,48 +169,12 @@ class ShopOpenTimeDBBusiness extends BasePublicDBBusiness
         // 获得还在线上的店铺id
         $shopIdsInLine = array_values(array_diff($shopIdsOnLine, $shopIdsOperateDownLine));
 
-        // 还在线上的和将要上线的店铺id，判断是否有非营业中的，有则要进行下线
-        // 将要上线的店铺id
-        if(!empty($shopIdsOperateOnLine)){
-            // 获得非营业中的店铺记录
-            $queryParams = [
-                'where' => [
-                   //  ['status_business', '!=', 1],
-                ],
-//            'select' => [
-//                'id','title','sort_num','volume'
-//            ],
-                //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
-            ];
-            $queryParams['select'] = ['id', 'status_business', 'status'];
-            $queryParams['whereIn']['id'] = $shopIdsOperateOnLine;
-            if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
-            $shopList = ShopDBBusiness::getAllList($queryParams, '')->toArray();
-            // 去掉未审核通过和是营业中的
-            foreach($shopList as $k => $v){
-                // 未审核通过,保留,不上线
-                if($v['status'] != 1){
-                    continue;
-                }
-                // 营业中的,保留,不上线
-                if($v['status_business'] == 1  ){
-                    continue;
-                }
-                unset($shopList[$k]);
-
-            }
-            $shopList = array_values($shopList);
-            if(!empty($shopList)){
-                $temShopIds = array_values(array_unique(array_column($shopList, 'id')));
-                $shopIdsOperateOnLine = array_values(array_diff($shopIdsOperateOnLine, $temShopIds));
-            }
-        }
         // 还在线上的
         if(!empty($shopIdsInLine)){
             // 获得非营业中的店铺记录
             $queryParams = [
                 'where' => [
-                   // ['status_business', '!=', 1],
+                    // ['status_business', '!=', 1],
                 ],
 //            'select' => [
 //                'id','title','sort_num','volume'
@@ -241,6 +205,42 @@ class ShopOpenTimeDBBusiness extends BasePublicDBBusiness
             }
         }
 
+        // 还在线上的和将要上线的店铺id，判断是否有非营业中的，有则要进行下线
+        // 将要上线的店铺id
+        if(!empty($shopIdsOperateOnLine)){
+            // 获得非营业中的店铺记录
+            $queryParams = [
+                'where' => [
+                   //  ['status_business', '!=', 1],
+                ],
+//            'select' => [
+//                'id','title','sort_num','volume'
+//            ],
+                //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+            ];
+            $queryParams['select'] = ['id', 'status_business', 'status'];
+            $queryParams['whereIn']['id'] = $shopIdsOperateOnLine;
+            if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+            $shopList = ShopDBBusiness::getAllList($queryParams, '')->toArray();
+            // 去掉未审核通过和是营业中的
+            foreach($shopList as $k => $v){
+                // 未审核通过,保留,不上线
+                if($v['status'] != 1){
+                    continue;
+                }
+                // 营业中的且在线的,保留,不上线
+                if($v['status_business'] == 1 && in_array($v['id'],$shopIdsInLine) ){
+                    continue;
+                }
+                unset($shopList[$k]);
+
+            }
+            $shopList = array_values($shopList);
+            if(!empty($shopList)){
+                $temShopIds = array_values(array_unique(array_column($shopList, 'id')));
+                $shopIdsOperateOnLine = array_values(array_diff($shopIdsOperateOnLine, $temShopIds));
+            }
+        }
         if(empty($shopIdsOperateOnLine) && empty($shopIdsOperateDownLine)) return true;
         $shopIdsAllOnLine = array_values(array_unique(array_merge($shopIdsInLine, $shopIdsOperateOnLine)));
 
