@@ -235,7 +235,7 @@ function cancelOrder(order_no,pay_type){
     document.write("                <%if(item.parent_order_no != ''){%>");
     document.write("                    <span>父单号:<%=item.parent_order_no_format%><\/span>");
     document.write("                <%}%>");
-    document.write("            <span class=\"shop\"><%=item.addr.addr%>  <%=item.addr.real_name%>(<%=item.addr.mobile_format%>)<\/span>");
+    document.write("            <span class=\"shop\"><%=item.addr.addr_name%>（<%=item.addr.addr%>）  <%=item.addr.real_name%>(<%=item.addr.mobile_format%>)<\/span>");
     // document.write("            <span>餐具数量:<%=item.tableware%>份<\/span>");
     document.write("            <span>希望速度:<%=item.second_num%>分钟(<%=item.send_end_time%>)<\/span>");
     document.write("            <span>商品金额:<%=item.total_price%>元(共<%=item.total_amount%>份)<\/span>");

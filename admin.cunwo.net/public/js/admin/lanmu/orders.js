@@ -234,7 +234,7 @@ function cancelOrder(order_no,pay_type){
     document.write("        <div class=\"order_info clearfix\">");
     document.write("            <span><%=item.created_at%><\/span>");
     document.write("            <span>订单号:<%=item.order_no_format%><\/span>");
-    document.write("            <span class=\"shop\"><%=item.addr.addr%>  <%=item.addr.real_name%>(<%=item.addr.mobile_format%>)<\/span>");
+    document.write("            <span class=\"shop\"><%=item.addr.addr_name%>（<%=item.addr.addr%>）  <%=item.addr.real_name%>(<%=item.addr.mobile_format%>)<\/span>");
     // document.write("            <span>餐具数量:<%=item.tableware%>份<\/span>");
     document.write("            <span>希望速度:<%=item.second_num%>分钟(<%=item.send_end_time%>)<\/span>");
     document.write("            <span>商品金额:<%=item.total_price%>元(共<%=item.total_amount%>份)<\/span>");
