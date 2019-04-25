@@ -43,7 +43,7 @@ class Kernel extends ConsoleKernel
         })->everyMinute();// ->everyFiveMinutes();//	每五分钟运行一次任务 ->everyMinute();
         $schedule->call(function () {
             CityDBBusiness::autoCityShopSalesVolume();// 跑城市店铺月销量最近30天脚本
-        })->everyFiveMinutes();
+        })->everyThirtyMinutes();
     }
 
     /**
