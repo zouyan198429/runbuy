@@ -153,7 +153,7 @@ class ShopOpenTimeDBBusiness extends BasePublicDBBusiness
         // 获得已上线的店铺id
         $shopIdsOnLine = Tool::getRedis('shop:online' . $city_site_id, 1);
         // if(!empty($shopIdsOnLine)) pr($shopIdsOnLine);
-        if(!is_array($shopIdsOnLine)){
+        if(!is_array($shopIdsOnLine) || true){
             $shopIdsOnLine = ShopDBBusiness::getBusinessShopIds($city_site_id, 1, 1);
             // 缓存起来
             Tool::setRedis('shop:', 'online' . $city_site_id , $shopIdsOnLine, 0 , 1);
@@ -164,12 +164,15 @@ class ShopOpenTimeDBBusiness extends BasePublicDBBusiness
 
         // 获得真正需要上线的店铺id
         $shopIdsOperateOnLine = array_values(array_diff($shopIdsNeed, $shopIdsOnLine));
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // 获得需要下线的店铺id
         $shopIdsOperateDownLine = array_values(array_diff($shopIdsOnLine, $shopIdsNeed));
+
         // 获得还在线上的店铺id
         $shopIdsInLine = array_values(array_diff($shopIdsOnLine, $shopIdsOperateDownLine));
 
-        // 还在线上的
+        // 还在线上的,如果未审或非营业中的，要下线操作
         if(!empty($shopIdsInLine)){
             // 获得非营业中的店铺记录
             $queryParams = [
@@ -185,7 +188,7 @@ class ShopOpenTimeDBBusiness extends BasePublicDBBusiness
             $queryParams['whereIn']['id'] = $shopIdsInLine;
             if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
             $shopList = ShopDBBusiness::getAllList($queryParams, '')->toArray();
-            // 去掉未审核通过和是营业中的
+            // 去掉未审核通过和非营业中的
             foreach($shopList as $k => $v){
                 // 未审核通过,保留,下线
                 if($v['status'] != 1){
@@ -206,7 +209,7 @@ class ShopOpenTimeDBBusiness extends BasePublicDBBusiness
         }
 
         // 还在线上的和将要上线的店铺id，判断是否有非营业中的，有则要进行下线
-        // 将要上线的店铺id
+        // 将要上线的店铺id--处理不能上线的
         if(!empty($shopIdsOperateOnLine)){
             // 获得非营业中的店铺记录
             $queryParams = [
@@ -229,11 +232,18 @@ class ShopOpenTimeDBBusiness extends BasePublicDBBusiness
                     continue;
                 }
                 // 营业中的且在线的,保留,不上线
-                if($v['status_business'] == 1 && in_array($v['id'],$shopIdsInLine) ){
-                    continue;
+                if($v['status_business'] == 1 ){// 1营业中
+                    if( in_array($v['id'],$shopIdsInLine)){
+                        continue;
+                    }
+                }else{// 非营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]
+                    // 非 1营业中 2 歇业中
+                    // 非营业中的 经营状态  1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]
+                    if(!in_array($v['status_business'], [1,2])){
+                        continue;
+                    }
                 }
                 unset($shopList[$k]);
-
             }
             $shopList = array_values($shopList);
             if(!empty($shopList)){
