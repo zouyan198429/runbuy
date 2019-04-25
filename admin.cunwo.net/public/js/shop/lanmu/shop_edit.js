@@ -226,13 +226,13 @@ function ajax_form(){
         return false;
     }
 
-    var status = $('input[name=status]:checked').val() || '';
-    var judge_seled = judge_validate(1,'状态',status,true,'custom',/^[0124]$/,"");
-    if(judge_seled != ''){
-        layer_alert("请选择状态",3,0);
-        //err_alert('<font color="#000000">' + judge_seled + '</font>');
-        return false;
-    }
+    // var status = $('input[name=status]:checked').val() || '';
+    // var judge_seled = judge_validate(1,'状态',status,true,'custom',/^[0124]$/,"");
+    // if(judge_seled != ''){
+    //     layer_alert("请选择状态",3,0);
+    //     //err_alert('<font color="#000000">' + judge_seled + '</font>');
+    //     return false;
+    // }
 
     var linkman = $('input[name=linkman]').val();
     if(!judge_validate(4,'联系人',linkman,true,'length',1,30)){
