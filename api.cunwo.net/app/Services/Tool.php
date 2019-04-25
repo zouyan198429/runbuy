@@ -1143,6 +1143,7 @@ class Tool
      * 功能：日期 加/减操作
      * @param string $operateDate 操作日期/时间;// 为空，则操作当前时间
      * @param array $oprates 操作类型 一维数组, 下面空格拼接执行
+     [
     // +1 day +1 hour +1 minute  可以随便自由组合，以达到任意输出时间的目的
     // -1 day  ---昨天  // 可以修改参数1为任何想需要的数  day也可以改成year（年），month（月），hour（小时），minute（分），second（秒）
     // +1 day  ---明天
@@ -1153,6 +1154,7 @@ class Tool
     // last month  ---一个月前
     // +1 month  ---一个月后
     // +10 year  ---十年后
+     ]
      * @param string $format 返回数据格式化 "Y-m-d H:i:s","Y-m-d","H:i:s"
      * @param string $errDo 错误处理方式 1 throws 2直接返回错误
      * @param string $dateName 日期(默认); 时间

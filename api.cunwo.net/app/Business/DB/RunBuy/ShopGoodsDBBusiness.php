@@ -726,4 +726,80 @@ class ShopGoodsDBBusiness extends BasePublicDBBusiness
             $goodInfoObj->save();
         }
     }
+
+    /**
+     * 跑城市店铺商品月销量最近30天脚本
+     *
+     * @param string $beginDateTime 开始时间 格式 'Y-m-d'
+     * @param string $endDateTime 结束时间 格式 'Y-m-d'
+     * @param int $city_site_id 城市id
+//     * @param string $status 多个用逗号分隔 状态0待审核1审核通过2审核未通过4冻结(禁用)
+//     * @param string $status_business   多个用逗号分隔 经营状态  1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]
+     * @return mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function autoShopGoodsSalesVolume($beginDateTime = '', $endDateTime = '', $city_site_id = 0){ //, $status = '1', $status_business = '1,2'
+
+        $selectArr = ['goods_id'];// ['city_site_id', 'city_partner_id', 'seller_id', 'shop_id'];
+        $countOrderWhere = [
+            ['city_site_id', '=', $city_site_id],
+            // ['city_partner_id', '=', $v['city_partner_id']],
+            // ['seller_id', '=', $v['seller_id']],
+            //  ['shop_id', '=', $shop_id],
+        ];
+        $countOrderList = CountOrdersDBBusiness::getCountByGroupBy($selectArr, 'goods_id', $countOrderWhere, $beginDateTime, $endDateTime)->toArray();
+        // 返回二维数组 [ ['goods_id' => 3, 'amount_count' => 4, 'total_amount' => 32.000] ,...]
+        $formatCountOrders = [];
+        foreach($countOrderList as $k => $v){
+            $formatCountOrders[$v['goods_id']] = $v;
+        }
+        // 获得当前城市的店铺商品信息
+        $queryParams = [
+            'where' => [
+                //  ['city_site_id', '=', $city_site_id],
+            ],
+            'select' => ['id', 'mon_sales_volume', 'mon_total_price'],// ['id', 'city_site_id', 'city_partner_id', 'seller_id'],
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+//        if(!empty($status)){
+//            if (strpos($status, ',') === false) { // 单条
+//                array_push($queryParams['where'], ['status', $status]);
+//            } else {
+//                $queryParams['whereIn']['status'] = explode(',', $status);
+//            }
+//        }
+//
+//        if(!empty($status_business)){
+//            if (strpos($status_business, ',') === false) { // 单条
+//                array_push($queryParams['where'], ['status_business', $status_business]);
+//            } else {
+//                $queryParams['whereIn']['status_business'] = explode(',', $status_business);
+//            }
+//
+//        }
+
+        $dataList = static::getAllList($queryParams, '')->toArray();
+
+        $dataUdateMon = [];
+        foreach($dataList as $v){
+            $good_id = $v['id'];
+            $temShopCountInfo =$formatCountOrders[$good_id] ?? [
+                    'goods_id' => $good_id,
+                    'amount_count' => 0,
+                    'total_amount' => 0
+                ];
+
+            if($v['mon_sales_volume'] != $temShopCountInfo['amount_count'] || $v['mon_total_price'] != $temShopCountInfo['total_amount']){
+                array_push($dataUdateMon, [
+                    'id' => $good_id,
+                    'mon_sales_volume' => $temShopCountInfo['amount_count'],
+                    'mon_total_price' => $temShopCountInfo['total_amount']
+                ]);
+            }
+        }
+        if(empty($dataUdateMon)) return true;
+        // 批量更新店铺销量
+        static::saveBathById($dataUdateMon, 'id');
+    }
 }

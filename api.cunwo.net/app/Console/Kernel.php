@@ -27,6 +27,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        // everyThirtyMinutes() 每三十分钟运行一次任务 ->hourly() 每小时运行一次任务  ->everyFiveMinutes();	每五分钟运行一次任务
+
 //         $schedule->command('inspire')
 //                  ->hourly();
 //        $filePath = '/data/CronResult.text';
@@ -39,6 +41,9 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             CityDBBusiness::autoCityOnLine();// 跑城市店铺营业中脚本
         })->everyMinute();// ->everyFiveMinutes();//	每五分钟运行一次任务 ->everyMinute();
+        $schedule->call(function () {
+            CityDBBusiness::autoCityShopSalesVolume();// 跑城市店铺月销量最近30天脚本
+        })->everyThirtyMinutes();
     }
 
     /**

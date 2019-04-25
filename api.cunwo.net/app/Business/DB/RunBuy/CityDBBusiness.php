@@ -5,7 +5,9 @@ namespace App\Business\DB\RunBuy;
 use App\Services\Map\Map;
 use App\Services\Map\S2;
 use App\Services\Tool;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  *
@@ -387,9 +389,48 @@ class CityDBBusiness extends BasePublicDBBusiness
             //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
         ];
         $cityList = static::getAllList($queryParams, '')->toArray();
+//        Log::info('自动脚本日志---城市店铺营业中脚本--开始',[]);
         foreach($cityList as $v){
             $city_site_id = $v['id'];
+//            Log::info('自动脚本日志---城市店铺营业中脚本--开始执行城市',[$city_site_id]);
             ShopOpenTimeDBBusiness::autoShopOnLine($city_site_id);
+//            Log::info('自动脚本日志---城市店铺营业中脚本--结束执行城市',[$city_site_id]);
         }
+//        Log::info('自动脚本日志---城市店铺营业中脚本--结束',[]);
+    }
+
+    /**
+     * 跑城市店铺月销量最近30天脚本
+     *
+     * @param int $id
+     * @return mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function autoCityShopSalesVolume(){
+        // $currentNow = Carbon::now();
+        // $endDateTime = Carbon::now()->toDateTimeString();
+        $endDateTime = date('Y-m-d');
+        $beginDateTime = Tool::addMinusDate($endDateTime, ['-30 day'], 'Y-m-d', 1, '时间');
+        $queryParams = [
+            'where' => [
+                ['is_city_site', '=', 1],
+            ],
+            'select' => ['id'],
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        $cityList = static::getAllList($queryParams, '')->toArray();
+        Log::info('自动脚本日志---月销量最近30天脚本--开始',[]);
+        foreach($cityList as $v){
+            $city_site_id = $v['id'];
+//            Log::info('自动脚本日志---月销量最近30天脚本--开始执行城市',[$city_site_id]);
+            ShopDBBusiness::autoShopSalesVolume($beginDateTime, $endDateTime, $city_site_id, '', '');// 店铺月销量
+//            sleep(2);
+            ShopGoodsDBBusiness::autoShopGoodsSalesVolume($beginDateTime, $endDateTime, $city_site_id);// 店铺商品月销量
+//            sleep(2);
+            ShopGoodsPricesDBBusiness::autoShopGoodsPriceSalesVolume($beginDateTime, $endDateTime, $city_site_id);// 跑城市店铺商品价格月销量最近30天脚本
+            sleep(1);
+//            Log::info('自动脚本日志---月销量最近30天脚本--结束执行城市',[$city_site_id]);
+        }
+        Log::info('自动脚本日志---月销量最近30天脚本--结束',[]);
     }
 }

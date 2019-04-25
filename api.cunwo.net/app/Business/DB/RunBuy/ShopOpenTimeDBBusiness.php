@@ -139,12 +139,9 @@ class ShopOpenTimeDBBusiness extends BasePublicDBBusiness
                 ['close_time', '>', $nowTime],
                 ['is_open', '=', 2],
             ],
-//            'select' => [
-//                'id','title','sort_num','volume'
-//            ],
+            'select' => ['id', 'shop_id'],
             //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
         ];
-        $queryParams['select'] = ['id', 'shop_id'];
         if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
         $openTimeList = static::getAllList($queryParams, '')->toArray();
         // if(empty($openTimeList)) return true;
