@@ -109,6 +109,19 @@ class CTAPICommonAddrBusiness extends BasicPublicCTAPIBusiness
 //            // 公司名称
 //            $data_list[$k]['company_name'] = $v['company_info']['company_name'] ?? '';
 //            if(isset($data_list[$k]['company_info'])) unset($data_list[$k]['company_info']);
+            // 名称及地址处理
+            $tem_addr_name = $v['addr_name'] ?? '';
+            $tem_addr = $v['addr'] ?? '';
+            if(!empty($tem_addr_name) ){
+                if(empty($tem_addr)){
+                    $data_list[$k]['addr'] = $tem_addr_name;
+                }else{
+                    if($tem_addr_name != $tem_addr) {
+                        $data_list[$k]['addr'] = $tem_addr_name . '（' . $tem_addr . '）';
+                    }
+                }
+                $data_list[$k]['addr_name'] = '';
+            }
         }
         $result['data_list'] = $data_list;
         // 导出功能

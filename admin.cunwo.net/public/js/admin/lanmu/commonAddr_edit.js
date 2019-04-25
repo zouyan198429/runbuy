@@ -102,10 +102,10 @@ function ajax_form(){
     }
 
 
-    var addr_name = $('input[name=addr_name]').val();
-    if(!judge_validate(4,'地址名称',addr_name,true,'length',1,100)){
-        return false;
-    }
+    // var addr_name = $('input[name=addr_name]').val();
+    // if(!judge_validate(4,'地址名称',addr_name,true,'length',1,100)){
+    //     return false;
+    // }
 
     var addr = $('input[name=addr]').val();
     if(!judge_validate(4,'详细地址',addr,true,'length',1,200)){

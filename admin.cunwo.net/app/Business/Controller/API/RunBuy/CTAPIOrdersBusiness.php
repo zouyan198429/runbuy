@@ -237,6 +237,19 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
             // 收货地址
             if(isset($v['addr_history']) && !empty($v['addr_history'])){
                 $addr_history = $v['addr_history'] ?? [];
+
+                $tem_addr_name = $addr_history['addr_name'] ?? '';
+                $tem_addr = $addr_history['addr'] ?? '';
+                if(!empty($tem_addr_name) ){
+                    if(empty($tem_addr)){
+                        $addr_history['addr'] = $tem_addr_name;
+                    }else{
+                        if($tem_addr_name != $tem_addr) {
+                            $addr_history['addr'] = $tem_addr_name . '（' . $tem_addr . '）';
+                        }
+                    }
+                    $addr_history['addr_name'] = '';
+                }
                 unset($data_list[$k]['addr_history']);
                 $data_list[$k]['addr'] = Tool::formatArrKeys($addr_history
                     , Tool::arrEqualKeyVal(['addr_id', 'real_name', 'sex', 'sex_text', 'tel', 'mobile', 'addr_name', 'addr', 'longitude', 'latitude']), true );

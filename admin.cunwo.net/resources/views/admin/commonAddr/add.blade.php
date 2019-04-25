@@ -41,7 +41,7 @@
                 </td>
             </tr>
             <tr>
-                <th>地址名称<span class="must">*</span></th>
+                <th>地址名称<span class="must"></span></th>
                 <td>
                     <input type="text" class="inp wnormal"  name="addr_name" value="{{ $info['addr_name'] or '' }}" placeholder="请输入地址名称"/>
                 </td>
