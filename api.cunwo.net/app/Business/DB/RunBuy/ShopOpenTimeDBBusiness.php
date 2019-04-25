@@ -153,7 +153,7 @@ class ShopOpenTimeDBBusiness extends BasePublicDBBusiness
         // 获得已上线的店铺id
         $shopIdsOnLine = Tool::getRedis('shop:online' . $city_site_id, 1);
         // if(!empty($shopIdsOnLine)) pr($shopIdsOnLine);
-        if(!is_array($shopIdsOnLine) || true){
+        if(!is_array($shopIdsOnLine)){//  || true
             $shopIdsOnLine = ShopDBBusiness::getBusinessShopIds($city_site_id, 1, 1);
             // 缓存起来
             Tool::setRedis('shop:', 'online' . $city_site_id , $shopIdsOnLine, 0 , 1);
