@@ -31,6 +31,11 @@ class ShopController extends WorksController
         // 状态
         $reDataArr['status'] =  CTAPIShopBusiness::$statusArr;
         $reDataArr['defaultStatus'] = -1;// 默认状态
+
+        // 经营状态
+        $reDataArr['statusBusiness'] =  CTAPIShopBusiness::$statusBusinessArr;
+        $reDataArr['defaultStatusBusiness'] = -1;// 默认状态
+
         // 店铺分类
         $reDataArr['type_kv'] = CTAPIShopTypeBusiness::getListKV($request, $this);
         $reDataArr['defaultType'] = -1;// 默认

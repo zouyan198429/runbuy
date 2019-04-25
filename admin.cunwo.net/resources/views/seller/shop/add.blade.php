@@ -134,7 +134,7 @@
                     <input type="text" class="inp wnormal"  name="per_price" value="{{ $info['per_price'] or '' }}" placeholder="请输入人均"  onkeyup="numxs(this) " onafterpaste="numxs(this)"   />
                 </td>
             </tr>
-            <tr>
+            <tr style="display: none;">
                 <th>状态<span class="must">*</span></th>
                 <td>
                     @foreach ($status as $k=>$txt)

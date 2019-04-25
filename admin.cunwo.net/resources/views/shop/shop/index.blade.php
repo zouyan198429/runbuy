@@ -34,6 +34,12 @@
             <option value="{{ $k }}"  @if(isset($defaultStatus) && $defaultStatus == $k) selected @endif >{{ $txt }}</option>
           @endforeach
         </select>
+        <select class="wmini" name="status_business" style="width: 55px;">
+          <option value="">请选择营业状态</option>
+          @foreach ($statusBusiness as $k=>$txt)
+            <option value="{{ $k }}"  @if(isset($defaultStatusBusiness) && $defaultStatusBusiness == $k) selected @endif >{{ $txt }}</option>
+          @endforeach
+        </select>
         <select class="wmini" name="shop_type_id" style="width: 55px;">
           <option value="">请选择分类</option>
           @foreach ($type_kv as $k=>$txt)

@@ -104,12 +104,15 @@ class CTAPIStaffBusiness extends BasicPublicCTAPIBusiness
             case 2:// 城市分站
                 break;
             case 4:// 城市代理
+                if(empty($staffCityPartner))  throws('城市代理信息不存在！');
                 if($staffCityPartner['status'] != 1)  throws('不是审核通过状态！');
                 break;
             case 8:// 商家
+                if(empty($staffSeller))  throws('商家信息不存在！');
                 if($staffSeller['status'] != 1)  throws('不是审核通过状态！');
                 break;
             case 16:// 店铺
+                if(empty($staffShop))  throws('店铺信息不存在！');
                 if($staffShop['status'] != 1)  throws('不是审核通过状态！');
                 break;
             case 32:// 快跑人员

@@ -20,6 +20,14 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
         '4' => '冻结',
     ];
 
+    // status_business 经营状态  1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]
+    public static $statusBusinessArr = [
+        '1' => '营业中',
+        '2' => '歇业中',
+        //'4' => '停业中',
+        //'8' => '关业中',
+    ];
+
     /**
      * 获得列表数据--所有数据
      *
