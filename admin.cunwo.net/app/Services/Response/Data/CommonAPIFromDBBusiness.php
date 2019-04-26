@@ -105,9 +105,11 @@ class CommonAPIFromDBBusiness extends CommonAPIFormModel
         Tool::judgeEmptyParams('methodName', $methodName);
 
         $params = CommonRequest::get($request, 'params');
-        Tool::judgeEmptyParams('params', $params);
-        // json 转成数组
-        if (!empty($params))  jsonStrToArr($params , 1, '参数[params]格式有误!');
+        if(!empty($params)){
+            Tool::judgeEmptyParams('params', $params);
+            // json 转成数组
+            if (!empty($params))  jsonStrToArr($params , 1, '参数[params]格式有误!');
+        }
         if (!is_array($params)) $params =[];
 
         // 获得对象

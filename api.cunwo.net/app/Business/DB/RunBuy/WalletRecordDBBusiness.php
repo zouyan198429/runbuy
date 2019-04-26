@@ -939,7 +939,7 @@ class WalletRecordDBBusiness extends BasePublicDBBusiness
                         $leave_run_price = $total_run_price - $refund_amount;
 
                         $orderSaveData = [
-                            'total_run_price' => $total_run_price - $refund_amount,
+                            'total_run_price' => $total_run_price - $refund_amount,// 总跑腿费[扣除退款的]
                             'refund_price_frozen' => $orderInfo->refund_price_frozen + $refund_amount,// 退费冻结[申请时冻结，成功/失败时减掉]
                             'has_refund' => 2,// 是否退费0未退费1已退费2待退费
                             'cancel_time' => date("Y-m-d H:i:s",time()),// 作废时间

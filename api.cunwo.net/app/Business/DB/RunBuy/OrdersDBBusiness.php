@@ -724,4 +724,56 @@ class OrdersDBBusiness extends BasePublicDBBusiness
 
         return $return;
     }
+
+    /**
+     * 跑城市最新支付时间范围内已支付订单列表，自动取消订单用
+     *
+     * @param string $beginDateTime >= 开始时间 格式 'Y-m-d'
+     * @param string $endDateTime <= 结束时间 格式 'Y-m-d'
+     * @param int $city_site_id 城市id
+     * @return array 需要取消并退款的订单信息  二维数组
+         [
+            [
+                'order_no' => $order_no, // 订单号 , 如果是订单操作必传-- order_no 或 my_order_no 之一不能为空
+                'my_order_no' => $my_order_no,//付款 我方单号--与第三方对接用 -- order_no 或 my_order_no 之一不能为空
+                'refund_amount' => $amount,// 需要退款的金额--0为全退---单位元
+                'refund_reason' => $refund_reason,// 退款的原因--:为空，则后台自己组织内容
+            ]
+        ]
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getCancelOrderList($beginDateTime = '', $endDateTime = '', $city_site_id = 0){
+
+        // 获得当前订单信息
+        $queryParams = [
+            'where' => [
+                ['order_type', 1],// 订单类型1普通订单/父订单4子订单
+                ['status', 2],// 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
+                ['pay_run_price', 1],// 是否支付跑腿费0未支付1已支付
+                ['has_refund' , '!=', 2],// 是否退费0未退费1已退费2待退费
+            ],
+            'select' => ['id', 'order_no', 'total_run_price'],//  total_run_price 总跑腿费[扣除退款的] , 'refund_price_frozen' 退费冻结[申请时冻结，成功/失败时减掉]['id', 'city_site_id', 'city_partner_id', 'seller_id'],
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        if(!empty($beginDateTime) && empty($endDateTime)) array_push($queryParams['where'], ['pay_time_latest', '>=', $beginDateTime]);
+        if(empty($beginDateTime) && !empty($endDateTime)) array_push($queryParams['where'], ['pay_time_latest', '<=', $endDateTime]);
+        if(!empty($beginDateTime) && !empty($endDateTime)){
+            $queryParams['whereBetween'] = [
+                    'pay_time_latest' => [$beginDateTime, $endDateTime]
+                ];
+        }
+        if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+
+        $dataList = OrdersDoingDBBusiness::getAllList($queryParams, '')->toArray();
+        $resultList = [];
+        foreach($dataList as $v){
+            array_push($resultList, [
+                'order_no' => $v['order_no'],// 订单号 , 如果是订单操作必传-- order_no 或 my_order_no 之一不能为空
+                'my_order_no' => '',//付款 我方单号--与第三方对接用 -- order_no 或 my_order_no 之一不能为空
+                'refund_amount' => 0,//$v['total_run_price'] 需要退款的金额--0为全退---单位元
+                'refund_reason' => '订单超期，系统自动取消并退款',// 退款的原因--:为空，则后台自己组织内容
+            ]);
+        }
+        return $resultList;
+    }
 }

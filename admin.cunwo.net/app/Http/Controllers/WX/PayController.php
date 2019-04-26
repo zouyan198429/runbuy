@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\WX;
 
+use App\Business\API\RunBuy\CityAPIBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIOrdersBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIOrdersDoingBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIWalletRecordBusiness;
@@ -223,7 +224,7 @@ class PayController extends BaseController
     public function refundOrder(Request $request)
     {
         $this->InitParams($request);
-        return CTAPIWalletRecordBusiness::cancelOrder($request, $this);
+        return CTAPIWalletRecordBusiness::cancelOrder($request, $this, 0);
         /*
         switch($pay_type){
             case 1:// 1 订单支付跑腿费
@@ -408,6 +409,8 @@ class PayController extends BaseController
 //    }
 
         public function test(Request $request){
+//             $cancelOrderList = CityAPIBusiness::autoCancelOrdes();
+//             pr($cancelOrderList);
             $message = '{"appid":"wxcb82783fe211782f","bank_type":"CFT","cash_fee":"1","fee_type":"CNY","is_subscribe":"N","mch_id":"1527642191","nonce_str":"5c9a4a10401dd","openid":"owfFF4ydu2HmuvmSDS4goIoAIYEs","out_trade_no":"31903262349363516","result_code":"SUCCESS","return_code":"SUCCESS","sign":"27EEA7F8C022D97B9FC6B147373B5AA7","time_end":"20190326234942","total_fee":"1","trade_type":"JSAPI","transaction_id":"4200000284201903266412932872"}';
             $queryResult = '{"return_code":"SUCCESS","return_msg":"OK","appid":"wxcb82783fe211782f","mch_id":"1527642191","nonce_str":"fKvV3jFuqUG3H0mJ","sign":"96F61E600C674F0D2E049D400BF26A62","result_code":"SUCCESS","openid":"owfFF4ydu2HmuvmSDS4goIoAIYEs","is_subscribe":"N","trade_type":"JSAPI","bank_type":"CFT","total_fee":"1","fee_type":"CNY","transaction_id":"4200000284201903266412932872","out_trade_no":"31903262349363516","attach":null,"time_end":"20190326234942","trade_state":"SUCCESS","cash_fee":"1","trade_state_desc":"支付成功"}';
             $message = json_decode($message, true);

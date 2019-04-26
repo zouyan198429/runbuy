@@ -26,7 +26,8 @@ class TestController extends CompController
 
     public  function  index(Request $request){
         echo 'aaa';
-        CityDBBusiness::autoCityShopSalesVolume();// 跑城市店铺月销量最近30天脚本
+        CityDBBusiness::autoCityCancelOrder();// 跑城市订单过期未接单自动关闭脚本--每一分钟跑一次
+//        CityDBBusiness::autoCityShopSalesVolume();// 跑城市店铺月销量最近30天脚本
        // CityDBBusiness::autoCityOnLine();// 跑城市店铺营业中脚本
 //        ShopDBBusiness::initOpenTime();
 

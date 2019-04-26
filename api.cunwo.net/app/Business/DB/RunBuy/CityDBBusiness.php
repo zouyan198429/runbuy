@@ -433,4 +433,45 @@ class CityDBBusiness extends BasePublicDBBusiness
         }
         Log::info('自动脚本日志---月销量最近30天脚本--结束',[]);
     }
+
+    /**
+     * 跑城市订单过期未接单自动关闭脚本--每一分钟跑一次  ;注意这个脚本不在api跑，admin来跑，这里只为它提供数据。
+     *
+     * @param int $id
+     * @return array 需要取消并退款的订单信息  二维数组
+        [
+            [
+                'order_no' => $order_no, // 订单号 , 如果是订单操作必传-- order_no 或 my_order_no 之一不能为空
+                'my_order_no' => $my_order_no,//付款 我方单号--与第三方对接用 -- order_no 或 my_order_no 之一不能为空
+                'refund_amount' => $amount,// 需要退款的金额--0为全退---单位元
+                'refund_reason' => $refund_reason,// 退款的原因--:为空，则后台自己组织内容
+            ]
+        ]
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function autoCityCancelOrder(){
+        // $currentNow = Carbon::now();
+        // $endDateTime = Carbon::now()->toDateTimeString();
+        $endDateTime = date('Y-m-d H:i:s');
+        $beginDateTime = Tool::addMinusDate($endDateTime, ['-24 minute'], 'Y-m-d H:i:s', 1, '时间');
+        $queryParams = [
+            'where' => [
+                ['is_city_site', '=', 1],
+            ],
+            'select' => ['id'],
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        $cityList = static::getAllList($queryParams, '')->toArray();
+//        Log::info('自动脚本日志---过期未接单自动关闭脚本--开始',[]);
+        $resultList = [];
+        foreach($cityList as $v){
+            $city_site_id = $v['id'];
+//            Log::info('自动脚本日志---过期未接单自动关闭脚本--开始执行城市',[$city_site_id]);
+              $cancelOrderList = OrdersDBBusiness::getCancelOrderList('', $beginDateTime, $city_site_id);// 店铺月销量
+            if(!empty($cancelOrderList)) $resultList = array_merge($resultList, $cancelOrderList);
+//            Log::info('自动脚本日志---过期未接单自动关闭脚本--结束执行城市',[$city_site_id]);
+        }
+//        Log::info('自动脚本日志---过期未接单自动关闭脚本--结束',[]);
+        return $resultList;
+    }
 }

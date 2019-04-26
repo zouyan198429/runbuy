@@ -285,7 +285,7 @@ class OrdersController extends WorksController
     public function refundOrder(Request $request)
     {
         $this->InitParams($request);
-        return CTAPIWalletRecordBusiness::cancelOrder($request, $this);
+        return CTAPIWalletRecordBusiness::cancelOrder($request, $this, 0);
     }
 
     /**

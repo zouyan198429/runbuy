@@ -129,14 +129,20 @@ class CommonDB
                     // whereBetween  子句
                     // ->whereBetween('votes', [1, 100])
                     if ( (! empty($param)) && is_array($param)){
-                        $tbObj = $tbObj->whereBetween($param);
+                        foreach($param as $betweenField => $rangeValsArr){
+                            if(!is_array($rangeValsArr) || count($rangeValsArr) != 2) continue;
+                            $tbObj = $tbObj->whereBetween($betweenField, $rangeValsArr);
+                        }
                     }
                     break;
                 case 'whereNotBetween':// 数组 [1, 100]
                     // whereNotBetween  子句
                     // ->whereNotBetween('votes', [1, 100])
                     if ( (! empty($param)) && is_array($param)){
-                        $tbObj = $tbObj->whereNotBetween($param);
+                        foreach($param as $betweenField => $rangeValsArr){
+                            if(!is_array($rangeValsArr) || count($rangeValsArr) != 2) continue;
+                            $tbObj = $tbObj->whereNotBetween($betweenField, $rangeValsArr);
+                        }
                     }
                     break;
                 case 'whereIn': // 数组 [1, 2, 3] 二维数组 [ [字段名=>[多个字段值]],....]
