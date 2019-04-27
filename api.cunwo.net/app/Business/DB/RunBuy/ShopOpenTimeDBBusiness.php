@@ -128,10 +128,11 @@ class ShopOpenTimeDBBusiness extends BasePublicDBBusiness
      * 跑店铺营业中脚本
      *
      * @param int $id
+     * @param int $db_force 是否强制从数据库获得营业中店铺 true:强制;false：从redis读
      * @return mixed
      * @author zouyan(305463219@qq.com)
      */
-    public static function autoShopOnLine($city_site_id = 0){
+    public static function autoShopOnLine($city_site_id = 0, $db_force = false){
         $nowTime =  date('H:i:s');
         $queryParams = [
             'where' => [
@@ -150,7 +151,7 @@ class ShopOpenTimeDBBusiness extends BasePublicDBBusiness
         // 获得已上线的店铺id
         $shopIdsOnLine = Tool::getRedis('shop:online' . $city_site_id, 1);
         // if(!empty($shopIdsOnLine)) pr($shopIdsOnLine);
-        if(!is_array($shopIdsOnLine)){//  || true
+        if(!is_array($shopIdsOnLine) || $db_force){//  || true
             $shopIdsOnLine = ShopDBBusiness::getBusinessShopIds($city_site_id, 1, 1);
             // 缓存起来
             Tool::setRedis('shop:', 'online' . $city_site_id , $shopIdsOnLine, 0 , 1);

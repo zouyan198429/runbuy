@@ -96,7 +96,7 @@
       <th>城市</th>
       <th>头像</th>
       {{--<th>是否超级帐户<hr/>状态</th>--}}
-      {{--<th>最近登陆</th>--}}
+      <th>添加时间<hr/>更新时间</th>
       <th style="width: 150px;display: none;">操作</th>
     </tr>
     </thead>

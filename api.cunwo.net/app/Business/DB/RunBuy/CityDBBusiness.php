@@ -393,7 +393,7 @@ class CityDBBusiness extends BasePublicDBBusiness
         foreach($cityList as $v){
             $city_site_id = $v['id'];
 //            Log::info('自动脚本日志---城市店铺营业中脚本--开始执行城市',[$city_site_id]);
-            ShopOpenTimeDBBusiness::autoShopOnLine($city_site_id);
+            ShopOpenTimeDBBusiness::autoShopOnLine($city_site_id, true);
 //            Log::info('自动脚本日志---城市店铺营业中脚本--结束执行城市',[$city_site_id]);
         }
 //        Log::info('自动脚本日志---城市店铺营业中脚本--结束',[]);

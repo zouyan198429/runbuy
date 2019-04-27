@@ -203,7 +203,7 @@ function staffOperate(staff_id, operate_type, reason){
     document.write("            <%}%>");
     document.write("            <\/td>");
     // document.write("            <td><%=item.issuper_text%><hr/><%=item.account_status_text%><\/td>");
-    // document.write("            <td><%=item.lastlogintime%><\/td>");
+    document.write("            <td><%=item.created_at%><hr/><%=item.updated_at%><\/td>");
     document.write("            <td >");
     // document.write("                <%if( true){%>");
     // document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.showLog(<%=item.id%>)\">");
