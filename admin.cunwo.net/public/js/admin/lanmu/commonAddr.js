@@ -44,8 +44,8 @@ function reset_list_self(is_read_page, ajax_async, reset_total, do_num){
     document.write("            <td><%=item.mobile%><\/td>");
     // document.write("            <td><%=item.addr_name%><\/td>");
     document.write("            <td><%=item.addr%><\/td>");
-    document.write("            <td><%=item.is_default_text%><\/td>");
-    document.write("            <td><%=item.longitude%><br/><%=item.latitude%><\/td>");
+    document.write("            <td><%=item.is_default_text%><hr/><%=item.created_at%><hr/><%=item.updated_at%><\/td>");
+    document.write("            <td><%=item.longitude%><hr/><%=item.latitude%><\/td>");
     document.write("            <td>");
     document.write("                <%if( false){%>");
     document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"action.show(<%=item.id%>)\">");
