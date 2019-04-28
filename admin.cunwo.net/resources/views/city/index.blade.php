@@ -231,14 +231,14 @@
                     <dd><a lay-href="">每月订单</a></dd>
                   </dl>
                 </dd>
-                <dd class="layui-nav-itemed">
-                  <a href="javascript:;">会员统计</a>
-                  <dl class="layui-nav-child">
-                    <dd><a lay-href="">每日会员</a></dd>
-                    <dd><a lay-href="">每月会员</a></dd>
-                    <dd><a lay-href="">每城市会员</a></dd>
-                  </dl>
-                </dd>
+                {{--<dd class="layui-nav-itemed">--}}
+                  {{--<a href="javascript:;">会员统计</a>--}}
+                  {{--<dl class="layui-nav-child">--}}
+                    {{--<dd><a lay-href="">每日会员</a></dd>--}}
+                    {{--<dd><a lay-href="">每月会员</a></dd>--}}
+                    {{--<dd><a lay-href="">每城市会员</a></dd>--}}
+                  {{--</dl>--}}
+                {{--</dd>--}}
               </dl>
             </li>
 
