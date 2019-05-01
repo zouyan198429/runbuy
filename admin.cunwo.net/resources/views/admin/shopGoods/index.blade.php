@@ -41,7 +41,7 @@
           @endforeach
         </select>
         <select style="width:80px; height:28px;" name="field">
-          <option value="shop_name">店铺名称</option>
+          <option value="goods_name">商品名称</option>
         </select>
         <input type="text" value=""    name="keyword"  placeholder="请输入关键字"/>
         <button class="btn btn-normal search_frm">搜索</button>
