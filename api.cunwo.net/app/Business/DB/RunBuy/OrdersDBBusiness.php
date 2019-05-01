@@ -228,7 +228,7 @@ class OrdersDBBusiness extends BasePublicDBBusiness
     /**
      * 根据订单号，删除正在进行的订单数据
      *
-     * @param string  $order_no 订单号, 多个用逗号,分隔
+     * @param string  $order_no 订单号, 多个用逗号,分隔--如果多店铺--父订单号
      * @param int $operate_staff_id 操作员工id
      * @param int $operate_staff_history_id 操作员工历史id
      * @param string $logContent 操作说明
@@ -527,12 +527,34 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         if(is_object($orderLists) && count($orderLists) <= 0) throws('订单[' . $order_no . '] 记录不存在'); //记录不存在
 
         // 遍历判断订单是否可以操作
+        $parentOrderNos = [];// 如果有子订单的父订单数组
         foreach($orderLists as $orderInfoObj){
             $temOrderNo = $orderInfoObj->order_no;
             if($orderInfoObj->send_staff_id <= 0 ) throws('订单[' . $temOrderNo . '] 未指定派送人员!');
             if($orderInfoObj->status != 4 ) throws('订单[' . $temOrderNo . '] 非取货或配送中状态!');
             if($orderInfoObj->has_refund == 2 ) throws('订单[' . $temOrderNo . ']待退费中 !');
             if($orderInfoObj->refund_price_frozen > 0 ) throws('订单[' . $temOrderNo . ']还有未完成的退费!');
+            // 是否有子订单0无1有
+            if($orderInfoObj->has_son_order == 1) array_push($parentOrderNos, $temOrderNo);
+        }
+        // 有子订单号
+        $childOrderNos = [];
+        if(!empty($parentOrderNos)){
+            $temParentOrderNoStr = implode(',', $parentOrderNos);
+            $queryParams = [
+                'where' => [
+                    ['order_type', 4],// 订单类型1普通订单/父订单4子订单
+                    // ['parent_order_no', $order_no],
+                ],
+                'select' => ['id', 'order_no']
+            ];
+            if (strpos($temParentOrderNoStr, ',') === false) { // 单条
+                array_push($queryParams['where'], ['parent_order_no', $temParentOrderNoStr]);
+            } else {
+                $queryParams['whereIn']['parent_order_no'] = explode(',', $temParentOrderNoStr);
+            }
+            $childOrderList = OrdersDoingDBBusiness::getAllList($queryParams, [])->toArray();
+            $childOrderNos = array_column($childOrderList, 'order_no');
         }
 
         DB::beginTransaction();
@@ -562,9 +584,12 @@ class OrdersDBBusiness extends BasePublicDBBusiness
                 OrdersDoingDBBusiness::updateOrders($orderSaveData,  $temOrderNo, 2 + 4, $operate_staff_id, $operate_staff_id_history
                     , '订单完成！');
             }
-            if(!empty($order_no_arr)){
+            if(!empty($order_no_arr) || !empty($childOrderNos)){
+                $goodOrderNoArr = array_merge($order_no_arr, $childOrderNos);
                 // 订单商品统计
-                OrdersGoodsDoingDBBusiness::finishGoods(implode(',', $order_no_arr), $operate_staff_id, $operate_staff_id_history);
+                OrdersGoodsDoingDBBusiness::finishGoods(implode(',', $goodOrderNoArr), $operate_staff_id, $operate_staff_id_history);
+            }
+            if(!empty($order_no_arr)){
 
                 // 删除正在进行订单数据
                 OrdersDoingDBBusiness::delDoingOrders( implode(',', $order_no_arr), $operate_staff_id , $operate_staff_id_history, '');// 删除正在进行的订单

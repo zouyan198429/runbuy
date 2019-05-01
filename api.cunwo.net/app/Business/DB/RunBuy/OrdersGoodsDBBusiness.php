@@ -14,7 +14,7 @@ class OrdersGoodsDBBusiness extends BasePublicDBBusiness
     /**
      * 订单完成时订单商品处理
      *
-     * @param $order_no  订单号,多个用逗号分隔
+     * @param $order_no  订单号,多个用逗号分隔;注意这个订单号是：一个店铺：当前订单号；多店铺时：具体的子订单号
      * @param int $operate_staff_id 操作员工id
      * @param int $operate_staff_id_history 操作员工历史id
      * @return null
