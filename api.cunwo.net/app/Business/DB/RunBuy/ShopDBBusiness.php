@@ -368,12 +368,13 @@ class ShopDBBusiness extends BasePublicDBBusiness
      * @param string $beginDateTime 开始时间 格式 'Y-m-d'
      * @param string $endDateTime 结束时间 格式 'Y-m-d'
      * @param int $city_site_id 城市id
+     * @param int $shop_id 店铺ID; 为0：则为当前城市所有店铺
      * @param string $status 多个用逗号分隔 状态0待审核1审核通过2审核未通过4冻结(禁用)
      * @param string $status_business   多个用逗号分隔 经营状态  1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]
      * @return mixed
      * @author zouyan(305463219@qq.com)
      */
-    public static function autoShopSalesVolume($beginDateTime = '', $endDateTime = '', $city_site_id = 0, $status = '1', $status_business = '1,2'){
+    public static function autoShopSalesVolume($beginDateTime = '', $endDateTime = '', $city_site_id = 0, $shop_id = 0, $status = '1', $status_business = '1,2'){
 
         $selectArr = ['shop_id'];// ['city_site_id', 'city_partner_id', 'seller_id', 'shop_id'];
         $countOrderWhere = [
@@ -382,6 +383,7 @@ class ShopDBBusiness extends BasePublicDBBusiness
             // ['seller_id', '=', $v['seller_id']],
             //  ['shop_id', '=', $shop_id],
         ];
+        if($shop_id > 0 )  array_push($countOrderWhere, ['shop_id', '=', $shop_id]);
         $countOrderList = CountOrdersDBBusiness::getCountByGroupBy($selectArr, 'shop_id', $countOrderWhere, $beginDateTime, $endDateTime)->toArray();
         // 返回二维数组 [ ['shop_id' => 3, 'amount_count' => 4, 'total_amount' => 32.000] ,...]
         $formatCountOrders = [];
@@ -397,6 +399,7 @@ class ShopDBBusiness extends BasePublicDBBusiness
             //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
         ];
         if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+        if($shop_id > 0 )  array_push($queryParams['where'], ['id', '=', $shop_id]);
         if(!empty($status)){
             if (strpos($status, ',') === false) { // 单条
                 array_push($queryParams['where'], ['status', $status]);

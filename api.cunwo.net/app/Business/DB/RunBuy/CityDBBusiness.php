@@ -423,7 +423,7 @@ class CityDBBusiness extends BasePublicDBBusiness
         foreach($cityList as $v){
             $city_site_id = $v['id'];
 //            Log::info('自动脚本日志---月销量最近30天脚本--开始执行城市',[$city_site_id]);
-            ShopDBBusiness::autoShopSalesVolume($beginDateTime, $endDateTime, $city_site_id, '', '');// 店铺月销量
+            ShopDBBusiness::autoShopSalesVolume($beginDateTime, $endDateTime, $city_site_id, 0, '', '');// 店铺月销量
 //            sleep(2);
             ShopGoodsDBBusiness::autoShopGoodsSalesVolume($beginDateTime, $endDateTime, $city_site_id);// 店铺商品月销量
 //            sleep(2);
