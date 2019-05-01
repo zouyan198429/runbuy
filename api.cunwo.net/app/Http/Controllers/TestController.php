@@ -9,6 +9,8 @@ namespace App\Http\Controllers;
 use App\Business\DB\RunBuy\CityDBBusiness;
 use App\Business\DB\RunBuy\LrChinaCityDBBusiness;
 // use App\Models\LrChinaCity;
+use App\Business\DB\RunBuy\OrdersDBBusiness;
+use App\Business\DB\RunBuy\OrdersGoodsDoingDBBusiness;
 use App\Business\DB\RunBuy\ShopDBBusiness;
 use App\Services\GetPingYing;
 use App\Services\Map\Map;
@@ -25,8 +27,28 @@ class TestController extends CompController
 {
 
     public  function  index(Request $request){
-        echo 'aaa';
-        CityDBBusiness::autoCityCancelOrder();// 跑城市订单过期未接单自动关闭脚本--每一分钟跑一次
+        // 有子订单号
+
+        $queryParams = [
+            'where' => [
+                ['order_type', 4],// 订单类型1普通订单/父订单4子订单
+                ['status', 8],// 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
+                // ['parent_order_no', $order_no],
+            ],
+            'select' => ['id', 'order_no']
+        ];
+        $childOrderList = OrdersDBBusiness::getAllList($queryParams, [])->toArray();
+        $childOrderNos = array_column($childOrderList, 'order_no');
+        if(!empty($childOrderNos)){
+            $operate_staff_id = 0;
+            $operate_staff_id_history = 0;
+            // 订单商品统计
+            OrdersGoodsDoingDBBusiness::finishGoodsOrders(implode(',', $childOrderNos), $operate_staff_id, $operate_staff_id_history);
+
+        }
+        pr($childOrderNos);
+         echo 'aaa';
+        // CityDBBusiness::autoCityCancelOrder();// 跑城市订单过期未接单自动关闭脚本--每一分钟跑一次
 //        CityDBBusiness::autoCityShopSalesVolume();// 跑城市店铺月销量最近30天脚本
        // CityDBBusiness::autoCityOnLine();// 跑城市店铺营业中脚本
 //        ShopDBBusiness::initOpenTime();
