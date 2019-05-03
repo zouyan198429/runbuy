@@ -219,19 +219,19 @@
                 </dd>
               </dl>
             </li>
-            <li data-name="set" class="layui-nav-item">
-              <a href="javascript:;" lay-tips="统计" lay-direction="2">
-                <i class="layui-icon layui-icon-senior"></i>
-                <cite>统计</cite>
-              </a>
-              <dl class="layui-nav-child">
-                <dd class="layui-nav-itemed">
-                  <a href="javascript:;">订单统计</a>
-                  <dl class="layui-nav-child">
-                    <dd><a lay-href="">每日订单</a></dd>
-                    <dd><a lay-href="">每月订单</a></dd>
-                  </dl>
-                </dd>
+            {{--<li data-name="set" class="layui-nav-item">--}}
+              {{--<a href="javascript:;" lay-tips="统计" lay-direction="2">--}}
+                {{--<i class="layui-icon layui-icon-senior"></i>--}}
+                {{--<cite>统计</cite>--}}
+              {{--</a>--}}
+              {{--<dl class="layui-nav-child">--}}
+                {{--<dd class="layui-nav-itemed">--}}
+                  {{--<a href="javascript:;">订单统计</a>--}}
+                  {{--<dl class="layui-nav-child">--}}
+                    {{--<dd><a lay-href="">每日订单</a></dd>--}}
+                    {{--<dd><a lay-href="">每月订单</a></dd>--}}
+                  {{--</dl>--}}
+                {{--</dd>--}}
                 {{--<dd class="layui-nav-itemed">--}}
                   {{--<a href="javascript:;">会员统计</a>--}}
                   {{--<dl class="layui-nav-child">--}}
@@ -240,8 +240,8 @@
                     {{--<dd><a lay-href="">每城市会员</a></dd>--}}
                   {{--</dl>--}}
                 {{--</dd>--}}
-              </dl>
-            </li>
+              {{--</dl>--}}
+            {{--</li>--}}
 
             <li data-name="user" class="layui-nav-item">
               <a href="javascript:;" lay-tips="用户" lay-direction="2">
