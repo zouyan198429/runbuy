@@ -31,17 +31,30 @@ class Map
     /**
      *对数据进行经纬度处理 string 1公里以下不变，以上转为KM [2位小数]
      *
-     *@param array  $dataList 需要处理的数据 二维数组 ; 如果排序的话，排序后会对数组进行 array_values 操作
+     *@param array  $dataList 需要处理的数据 一维/二维数组 ; 如果排序的话，排序后会对数组进行 array_values 操作
      *@param float  $latitude 纬度
      *@param float  $longitude 经度
+     *@param string  $dataUboundName 距离加入数组数据中的下标名称  如 distance
+     *@param float  $correctionDistance 矫正距离 单位:米 可以为正数或负数 如 0
      *@param float  $distanceOrder 距离排序 '': 不排序 ; desc 降序  asc: 升序
      *@param string  $latitudeUbound 数据中纬度下标
      *@param string  $longitudeUbound 数据中经度下标
      *@param string  $notLatLonStr 数据中不存在经纬度时，显示的文字  [默认]空'' 或 未知
      *@return  array 二维数组
      */
-    public static function resolveDistance(&$dataList, $latitude, $longitude, $distanceOrder = '', $latitudeUbound = 'latitude', $longitudeUbound= 'longitude', $notLatLonStr = ''){
+    public static function resolveDistance(&$dataList, $latitude, $longitude, $dataUboundName = 'distance', $correctionDistance = 0, $distanceOrder = '', $latitudeUbound = 'latitude', $longitudeUbound= 'longitude', $notLatLonStr = ''){
         if(empty($latitude)  || empty($longitude)) return $dataList;
+
+        $isMultiArr = false; // true:二维;false:一维
+        foreach($dataList as $k => $v){
+            if(is_array($v)){
+                $isMultiArr = true;
+            }
+            break;
+        }
+        // 一维
+        if(!$isMultiArr) $dataList = [$dataList];
+
         $lastList = [];
         $maxDistance = 0;
         foreach($dataList as $k => $v){
@@ -56,14 +69,18 @@ class Map
             // $earthDistance = Map::getDistanceM($longitude, $latitude, $temLongitude, $temLatitude);
 
             $earthDistance = static::getDistance($latitude, $longitude, $temLatitude, $temLongitude);
-            $dataList[$k]['distance'] = $earthDistance + 400;
-            $dataList[$k]['distanceStr'] =static::distanceShow($earthDistance, 2);
+//            $dataList[$k]['distance'] = $earthDistance + 400;
+//            $dataList[$k]['distanceStr'] =static::distanceShow($earthDistance, 2);
+            $dataList[$k][$dataUboundName] = $earthDistance + $correctionDistance;// 400
+            $dataList[$k][$dataUboundName . 'Str'] =static::distanceShow($earthDistance, 2);
             if($maxDistance < $earthDistance ) $maxDistance = $earthDistance;
         }
 
         $temDistance = [
-            'distance' => $maxDistance + 1,
-            'distanceStr' => $notLatLonStr,
+//            'distance' => $maxDistance + 1,
+//            'distanceStr' => $notLatLonStr,
+            $dataUboundName => $maxDistance + 1,
+            $dataUboundName . 'Str' => $notLatLonStr,
         ];
         foreach($lastList as $k => $v){
             $dataList[$k] = array_merge($v, $temDistance);
@@ -73,7 +90,8 @@ class Map
         if(in_array($distanceOrder, ['asc', 'desc'])){
             $dataList = array_values($dataList);
             $orderDistance = [
-                 ['key' => 'distance', 'sort' => $distanceOrder, 'type' => 'numeric'],
+                 // ['key' => 'distance', 'sort' => $distanceOrder, 'type' => 'numeric'],
+                ['key' => $dataUboundName, 'sort' => $distanceOrder, 'type' => 'numeric'],
                  // ['key' => 'id', 'sort' => 'desc', 'type' => 'numeric'],
             ];
             if(!empty($dataList)) {
@@ -83,7 +101,7 @@ class Map
             }
         }
 
-
+        if(!$isMultiArr) $dataList = $dataList[0] ?? [];// 是一维数组
         return $dataList;
     }
 
@@ -93,16 +111,18 @@ class Map
      *@param array  $dataInfo 需要处理的数据 一维数组
      *@param float  $latitude 纬度
      *@param float  $longitude 经度
+     *@param string  $dataUboundName 距离加入数组数据中的下标名称  如 distance
+     *@param float  $correctionDistance 矫正距离 单位:米 可以为正数或负数 如 0
      *@param float  $distanceOrder 距离排序 '': 不排序 ; desc 降序  asc: 升序
      *@param string  $latitudeUbound 数据中纬度下标
      *@param string  $longitudeUbound 数据中经度下标
      *@param string  $notLatLonStr 数据中不存在经纬度时，显示的文字  [默认]空'' 或 未知
      *@return  array 二维数组
      */
-    public static function resolveDistanceSingle(&$dataInfo, $latitude, $longitude, $distanceOrder = '', $latitudeUbound = 'latitude', $longitudeUbound= 'longitude', $notLatLonStr = '')
+    public static function resolveDistanceSingle(&$dataInfo, $latitude, $longitude, $dataUboundName = 'distance', $correctionDistance = 0, $distanceOrder = '', $latitudeUbound = 'latitude', $longitudeUbound= 'longitude', $notLatLonStr = '')
     {
         $dataList = [$dataInfo];
-        static::resolveDistance($dataList, $latitude, $longitude, $distanceOrder, $latitudeUbound, $longitudeUbound, $notLatLonStr);
+        static::resolveDistance($dataList, $latitude, $longitude, $dataUboundName, $correctionDistance, $distanceOrder, $latitudeUbound, $longitudeUbound, $notLatLonStr);
         $dataInfo = $dataList[0] ?? [];
         return $dataInfo;
     }

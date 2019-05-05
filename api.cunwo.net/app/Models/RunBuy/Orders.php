@@ -37,7 +37,7 @@ class Orders extends BasePublicModel
         '8' => '订单完成',
         '16' => '系统取消',
         '32' => '用户取消',
-        '64' => '完成',
+        '64' => '已删除[作废]',
     ];
 
     // 支付方式1余额支付2在线支付
@@ -163,6 +163,14 @@ class Orders extends BasePublicModel
     public function staffHistory()
     {
         return $this->belongsTo('App\Models\RunBuy\StaffHistory', 'staff_id_history', 'id');
+    }
+
+    /**
+     * 获取订单的抢单会员--一维
+     */
+    public function sendInfo()
+    {
+        return $this->belongsTo('App\Models\RunBuy\Staff', 'send_staff_id', 'id');
     }
 
     /**

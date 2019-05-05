@@ -45,6 +45,8 @@ class ShopGoodsController extends BaseController
             $resource_url = $v['resource_list'][0]['resource_url'] ?? '';
 //            $intro = $v['intro'] ?? '';
 //            $v['intro'] = replace_enter_char($intro,2);
+            $tem_price_val = $v['price'] ?? '';
+            $tem_price_val = Tool::formatMoney($tem_price_val, 2, '');
             $temInfo = [
                 'id' => $v['id'],
                 'is_sale' => $v['is_sale'],
@@ -56,7 +58,7 @@ class ShopGoodsController extends BaseController
                 'props' => $format_props,
 
 
-                'price_val' => $v['price'] ?? '',
+                'price_val' => $tem_price_val,// $v['price'] ?? '',
                 'price_name' => '',
                 'price_id' => 0,
                 'prop_id' => 0,
@@ -69,8 +71,10 @@ class ShopGoodsController extends BaseController
                 $price_name = $t_v['price_name'] ?? '';
                 $goods_name_full = empty($price_name) ? $goods_name : $goods_name . '[' . $price_name . ']';
                 if($v['is_hot'] == 2) $goods_name_full .= '-热销';
+                $tem_price_val = $t_v['price_val'] ?? '0';
+                $tem_price_val = Tool::formatMoney($tem_price_val, 2, '');
                 $tPriceArr = array_merge($tPriceArr, [
-                    'price_val' => $t_v['price_val'] ?? '0',
+                    'price_val' => $tem_price_val,// $t_v['price_val'] ?? '0',
                     'price_name' => $price_name,
                     'price_id' => $t_v['price_id'] ?? '0',
                     'prop_id' => $t_v['prop_id'] ?? '0',

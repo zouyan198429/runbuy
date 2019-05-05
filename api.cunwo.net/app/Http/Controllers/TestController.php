@@ -7,15 +7,18 @@ namespace App\Http\Controllers;
 //use App\Models\test\Comment;
 //use App\Models\test\Post;
 use App\Business\DB\RunBuy\CityDBBusiness;
+use App\Business\DB\RunBuy\CountOrdersGrabDBBusiness;
 use App\Business\DB\RunBuy\LrChinaCityDBBusiness;
 // use App\Models\LrChinaCity;
 use App\Business\DB\RunBuy\OrdersDBBusiness;
 use App\Business\DB\RunBuy\OrdersGoodsDoingDBBusiness;
 use App\Business\DB\RunBuy\ShopDBBusiness;
+use App\Models\RunBuy\CountOrdersGrab;
 use App\Services\GetPingYing;
 use App\Services\Map\Map;
 use App\Services\Map\S2;
 use App\Services\pyClass;
+use App\Services\Tool;
 use Illuminate\Http\Request;
 use S2\S2Cap;
 use S2\S2CellId;
@@ -27,6 +30,16 @@ class TestController extends CompController
 {
 
     public  function  index(Request $request){
+        $company_id = 0;
+        $tem_begin_date = Tool::getDateByType(9);// 9 本年一日
+        $tem_end_date = Tool::getDateByType(6);// 6 本月最后一日;
+        $listData['repairSumCurrentMonth'] = [
+            'begin_date' => $tem_begin_date,
+            'end_date' => $tem_end_date,
+            'amount' => CountOrdersGrabDBBusiness::getCountAmount($company_id, 1, $tem_begin_date, $tem_end_date, 0, 0, 0),
+        ];
+        pr($listData);
+        echo 'aaa';
         // 有子订单号
 
 //        $queryParams = [
@@ -47,7 +60,6 @@ class TestController extends CompController
 //
 //        }
 //        pr($childOrderNos);
-         echo 'aaa';
         // CityDBBusiness::autoCityCancelOrder();// 跑城市订单过期未接单自动关闭脚本--每一分钟跑一次
 //        CityDBBusiness::autoCityShopSalesVolume();// 跑城市店铺月销量最近30天脚本
        // CityDBBusiness::autoCityOnLine();// 跑城市店铺营业中脚本

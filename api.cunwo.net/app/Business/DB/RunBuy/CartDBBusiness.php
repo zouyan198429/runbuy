@@ -445,7 +445,7 @@ class CartDBBusiness extends BasePublicDBBusiness
             //'select' => [
             //   'id', 'city_site_id', 'city_partner_id', 'seller_id', 'names_id', 'sort_num'
             //],
-            // 'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],
+//             'orderBy' => [ 'id'=>'desc'],// 'sort_num'=>'desc',
         ];
         if (strpos($cartIds, ',') === false) { // 单条
             array_push($queryParams['where'], ['id', $cartIds]);
@@ -453,7 +453,7 @@ class CartDBBusiness extends BasePublicDBBusiness
             $queryParams['whereIn']['id'] = explode(',', $cartIds);
         }
 
-        $cartList = self::getList($queryParams, [
+        $cartList = static::getList($queryParams, [
             'props.prop.name'// 购物车属性的属性
             ,'props.propVal.name'// 购物车属性的属性值
             ,'goodsPrice.prop.name'// 购物车价格属性
@@ -476,6 +476,7 @@ class CartDBBusiness extends BasePublicDBBusiness
         // 判断商品是否存在，是否上架
         // 判断价格属性是否存存，价格属性值是否存在
         // 判断属性是否存存，属性值是否存在
+        $cartList = array_values(array_reverse($cartList));// 反转数组
         foreach($cartList as $k => $cartInfo){
             $cart_seller_id = $cartInfo['seller_id'];// 商家ID
             $cart_shop_id = $cartInfo['shop_id'];// 店铺ID
@@ -977,6 +978,8 @@ class CartDBBusiness extends BasePublicDBBusiness
                 $order_total_price = 0;
                 // 保存商品
                 $cart_list = $vShop['cart_list'] ?? [];
+
+                $cart_list = array_values(array_reverse($cart_list));// 反转数组
                 foreach($cart_list as $goodInfo){
                     $goods_id = $goodInfo['goods_id'] ;
                     if(isset($cacheData['goods_id'][$goods_id]) && $cacheData['goods_id'][$goods_id] > 0){

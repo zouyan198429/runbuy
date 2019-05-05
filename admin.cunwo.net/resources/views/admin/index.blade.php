@@ -130,6 +130,7 @@
                       <a lay-href="{{ url('admin/labels') }}">搜索标签</a>
                     </dd>
                     <dd><a lay-href="{{ url('admin/siteIntro') }}">站点介绍</a></dd>
+                    <dd><a lay-href="{{ url('admin/siteIntroRuner') }}">站点介绍(跑腿)</a></dd>
                     <dd><a lay-href="{{ url('admin/feeScale') }}">收费标准</a></dd>
                   </dl>
                 </dd>
@@ -214,19 +215,22 @@
                 </dd>
               </dl>
             </li>
-            {{--<li data-name="set" class="layui-nav-item">--}}
-              {{--<a href="javascript:;" lay-tips="统计" lay-direction="2">--}}
-                {{--<i class="layui-icon layui-icon-senior"></i>--}}
-                {{--<cite>统计</cite>--}}
-              {{--</a>--}}
-              {{--<dl class="layui-nav-child">--}}
-                {{--<dd class="layui-nav-itemed">--}}
-                  {{--<a href="javascript:;">订单统计</a>--}}
-                  {{--<dl class="layui-nav-child">--}}
+            <li data-name="set" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="统计" lay-direction="2">
+                <i class="layui-icon layui-icon-senior"></i>
+                <cite>统计</cite>
+              </a>
+              <dl class="layui-nav-child">
+                <dd class="layui-nav-itemed">
+                  <a href="javascript:;">订单统计</a>
+                  <dl class="layui-nav-child">
+                    <dd>
+                      <a lay-href="{{ url('admin/order/countOrders') }}">订单统计</a>
+                    </dd>
                     {{--<dd><a lay-href="">每日订单</a></dd>--}}
                     {{--<dd><a lay-href="">每月订单</a></dd>--}}
-                  {{--</dl>--}}
-                {{--</dd>--}}
+                  </dl>
+                </dd>
                 {{--<dd class="layui-nav-itemed">--}}
                   {{--<a href="javascript:;">会员统计</a>--}}
                   {{--<dl class="layui-nav-child">--}}
@@ -235,8 +239,8 @@
                     {{--<dd><a lay-href="">每城市会员</a></dd>--}}
                   {{--</dl>--}}
                 {{--</dd>--}}
-              {{--</dl>--}}
-            {{--</li>--}}
+              </dl>
+            </li>
 
             <li data-name="user" class="layui-nav-item">
               <a href="javascript:;" lay-tips="用户" lay-direction="2">

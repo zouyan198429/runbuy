@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\WX;
 
+use App\Business\Controller\API\RunBuy\CTAPICountOrdersGrabBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIOrdersBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIOrdersDoingBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIStaffBusiness;
+use App\Services\Map\Map;
 use App\Services\Request\CommonRequest;
 use App\Services\Tool;
 use Illuminate\Http\Request;
@@ -53,7 +55,7 @@ class OrderController extends BaseController
         $user_id = $this->user_id;
 
         $relations = [
-            'addrHistory', 'staffHistory', 'partnerHistory', 'sendHistory'
+            'addrHistory', 'staffHistory', 'partnerHistory', 'sendHistory', 'sendInfo'
             ,'provinceHistory','cityHistory','areaHistory'
             , 'sellerHistory', 'shopHistory'
             ,'ordersGoods.goodsHistory'
@@ -67,6 +69,10 @@ class OrderController extends BaseController
         $status = CommonRequest::get($request, 'status');
 
         $getType = CommonRequest::get($request, 'getType');// 数据类型 1用户的订单2 待接单的订单 3派送人员接的单 4 已完成 派送人员接的单
+        // 待接单时，可以传入当前用户的经longitude纬latitude度,来算计接单人与送货地址的距离
+//        $latitude = CommonRequest::get($request, 'latitude');// 纬度
+//        $longitude = CommonRequest::get($request, 'longitude');// 经度
+
         if(empty($getType) || !is_numeric($getType)) $getType = 1;
 
         // 数字或单条
@@ -153,8 +159,12 @@ class OrderController extends BaseController
             $has_son_order = $v['has_son_order'] ?? 0;// 是否有子订单0无1有
             $childOrder = $formatChildList[$parent_order_no] ?? [];
             if($has_son_order == 1 ){// 有子订单
+                // 用户到店铺的距离
+//                if(!empty($childOrder['shop'])) Map::resolveDistance($childOrder['shop'], $childOrder['addr']['latitude'], $childOrder['addr']['longitude'], 'distance', 400, '', 'latitude', 'longitude', '');
                 $data_list[$k]['shopList'] = $childOrder;
             }else{
+                // 用户到店铺的距离
+//                if(!empty($v['shop'])) Map::resolveDistance($v['shop'], $v['addr']['latitude'], $v['addr']['longitude'], 'distance', 400, '', 'latitude', 'longitude', '');
                 $data_list[$k]['shopList'][] = $v;
                 if(isset($v['orders_goods'])) unset($data_list[$k]['orders_goods']);
             }
@@ -399,6 +409,23 @@ class OrderController extends BaseController
     }
 
     /**
+     * ajax 订单删除
+     *
+     * @param Request $request
+     * @return mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public function delOrder(Request $request)
+    {
+        $this->InitParams($request);
+
+        $send_staff_id = $this->user_id;
+        $order_no = CommonRequest::get($request, 'order_no');// 订单号,多个用逗号分隔
+        $result = CTAPIOrdersDoingBusiness::delOrder($request, $this, $order_no, $send_staff_id);
+        return ajaxDataArr(1, $result, '');
+    }
+
+    /**
      * ajax 每30秒或1分钟去执行一次的方法,获得这段时间内的待接订单
      *   参数 city_site_id 城市id
      *        order_id 订单id
@@ -417,8 +444,39 @@ class OrderController extends BaseController
         $status = CommonRequest::get($request, 'status');// 状态, 多个用逗号,分隔 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
         if(empty($status)) $status = 2;
         $send_staff_id = $this->user_id;
+        $latitude = CommonRequest::get($request, 'latitude');// 纬度
+        if(!is_numeric($latitude))  $latitude = 0;
+        $longitude = CommonRequest::get($request, 'longitude');// 经度
+        if(!is_numeric($longitude))  $longitude = 0;
+
         $other_where = [];
-        $result = CTAPIOrdersDoingBusiness::getWaitOrder($request, $this, $operate_type, $status, $city_site_id, $order_id, $other_where, $send_staff_id);
+        $result = CTAPIOrdersDoingBusiness::getWaitOrder($request, $this, $operate_type, $status, $city_site_id, $order_id, $other_where, $send_staff_id, $latitude, $longitude);
+        return ajaxDataArr(1, $result, '');
+    }
+
+    /**
+     * ajax 获得统计数据
+     * @param Request $request
+     * @return mixed 这段时间内的待接订单数量
+     * @author zouyan(305463219@qq.com)
+     */
+    public function getCountList(Request $request)
+    {
+        $this->InitParams($request);
+        $send_staff_id = $this->user_id;
+        $count_type = CommonRequest::get($request, 'count_type');// 统计类型 1 按天统计[当月天的] ; 2 按月统计[当年的]; 3 按年统计
+        if(!in_array($count_type, [1,2,3])){
+            // return ajaxDataArr(0, null, '请选择统计类型！');
+            throws('请选择统计类型！');
+        }
+         $begin_date = CommonRequest::get($request, 'begin_date');// 开始日期--可为空
+         $end_date = CommonRequest::get($request, 'end_date');// 结束日期--可为空
+        $city_site_id = 0;// 城市分站id
+        $city_partner_id = 0;// 城市合伙人id
+        // $send_staff_id = 0;// 派送用户id
+        $staff_id = 0;// 下单用户id
+        $result = CTAPICountOrdersGrabBusiness::getCounts($request, $this, 0, $count_type, $begin_date, $end_date
+            , 'record_num', $city_site_id , $city_partner_id, $send_staff_id, $staff_id, 0);
         return ajaxDataArr(1, $result, '');
     }
 }

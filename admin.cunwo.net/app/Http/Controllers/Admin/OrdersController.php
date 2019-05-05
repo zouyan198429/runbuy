@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Business\Controller\API\RunBuy\CTAPICityBusiness;
+use App\Business\Controller\API\RunBuy\CTAPICountOrdersGrabBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIOrdersBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIWalletRecordBusiness;
 use App\Http\Controllers\WorksController;
@@ -375,4 +376,53 @@ class OrdersController extends WorksController
 //        $resultDatas = CTAPIOrdersBusiness::importByFile($request, $this, $fileName);
 //        return ajaxDataArr(1, $resultDatas, '');
 //    }
+
+    /**
+     * 统计-订单数量
+     *
+     * @param Request $request
+     * @return mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public function countOrders(Request $request)
+    {
+        $this->InitParams($request);
+        $reDataArr = $this->reDataArr;
+        $reDataArr['count_types'] =  CTAPICountOrdersGrabBusiness::$countTypeArr;
+        $reDataArr['defaultCountType'] = 1;// 列表页默认状态
+
+        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
+        $reDataArr['city_partner_id'] =  CommonRequest::getInt($request, 'city_partner_id');
+        $reDataArr['send_staff_id'] =  CommonRequest::getInt($request, 'send_staff_id');
+        $reDataArr['staff_id'] =  CommonRequest::getInt($request, 'staff_id');
+
+        return view('admin.orders.countOrders', $reDataArr);
+    }
+
+    /**
+     * ajax 获得统计数据
+     * @param Request $request
+     * @return mixed 这段时间内的待接订单数量
+     * @author zouyan(305463219@qq.com)
+     */
+    public function ajax_count_orders(Request $request)
+    {
+        $this->InitParams($request);
+        // $send_staff_id = $this->user_id;
+        $count_type = CommonRequest::get($request, 'count_type');// 统计类型 1 按天统计[当月天的] ; 2 按月统计[当年的]; 3 按年统计
+        if(!in_array($count_type, [1,2,3])){
+            // return ajaxDataArr(0, null, '请选择统计类型！');
+            throws('请选择统计类型！');
+        }
+        $begin_date = CommonRequest::get($request, 'begin_date');// 开始日期--可为空
+        $end_date = CommonRequest::get($request, 'end_date');// 结束日期--可为空
+        $city_site_id = CommonRequest::getInt($request, 'city_site_id');// 城市分站id
+        $city_partner_id = CommonRequest::getInt($request, 'city_partner_id');// 城市合伙人id
+        $send_staff_id = CommonRequest::getInt($request, 'send_staff_id');// 派送用户id
+        $staff_id = CommonRequest::getInt($request, 'staff_id');// 下单用户id
+
+        $result = CTAPICountOrdersGrabBusiness::getCounts($request, $this, 0, $count_type, $begin_date, $end_date
+            , 'record_num', $city_site_id , $city_partner_id, $send_staff_id, $staff_id, 0);
+        return ajaxDataArr(1, $result, '');
+    }
 }

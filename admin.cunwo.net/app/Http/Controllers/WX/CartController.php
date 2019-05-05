@@ -117,6 +117,8 @@ class CartController extends BaseController
             $price_prop_name = $v['goods_price']['prop_name']['main_name'] ?? '';// $v['goods_price']['prop']['name']['main_name'] ?? '';
             $goods_name_full = empty($price_name) ? $goods_name : $goods_name . '[' . $price_name . ']';
             if($v['goods']['is_hot'] == 2) $goods_name_full .= '-热销';
+            $tem_price_val = $v['goods_price']['price'] ?? $v['goods']['price'];
+            $tem_price_val = Tool::formatMoney($tem_price_val, 2, '');
 
             $formatList['shop' . $shop_id]['goods_list']['good' . $goods_id . 'p' . $prop_id . 'p' . $prop_price_id . ''] = [
                 'cart_id' => $v['id'],
@@ -126,7 +128,7 @@ class CartController extends BaseController
                 'prop_name' => $price_prop_name,// $v['goods_price']['prop_name']['main_name'] ?? '',
                 'price_id' => $prop_price_id,
                 'price_name' => $price_name,// $v['goods_price']['prop_val_name']['main_name'] ?? '',
-                'price' => $v['goods_price']['price'] ?? $v['goods']['price'],
+                'price' => $tem_price_val,// $v['goods_price']['price'] ?? $v['goods']['price'],
                 'amount' => $v['amount'],
                 'resource_url' => $resource_url,
                 'goods_name_full' => $goods_name_full,

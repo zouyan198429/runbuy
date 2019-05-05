@@ -1766,7 +1766,7 @@ class Tool
      * @return string
      */
     public static function formatMoney($money, $len=2, $sign='￥'){
-        $negative = $money > 0 ? '' : '-';
+        $negative = $money >= 0 ? '' : '-';
         $int_money = intval(abs($money));
         $len = intval(abs($len));
         $decimal = '';//小数

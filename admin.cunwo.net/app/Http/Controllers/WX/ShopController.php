@@ -33,8 +33,15 @@ class ShopController extends BaseController
         $latitude =  CommonRequest::get($request, 'latitude'); // '34.32932';
         $longitude = CommonRequest::get($request, 'longitude'); // '108.70929';//
 
+        $city_site_id = CommonRequest::getInt($request, 'city_site_id');
         // 查询
            // 关键字
+        $keyWord = CommonRequest::get($request, 'keyword');
+        // 关键字不为空，则查询包含此关键字的商品
+        $shop_ids = [];// 店铺id数组 ---一维
+        if(!empty($keyWord)){
+            $shop_ids = CTAPIShopBusiness::getShopIdsByKeyWord($request, $this, $city_site_id, $keyWord, '1', '1', '1,2', 0);
+        }
         // 排序 orderType 1综合排序[默认] 2 销量排序 4 最近
         $orderType = CommonRequest::getInt($request, 'orderType');
         if($orderType == 4 && (empty($latitude) || empty($longitude)) ) $orderType = 2;
@@ -80,13 +87,15 @@ class ShopController extends BaseController
         CTAPIShopBusiness::mergeRequest($request, $this, [
             'status' => 1,// 状态0待审核1审核通过2审核未通过4冻结(禁用)
             'status_business' => 1 + 2 ,// 经营状态  1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]
-            'field' => 'shop_name',// 关键词查询时的字段
+            'field' => '',// 'shop_name',// 关键词查询时的字段
+            'keyword' => '',
+            'ids' => implode(',', $shop_ids),
         ]);
 
         $result = CTAPIShopBusiness::getList($request, $this, $oprateBit, [], $relations, $extParams);
 
         $data_list = $result['result']['data_list'] ?? [];
-        if(!empty($data_list)) Map::resolveDistance($data_list, $latitude, $longitude, '', 'latitude', 'longitude', '');
+        if(!empty($data_list)) Map::resolveDistance($data_list, $latitude, $longitude, 'distance', 400, '', 'latitude', 'longitude', '');
         if($orderType == 4 && !empty($data_list)){// 最近
             //   2对获得的数据进行排序。--缓存
             $orderDistance = [
@@ -132,7 +141,7 @@ class ShopController extends BaseController
 
             $temResult = CTAPIShopBusiness::getList($request, $this, 1, [], $defaultRelations, $extParams);
             $temDataList = $temResult['result']['data_list'] ?? [];
-            if(!empty($temDataList)) Map::resolveDistance($temDataList, $latitude, $longitude, '', 'latitude', 'longitude', '');
+            if(!empty($temDataList)) Map::resolveDistance($temDataList, $latitude, $longitude, 'distance', 400, '', 'latitude', 'longitude', '');
             $temDataList = Tool::php_multisort($temDataList, $orderDistance);
             $temDataList = array_values($temDataList);
 
@@ -169,7 +178,7 @@ class ShopController extends BaseController
         $info['resource_url'] = $info['resource_list'][0]['resource_url'] ?? '';
         // if(isset($info['resource_list']))  unset($info['resource_list']);
 
-        if(!empty($info)) Map::resolveDistanceSingle($info, $latitude, $longitude, '', 'latitude', 'longitude', '');
+        if(!empty($info)) Map::resolveDistanceSingle($info, $latitude, $longitude, 'distance', 400, '', 'latitude', 'longitude', '');
         return ajaxDataArr(1, $info, '');
     }
 }

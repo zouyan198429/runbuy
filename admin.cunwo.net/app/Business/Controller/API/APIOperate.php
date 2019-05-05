@@ -183,7 +183,13 @@ class APIOperate
     {
         // 获得对象
         static::requestGetObj($request, $controller,$modelObj);
-        return $modelObj::getInfoByQuery($modelName, $companyId, $queryParams, $relations, $notLog);
+        $info = $modelObj::getInfoByQuery($modelName, $companyId, $queryParams, $relations, $notLog);
+
+        if(isset($info['total_price'])) $info['total_price_format'] = Tool::formatMoney($info['total_price'], 2, '');
+        if(isset($info['total_run_price'])) $info['total_run_price_format'] = Tool::formatMoney($info['total_run_price'], 2, '');
+        if(isset($info['pay_run_amount'])) $info['pay_run_amount_format'] = Tool::formatMoney($info['pay_run_amount'], 2, '');
+
+        return $info;
     }
 
     /**

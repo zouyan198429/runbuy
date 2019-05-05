@@ -225,6 +225,17 @@ Route::post('admin/siteIntro/ajax_import_staff','Admin\SiteIntroController@ajax_
 Route::post('admin/siteIntro/import', 'Admin\SiteIntroController@import');// 导入excel
 Route::post('admin/siteIntro/ajax_get_ids', 'Admin\SiteIntroController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
+//站点介绍-跑腿人员
+Route::post('admin/siteIntroRuner/ajax_alist', 'Admin\SiteIntroRunerController@ajax_alist');//ajax获得列表数据
+Route::post('admin/siteIntroRuner/ajax_del', 'Admin\SiteIntroRunerController@ajax_del');// 删除
+Route::post('admin/siteIntroRuner/ajax_save', 'Admin\SiteIntroRunerController@ajax_save');// 新加/修改
+Route::post('admin/siteIntroRuner/ajax_get_child', 'Admin\SiteIntroRunerController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('admin/siteIntroRuner/ajax_get_areachild', 'Admin\SiteIntroRunerController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('admin/siteIntroRuner/ajax_import_staff','Admin\SiteIntroRunerController@ajax_import'); // 导入员工
+
+Route::post('admin/siteIntroRuner/import', 'Admin\SiteIntroRunerController@import');// 导入excel
+Route::post('admin/siteIntroRuner/ajax_get_ids', 'Admin\SiteIntroRunerController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
 //标签[一级分类]
 Route::post('admin/labels/ajax_alist', 'Admin\LabelsController@ajax_alist');//ajax获得列表数据
 Route::post('admin/labels/ajax_del', 'Admin\LabelsController@ajax_del');// 删除
@@ -286,7 +297,7 @@ Route::post('admin/order/ajax_get_ids', 'Admin\OrdersController@ajax_get_ids');/
 Route::any('admin/order/ajax_getCountByStatus', 'Admin\OrdersController@ajax_getCountByStatus');//ajax获得统计数据
 Route::any('admin/order/ajax_status_count', 'Admin\OrdersController@ajax_status_count');// 工单状态统计
 Route::any('admin/order/refundOrder', 'Admin\OrdersController@refundOrder');// 退单
-
+Route::any('admin/order/ajax_count_orders', 'Admin\OrdersController@ajax_count_orders');// 统计抢单/订单
 // ----城市代理后台
 // city
 // 上传图片
@@ -524,7 +535,7 @@ Route::post('city/order/ajax_get_ids', 'City\OrdersController@ajax_get_ids');// 
 Route::any('city/order/ajax_getCountByStatus', 'City\OrdersController@ajax_getCountByStatus');//ajax获得统计数据
 Route::any('city/order/ajax_status_count', 'City\OrdersController@ajax_status_count');// 工单状态统计
 Route::any('city/order/refundOrder', 'City\OrdersController@refundOrder');// 退单
-
+Route::any('city/order/ajax_count_orders', 'City\OrdersController@ajax_count_orders');// 统计抢单/订单
 // ----商家后台
 // seller
 // 上传图片
@@ -1059,6 +1070,10 @@ Route::any('shopType/ajax_info/{id}', 'WX\ShopTypeController@ajax_info');//ajax�
 Route::any('siteIntro/ajax_alist', 'WX\SiteIntroController@ajax_alist');//ajax获得列表数据
 Route::any('siteIntro/ajax_info/{id}', 'WX\SiteIntroController@ajax_info');//ajax获得详情数据
 
+//站点介绍-跑腿人员
+Route::any('siteIntroRuner/ajax_alist', 'WX\SiteIntroRunerController@ajax_alist');//ajax获得列表数据
+Route::any('siteIntroRuner/ajax_info/{id}', 'WX\SiteIntroRunerController@ajax_info');//ajax获得详情数据
+
 //收费标准
 Route::any('feeScale/ajax_alist', 'WX\FeeScaleController@ajax_alist');//ajax获得列表数据
 Route::any('feeScale/ajax_info/{id}', 'WX\FeeScaleController@ajax_info');//ajax获得详情数据
@@ -1073,6 +1088,7 @@ Route::any('feeScale/ajax_infoByCityId/{city_id}', 'WX\FeeScaleController@ajax_i
 // 城市相关的
 Route::any('city/getNearCity', 'WX\CityController@getNearCity');// 根据经纬度坐标，获得最近的城市信息
 Route::any('city/getCitys', 'WX\CityController@getCitys');// 获得所有的城市信息
+Route::any('city/getOrderSaturation', 'WX\CityController@getOrderSaturation');// 获得订单饱和度
 
 // 店铺相关的
 Route::any('shop/ajax_alist', 'WX\ShopController@ajax_alist');//ajax获得列表数据
@@ -1121,7 +1137,9 @@ Route::any('order/ajax_alist', 'WX\OrderController@ajax_alist');//ajax获得列�
 Route::any('order/ajax_getCountByStatus', 'WX\OrderController@ajax_getCountByStatus');//ajax获得统计数据
 Route::any('order/grabOrder', 'WX\OrderController@grabOrder');// 抢单
 Route::any('order/finishOrder', 'WX\OrderController@finishOrder');// 订单完成
+Route::any('order/delOrder', 'WX\OrderController@delOrder');// 订单删除
 Route::any('order/eachDoOrder', 'WX\OrderController@eachDoOrder');// 每30秒或1分钟去执行一次的方法,获得这段时间内的待接订单
+Route::any('order/getCountList', 'WX\OrderController@getCountList');// 统计抢单/订单
 
 // 订单支付相关的
 Route::any('orderPay/pay', 'WX\OrderPayController@pay');// 订单付款

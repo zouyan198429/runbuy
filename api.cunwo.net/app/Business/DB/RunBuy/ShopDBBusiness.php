@@ -440,4 +440,88 @@ class ShopDBBusiness extends BasePublicDBBusiness
         // 批量更新店铺销量
         static::saveBathById($shopUdateMon, 'id');
     }
+
+
+    /**
+     * 根据关键字，返回有此关键字的商品的店铺id和店铺名称包含关键字的店铺id
+     *
+     * @param int $city_site_id 城市id
+     * @param string $key_word 关键字
+     * @param string $is_sale 是否上架1上架2下架 -- 多个用逗号分隔-- 可为空
+     * @param string $shop_status  状态0待审核1审核通过2审核未通过4冻结(禁用) -- 多个用逗号分隔-- 可为空
+     * @param string $shop_status_business  经营状态  1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]-- 多个用逗号分隔-- 可为空
+     * @param int  $company_id 企业id
+     * @param int $operate_staff_id 操作人id
+     * @return  array 店铺id数组 ---一维
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getIdsByKeyWord($city_site_id = 0, $key_word = '', $is_sale = '', $shop_status = '', $shop_status_business = '', $company_id = 0, $operate_staff_id = 0){
+        $shopIds = [];
+        if(empty($key_word)) return $shopIds;
+        // 根据关键词，获得商品表中的店铺信息
+        $queryParams = [
+            'where' => [
+                ['goods_name', 'like', '%' . $key_word . '%', ]
+            ],
+            'select' => [
+                'shop_id'
+            ],
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        if($city_site_id > 0 ){
+            array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+        }
+        if(!empty($is_sale)){
+            if (strpos($is_sale, ',') === false) { // 单条
+                array_push($queryParams['where'], ['is_sale', $is_sale]);
+            } else {
+                $queryParams['whereIn']['is_sale'] = explode(',', $is_sale);
+            }
+        }
+        $goodLists = ShopGoodsDBBusiness::getAllList($queryParams, [])->toArray();
+        if(!empty($goodLists)){
+            $goodShopIds = array_column($goodLists, 'shop_id');
+            $shopIds = array_merge($shopIds , $goodShopIds);
+            $shopIds = array_values(array_unique($shopIds));
+
+        }
+
+        // 根据关键词，获得店铺表中的店铺信息
+        $queryParams = [
+            'where' => [
+                ['shop_name', 'like', '%' . $key_word . '%', ]
+            ],
+            'select' => [
+                'id'
+            ],
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        if($city_site_id > 0 ){
+            array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+        }
+        if(!empty($shop_status)){
+            if (strpos($shop_status, ',') === false) { // 单条
+                array_push($queryParams['where'], ['status', $shop_status]);
+            } else {
+                $queryParams['whereIn']['status'] = explode(',', $shop_status);
+            }
+        }
+        if(!empty($shop_status_business)){
+            if (strpos($shop_status_business, ',') === false) { // 单条
+                array_push($queryParams['where'], ['status_business', $shop_status_business]);
+            } else {
+                $queryParams['whereIn']['status_business'] = explode(',', $shop_status_business);
+            }
+        }
+        $shopLists = static::getAllList($queryParams, [])->toArray();
+
+        if(!empty($shopLists)){
+            $temShopIds = array_column($shopLists, 'id');
+            $shopIds = array_merge($shopIds , $temShopIds);
+            $shopIds = array_values(array_unique($shopIds));
+
+        }
+        return $shopIds;
+    }
+
 }

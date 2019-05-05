@@ -305,6 +305,15 @@ Route::get('admin/siteIntro/add/{id}', 'Admin\SiteIntroController@add');// 添�
 Route::get('admin/siteIntro/export', 'Admin\SiteIntroController@export');// 导出
 Route::get('admin/siteIntro/import_template', 'Admin\SiteIntroController@import_template');// 导入模版
 
+
+// 站点介绍-跑腿人员
+Route::get('admin/siteIntroRuner', 'Admin\SiteIntroRunerController@index');// 列表
+Route::get('admin/siteIntroRuner/add/{id}', 'Admin\SiteIntroRunerController@add');// 添加
+// Route::get('admin/siteIntroRuner/select', 'Admin\SiteIntroRunerController@select');// 选择-弹窗
+Route::get('admin/siteIntroRuner/export', 'Admin\SiteIntroRunerController@export');// 导出
+Route::get('admin/siteIntroRuner/import_template', 'Admin\SiteIntroRunerController@import_template');// 导入模版
+
+
 // 标签[一级分类]
 Route::get('admin/labels', 'Admin\LabelsController@index');// 列表
 Route::get('admin/labels/add/{id}', 'Admin\LabelsController@add');// 添加
@@ -340,6 +349,7 @@ Route::get('admin/order/add/{id}', 'Admin\OrdersController@add');// 添加
 // Route::get('admin/order/select', 'Admin\OrdersController@select');// 选择-弹窗
 Route::get('admin/order/export', 'Admin\OrdersController@export');// 导出
 Route::get('admin/order/import_template', 'Admin\OrdersController@import_template');// 导入模版
+Route::get('admin/order/countOrders', 'Admin\OrdersController@countOrders');// 统计-订单数量
 
 // ----城市代理商
 // City
@@ -486,6 +496,7 @@ Route::get('city/order/add/{id}', 'City\OrdersController@add');// 添加
 // Route::get('city/order/select', 'City\OrdersController@select');// 选择-弹窗
 Route::get('city/order/export', 'City\OrdersController@export');// 导出
 Route::get('city/order/import_template', 'City\OrdersController@import_template');// 导入模版
+Route::get('city/order/countOrders', 'City\OrdersController@countOrders');// 统计-订单数量
 
 
 // ----商家后台

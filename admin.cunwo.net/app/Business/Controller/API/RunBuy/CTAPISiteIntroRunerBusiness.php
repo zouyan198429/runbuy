@@ -1,5 +1,5 @@
 <?php
-// 购物车
+// 站点介绍
 namespace App\Business\Controller\API\RunBuy;
 
 use App\Services\Excel\ImportExport;
@@ -8,9 +8,9 @@ use App\Services\Tool;
 use Illuminate\Http\Request;
 use App\Services\Request\CommonRequest;
 use App\Http\Controllers\BaseController as Controller;
-class CTAPICartBusiness extends BasicPublicCTAPIBusiness
+class CTAPISiteIntroRunerBusiness extends BasicPublicCTAPIBusiness
 {
-    public static $model_name = 'API\RunBuy\CartAPI';
+    public static $model_name = 'API\RunBuy\SiteIntroRunerAPI';
 
     /**
      * 获得列表数据--所有数据
@@ -46,12 +46,12 @@ class CTAPICartBusiness extends BasicPublicCTAPIBusiness
 //                ['company_id', $company_id],
 //                //['mobile', $keyword],
             ],
-//            'select' => [
-//                'id','title','sort_num','volume'
-//                ,'operate_staff_id','operate_staff_id_history'
-//                ,'created_at' ,'updated_at'
-//            ],
-            'orderBy' => [ 'id'=>'asc'],//'sort_num'=>'desc',
+            'select' => [
+                'id','title','sort_num','volume'
+                ,'operate_staff_id','operate_staff_id_history'
+                ,'created_at' ,'updated_at'
+            ],
+            'orderBy' => ['sort_num'=>'desc', 'id'=>'desc'],//
         ];// 查询条件参数
         if(empty($queryParams)){
             $queryParams = $defaultQueryParams;
@@ -71,12 +71,6 @@ class CTAPICartBusiness extends BasicPublicCTAPIBusiness
             // $params = self::formatListParams($request, $controller, $queryParams);
 //            $province_id = CommonRequest::getInt($request, 'province_id');
 //            if($province_id > 0 )  array_push($queryParams['where'], ['city_ids', 'like', '' . $province_id . ',%']);
-            $city_site_id = CommonRequest::getInt($request, 'city_site_id');
-            if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
-
-            $staff_id = CommonRequest::getInt($request, 'staff_id');
-            if($staff_id > 0 )  array_push($queryParams['where'], ['staff_id', '=', $staff_id]);
-
             $field = CommonRequest::get($request, 'field');
             $keyWord = CommonRequest::get($request, 'keyword');
             if (!empty($field) && !empty($keyWord)) {
@@ -196,7 +190,7 @@ class CTAPICartBusiness extends BasicPublicCTAPIBusiness
         // 前**条[默认]
         $defaultQueryParams = [
             'where' => [
-                //  ['company_id', $company_id],
+              //  ['company_id', $company_id],
 //                ['id', '>', $id],
             ],
             'select' => [
@@ -291,60 +285,25 @@ class CTAPICartBusiness extends BasicPublicCTAPIBusiness
      */
     public static function replaceById(Request $request, Controller $controller, $saveData, &$id, $modifAddOprate = false, $notLog = 0){
         $company_id = $controller->company_id;
-        $user_id = $controller->user_id;
-        if(isset($saveData['staff_id']) && empty($saveData['staff_id'])  ){
-            throws('用户不能为空！');
-        }
-
-        if(isset($saveData['city_site_id']) && empty($saveData['city_site_id'])  ){
-            throws('城市不能为空！');
-        }
-
-//        if(isset($saveData['shop_id']) && empty($saveData['shop_id'])  ){
-//            throws('店铺不能为空！');
-//        }
-
-        if(isset($saveData['goods_id']) && empty($saveData['goods_id'])  ){
-            throws('商品不能为空！');
-        }
-
-        if(isset($saveData['prop_price_id']) && !is_numeric($saveData['prop_price_id'])  ){
-            throws('价格属性不能为空！');
-        }
-
-        if(isset($saveData['amount']) && !is_numeric($saveData['amount']) ){
-            throws('商品数量不能为空！');
-        }
-
-        // 调用新加或修改接口
-        $apiParams = [
-            'saveData' => $saveData,
-            'company_id' => $company_id,
-            'id' => $id,
-            'operate_staff_id' => $user_id,
-            'modifAddOprate' => 0,
-        ];
-        $id = static::exeDBBusinessMethodCT($request, $controller, '',  'replaceById', $apiParams, $company_id, $notLog);
-        return $id;
-//        if($id > 0){
-//            // 判断权限
-////            $judgeData = [
-////                'company_id' => $company_id,
-////            ];
-////            $relations = '';
-////            static::judgePower($request, $controller, $id, $judgeData, '', $company_id, $relations, $notLog);
-//            if($modifAddOprate) static::addOprate($request, $controller, $saveData);
-//
-//        }else {// 新加;要加入的特别字段
-//            $addNewData = [
-//                // 'company_id' => $company_id,
+        if($id > 0){
+            // 判断权限
+//            $judgeData = [
+//                'company_id' => $company_id,
 //            ];
-//            $saveData = array_merge($saveData, $addNewData);
-//            // 加入操作人员信息
-//            static::addOprate($request, $controller, $saveData);
-//        }
-//        // 新加或修改
-//        return static::replaceByIdBase($request, $controller, '', $saveData, $id, $notLog);
+//            $relations = '';
+//            static::judgePower($request, $controller, $id, $judgeData, '', $company_id, $relations, $notLog);
+            if($modifAddOprate) static::addOprate($request, $controller, $saveData);
+
+        }else {// 新加;要加入的特别字段
+            $addNewData = [
+               // 'company_id' => $company_id,
+            ];
+            $saveData = array_merge($saveData, $addNewData);
+            // 加入操作人员信息
+            static::addOprate($request, $controller, $saveData);
+        }
+        // 新加或修改
+        return static::replaceByIdBase($request, $controller, '', $saveData, $id, $notLog);
     }
 
     // ***********导入***开始************************************************************
@@ -521,127 +480,5 @@ class CTAPICartBusiness extends BasicPublicCTAPIBusiness
     }
     // ***********通过组织条件获得kv***结束************************************************************
 
-    /**
-     * 根据id新加或修改单条数据-id 为0 新加，返回新的对象数组[-维],  > 0 ：修改对应的记录，返回true
-     *
-     * @param Request $request 请求信息
-     * @param Controller $controller 控制对象
-     * @param array $saveData 要保存或修改的数组
-     * @param int $shop_id id
-     * @param boolean $modifAddOprate 修改时是否加操作人，true:加;false:不加[默认]
-     * @param int $notLog 是否需要登陆 0需要1不需要
-     * @return  array 单条数据 - -维数组 为0 新加，返回新的对象数组[-维],  > 0 ：修改对应的记录，返回true
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function delByShopId(Request $request, Controller $controller, $saveData, &$shop_id, $modifAddOprate = false, $notLog = 0)
-    {
-        $company_id = $controller->company_id;
-        $user_id = $controller->user_id;
-        if (isset($saveData['staff_id']) && empty($saveData['staff_id'])) {
-            throws('用户不能为空！');
-        }
 
-        if (isset($saveData['city_site_id']) && empty($saveData['city_site_id'])) {
-            throws('城市不能为空！');
-        }
-
-//        if(isset($saveData['shop_id']) && empty($saveData['shop_id'])  ){
-//            throws('店铺不能为空！');
-//        }
-
-        // 调用新加或修改接口
-        $apiParams = [
-            'saveData' => $saveData,
-            'company_id' => $company_id,
-            'shop_id' => $shop_id,
-            'operate_staff_id' => $user_id,
-            'modifAddOprate' => 0,
-        ];
-        $shop_id = static::exeDBBusinessMethodCT($request, $controller, '', 'delByShopId', $apiParams, $company_id, $notLog);
-        return $shop_id;
-    }
-
-    /**
-     * 根据id新加或修改单条数据-id 为0 新加，返回新的对象数组[-维],  > 0 ：修改对应的记录，返回true
-     *
-     * @param Request $request 请求信息
-     * @param Controller $controller 控制对象
-     * @param array $saveData 要保存或修改的数组
-     * @param int $shop_id id
-     * @param boolean $modifAddOprate 修改时是否加操作人，true:加;false:不加[默认]
-     * @param int $notLog 是否需要登陆 0需要1不需要
-     * @return  array 单条数据 - -维数组 为0 新加，返回新的对象数组[-维],  > 0 ：修改对应的记录，返回true
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function saveProps(Request $request, Controller $controller, $saveData, &$prop_id, $modifAddOprate = false, $notLog = 0)
-    {
-        $company_id = $controller->company_id;
-        $user_id = $controller->user_id;
-        if (isset($saveData['staff_id']) && empty($saveData['staff_id'])) {
-            throws('用户不能为空！');
-        }
-
-        if (isset($saveData['city_site_id']) && empty($saveData['city_site_id'])) {
-            throws('城市不能为空！');
-        }
-
-        if (isset($saveData['cart_id']) && empty($saveData['cart_id'])) {
-            throws('购物车编号不能为空！');
-        }
-
-        // 调用新加或修改接口
-        $apiParams = [
-            'saveData' => $saveData,
-            'company_id' => $company_id,
-            'prop_id' => $prop_id,
-            'operate_staff_id' => $user_id,
-            'modifAddOprate' => 0,
-        ];
-        $prop_id = static::exeDBBusinessMethodCT($request, $controller, '', 'saveProps', $apiParams, $company_id, $notLog);
-        return $prop_id;
-    }
-
-    /**
-     * 根据购物车生成订单,返回生成的订单号
-     *
-     * @param Request $request 请求信息
-     * @param Controller $controller 控制对象
-     * @param array $saveData 要保存或修改的数组
-     * @param string $cartIds 购物车id,多个用逗号分隔
-     * @param boolean $modifAddOprate 修改时是否加操作人，true:加;false:不加[默认]
-     * @param int $notLog 是否需要登陆 0需要1不需要
-     * @return  array 单条数据 - -维数组 为0 新加，返回新的对象数组[-维],  > 0 ：修改对应的记录，返回true
-     * @author zouyan(305463219@qq.com)
-     */
-    public static function createOrderByCartId(Request $request, Controller $controller, $saveData, &$cartIds, $modifAddOprate = false, $notLog = 0)
-    {
-        $company_id = $controller->company_id;
-        $user_id = $controller->user_id;
-        if (isset($saveData['staff_id']) && empty($saveData['staff_id'])) {
-            throws('用户不能为空！');
-        }
-
-        if (isset($saveData['addr_id']) && empty($saveData['addr_id'])) {
-            throws('收货地址不能为空！');
-        }
-
-        if (isset($saveData['city_site_id']) && empty($saveData['city_site_id'])) {
-            throws('城市不能为空！');
-        }
-
-        if (isset($cartIds) && empty($cartIds)) {
-            throws('购物车编号不能为空！');
-        }
-
-        // 调用新加或修改接口
-        $apiParams = [
-            'saveData' => $saveData,
-            'company_id' => $company_id,
-            'cartIds' => $cartIds,
-            'operate_staff_id' => $user_id,
-            'modifAddOprate' => 0,
-        ];
-        $order_no = static::exeDBBusinessMethodCT($request, $controller, '', 'createOrder', $apiParams, $company_id, $notLog);
-        return $order_no;
-    }
 }

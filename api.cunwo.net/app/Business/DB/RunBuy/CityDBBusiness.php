@@ -253,7 +253,7 @@ class CityDBBusiness extends BasePublicDBBusiness
         $cityList = $cityListObj->toArray();
         $distanceOrder = '';
         if( ($reType & 1) == 1 || ($formatType & 2) == 2) $distanceOrder = 'asc';
-        Map::resolveDistance($cityList, $latitude, $longitude, $distanceOrder, 'latitude', 'longitude', '');
+        Map::resolveDistance($cityList, $latitude, $longitude, 'distance', 0, $distanceOrder, 'latitude', 'longitude', '');
 
         if( ($reType & 1) == 1 ) return $cityList[0] ?? [];
         if( ($formatType & 4) == 4 ) {// 4 所有城市 [二维数组--sort_num升序]

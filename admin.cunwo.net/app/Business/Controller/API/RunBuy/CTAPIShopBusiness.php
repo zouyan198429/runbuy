@@ -707,4 +707,38 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
     // ***********通过组织条件获得kv***结束************************************************************
 
 
+    /**
+     * 根据关键字，返回有此关键字的商品的店铺id和店铺名称包含关键字的店铺id
+     *
+     * @param Request $request 请求信息
+     * @param int $city_site_id 城市id
+     * @param Controller $controller 控制对象
+     * @param string $key_word 关键字
+     * @param string $is_sale 是否上架1上架2下架 -- 多个用逗号分隔-- 可为空
+     * @param string $shop_status  状态0待审核1审核通过2审核未通过4冻结(禁用) -- 多个用逗号分隔-- 可为空
+     * @param string $shop_status_business  经营状态  1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]-- 多个用逗号分隔-- 可为空
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 店铺id数组 ---一维
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getShopIdsByKeyWord(Request $request, Controller $controller, $city_site_id = 0, $key_word = '', $is_sale = '', $shop_status = '', $shop_status_business = '', $notLog = 0)
+    {
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+        if(empty($key_word)) return [];
+
+        // 调用新加或修改接口
+        $apiParams = [
+            'city_site_id' => $city_site_id,// 城市id
+            'key_word' => $key_word,// 关键字
+            'is_sale' => $is_sale,// 是否上架1上架2下架 -- 多个用逗号分隔-- 可为空
+            'shop_status' => $shop_status,// 状态0待审核1审核通过2审核未通过4冻结(禁用) -- 多个用逗号分隔-- 可为空
+            'shop_status_business' => $shop_status_business,// 经营状态  1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]-- 多个用逗号分隔-- 可为空
+            'company_id' => $company_id,
+            'operate_staff_id' => $user_id,
+        ];
+        $shop_ids = static::exeDBBusinessMethodCT($request, $controller, '', 'getIdsByKeyWord', $apiParams, $company_id, $notLog);
+        return $shop_ids;
+    }
+
 }

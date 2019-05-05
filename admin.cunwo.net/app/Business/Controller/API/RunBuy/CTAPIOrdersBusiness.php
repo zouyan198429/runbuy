@@ -4,6 +4,7 @@ namespace App\Business\Controller\API\RunBuy;
 
 
 use App\Services\Excel\ImportExport;
+use App\Services\Map\Map;
 use App\Services\Request\API\HttpRequest;
 use App\Services\Tool;
 use Illuminate\Http\Request;
@@ -193,6 +194,7 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
         $data_list = $result['data_list'] ?? [];
         $parentOrderNos = [];// 有子订单的订单数组
         foreach($data_list as $k => $v){
+            $tem_status = $v['status'] ?? 0;// 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
             $order_no = $v['order_no'] ?? '';
             $parent_order_no = $v['parent_order_no'] ?? '';
             $has_son_order = $v['has_son_order'] ?? 0;// 是否有子订单0无1有
@@ -259,6 +261,35 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
                     , ['len' => 4, 'splitStr' => ' ']
                 ]);
             }
+
+            if($tem_status == 2){// 2等待接单
+                $latitude = CommonRequest::get($request, 'latitude');// 纬度
+                $longitude = CommonRequest::get($request, 'longitude');// 经度
+                // 有经纬度
+                if(is_numeric($latitude) && is_numeric($longitude) && !empty($latitude) && !empty($longitude)){
+                    $v['send_info'] = [
+                        'latitude' => $latitude,
+                        'longitude' => $longitude,
+                    ];
+
+                }
+            }
+            // 送货人实时经纬度信息
+            if(in_array($tem_status, [2, 4]) && isset($v['send_info']) && !empty($v['send_info'])){
+                $staff_info = $v['send_info'] ?? [];
+                if( isset($data_list[$k]['send_info'])) unset($data_list[$k]['send_info']);
+                // 送货人实时与买家的距离
+                if(isset($data_list[$k]['addr']) && !empty($staff_info)){
+                    $temAddr = $data_list[$k]['addr'] ?? [];
+                    $addrLatitude = $temAddr['latitude'] ?? '';
+                    $addrLongitude = $temAddr['longitude'] ?? '';
+                    Map::resolveDistance($staff_info, $addrLatitude, $addrLongitude, 'distance', 0, '', 'latitude', 'longitude', '');
+                }
+
+                $data_list[$k]['sender'] = Tool::formatArrKeys($staff_info
+                    , Tool::arrEqualKeyVal(['id', 'real_name', 'mobile', 'tel', 'longitude', 'latitude', 'distance', 'distanceStr']), true );
+            }
+
             // 买家
             if(isset($v['staff_history']) && !empty($v['staff_history'])){
                 $staff_history = $v['staff_history'] ?? [];
@@ -322,9 +353,30 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
             // 店铺
             if(isset($v['shop_history']) && !empty($v['shop_history'])){
                 $shop_history = $v['shop_history'] ?? [];
+                $shop_history['mobile_format'] = Tool::formatStr($shop_history['mobile'], [
+                    ['len' => 3, 'splitStr' => ' ']
+                    , ['len' => 4, 'splitStr' => ' ']
+                    , ['len' => 4, 'splitStr' => ' ']
+                ]);
+                // 用户到店铺的距离
+                if(isset($data_list[$k]['addr']) && !empty($shop_history)){
+                    $temAddr = $data_list[$k]['addr'] ?? [];
+                    $addrLatitude = $temAddr['latitude'] ?? '';
+                    $addrLongitude = $temAddr['longitude'] ?? '';
+                    Map::resolveDistance($shop_history, $addrLatitude, $addrLongitude, 'distance', 0, '', 'latitude', 'longitude', '');
+                }
+                // 送货人实时与店家的距离
+                if(isset($data_list[$k]['sender']) && !empty($shop_history)){
+                    $temSendInfo = $data_list[$k]['sender'] ?? [];
+                    $sendLatitude = $temSendInfo['latitude'] ?? '';
+                    $sendLongitude = $temSendInfo['longitude'] ?? '';
+                    Map::resolveDistance($shop_history, $sendLatitude, $sendLongitude, 'distanceSend', 0, '', 'latitude', 'longitude', '');
+                }
+
+
                 unset($data_list[$k]['shop_history']);
                 $data_list[$k]['shop'] = Tool::formatArrKeys($shop_history
-                    , Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile', 'tel', 'addr', 'longitude', 'latitude']), true );
+                    , Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile', 'mobile_format', 'tel', 'addr', 'longitude', 'latitude', 'distance', 'distanceStr', 'distanceSend', 'distanceSendStr']), true );
             }
             // 商品
             if(isset($v['orders_goods']) && !empty($v['orders_goods'])) {
@@ -850,6 +902,33 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
     }
 
     /**
+     * 根据订单号，订单删除
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param string $order_no 订单号,多个用逗号分隔
+     * @param string $send_staff_id 派送给的用户id
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function delOrder(Request $request, Controller $controller, $order_no, $send_staff_id, $notLog = 0)
+    {
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+
+        // 调用新加或修改接口
+        $apiParams = [
+            'order_no' => $order_no,// 订单号,多个用逗号分隔, 可为空：所有的
+            'company_id' => $company_id,
+            // 'send_staff_id' => $send_staff_id,// 派送给的用户id
+            'operate_staff_id' => $user_id,
+        ];
+        $result = static::exeDBBusinessMethodCT($request, $controller, '', 'delOrder', $apiParams, $company_id, $notLog);
+        return $result;
+    }
+
+    /**
      * 根据 订单号获得订单详情
      *
      * @param Request $request 请求信息
@@ -895,11 +974,13 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
      * @param string $order_id 订单id
      * @param array $other_where 其它条件
      * @param string $send_staff_id 派送给的用户id
+     * @param float $latitude 纬度
+     * @param float $longitude 经度
      * @param int $notLog 是否需要登陆 0需要1不需要
      * @return  mixed
      * @author zouyan(305463219@qq.com)
      */
-    public static function getWaitOrder(Request $request, Controller $controller, $operate_type, $status, $city_site_id, $order_id, $other_where, $send_staff_id, $notLog = 0)
+    public static function getWaitOrder(Request $request, Controller $controller, $operate_type, $status, $city_site_id, $order_id, $other_where, $send_staff_id, $latitude = 0, $longitude = 0, $notLog = 0)
     {
         $company_id = $controller->company_id;
         $user_id = $controller->user_id;
@@ -913,6 +994,8 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
             'order_id' => $order_id,
             'company_id' => $company_id,
             'send_staff_id' => $send_staff_id,// 派送给的用户id
+            'latitude' => $latitude,
+            'longitude' => $longitude,
             'operate_staff_id' => $user_id,
         ];
         $result = static::exeDBBusinessMethodCT($request, $controller, '', 'getCityWaitOrder', $apiParams, $company_id, $notLog);

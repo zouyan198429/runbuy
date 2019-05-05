@@ -608,6 +608,90 @@ class OrdersDBBusiness extends BasePublicDBBusiness
 
 
     /**
+     * 根据订单号，订单删除
+     *
+     * @param $order_no  订单号,多个用逗号分隔
+     * @param int  $company_id 企业id
+     * @param int $operate_staff_id 操作人id
+     * @return  int 记录id值，
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function delOrder($order_no, $company_id, $operate_staff_id = 0){
+        if(empty($order_no)) throws('订单号不能为空！');
+        // 根据订单号，获得订单信息
+        $queryParams = [
+            'where' => [
+                ['order_type', 1],// 订单类型1普通订单/父订单4子订单
+            ],
+            /*
+            'select' => [
+                'id','title','sort_num','volume'
+                ,'operate_staff_id','operate_staff_id_history'
+                ,'created_at' ,'updated_at'
+            ],
+            */
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        if (strpos($order_no, ',') === false) { // 单条
+            array_push($queryParams['where'], ['order_no', $order_no]);
+        } else {
+            $queryParams['whereIn']['order_no'] = explode(',', $order_no);
+        }
+        $orderLists = OrdersDoingDBBusiness::getAllList($queryParams, []);
+        if(is_object($orderLists) && count($orderLists) <= 0) throws('订单[' . $order_no . '] 记录不存在'); //记录不存在
+
+        // 遍历判断订单是否可以操作
+        foreach($orderLists as $orderInfoObj){
+            $temOrderNo = $orderInfoObj->order_no;
+            // if($orderInfoObj->send_staff_id <= 0 ) throws('订单[' . $temOrderNo . '] 未指定派送人员!');
+            if($orderInfoObj->status != 1 ) throws('订单[' . $temOrderNo . '] 非待支付状态!');
+            if($orderInfoObj->has_refund == 2 ) throws('订单[' . $temOrderNo . ']待退费中 !');
+            if($orderInfoObj->refund_price_frozen > 0 ) throws('订单[' . $temOrderNo . ']还有未完成的退费!');
+        }
+
+        DB::beginTransaction();
+        try {
+            // 操作人员历史
+            $temData = [];
+            $operate_staff_id_history = 0;
+            static::addOprate($temData, $operate_staff_id,$operate_staff_id_history);
+
+            // 遍历判断订单是否可以操作
+            $order_no_arr = [];
+            foreach($orderLists as $orderInfoObj){
+                $temOrderNo = $orderInfoObj->order_no;
+                // if($orderInfoObj->send_staff_id <= 0 ) throws('订单[' . $temOrderNo . '] 未指定派送人员!');
+                if($orderInfoObj->status != 1 ) throws('订单[' . $temOrderNo . '] 非待支付状态!');
+                if($orderInfoObj->has_refund == 2 ) throws('订单[' . $temOrderNo . ']待退费中 !');
+                if($orderInfoObj->refund_price_frozen > 0 ) throws('订单[' . $temOrderNo . ']还有未完成的退费!');
+                array_push($order_no_arr, $orderInfoObj->order_no);
+
+                // 更新订单
+                $orderSaveData = [
+                    'cancel_time' => date("Y-m-d H:i:s",time()),// 作废时间
+                    'status' => 64,// 状态1待支付2等待接单4取货或配送中8订单完成16取消[系统取消]32取消[用户取消]64作废[非正常完成]
+                ];
+                OrdersDoingDBBusiness::updateOrders($orderSaveData,  $temOrderNo, 2 + 4, $operate_staff_id, $operate_staff_id_history
+                    , '订单作废！');
+            }
+
+            if(!empty($order_no_arr)){
+                // 删除正在进行订单数据
+                OrdersDoingDBBusiness::delDoingOrders( implode(',', $order_no_arr), $operate_staff_id , $operate_staff_id_history, '');// 删除正在进行的订单
+            }
+
+
+        } catch ( \Exception $e) {
+            DB::rollBack();
+//            throws('操作失败；信息[' . $e->getMessage() . ']');
+            throws($e->getMessage());
+        }
+        DB::commit();
+        return 1;
+    }
+
+
+    /**
      * 获得最新的，待接单的订单数据
      *
      * @param int  $operate_type 操作类型 1 商家 或者 店铺 2 非商家 或者 店铺
@@ -620,11 +704,13 @@ class OrdersDBBusiness extends BasePublicDBBusiness
      *            最新的订单支付时间:
      * @param int  $company_id 企业id
      * @param string $send_staff_id 派送给的用户id--请求数据，可能要接单的，可为0：  非0:主要记录最近一次访问
+     * @param float $latitude 纬度
+     * @param float $longitude 经度
      * @param int $operate_staff_id 操作人id
      * @return  array
      * @author zouyan(305463219@qq.com)
      */
-    public static function getCityWaitOrder($operate_type, $status, $city_site_id, $other_where, $order_id, $company_id, $send_staff_id, $operate_staff_id = 0){
+    public static function getCityWaitOrder($operate_type, $status, $city_site_id, $other_where, $order_id, $company_id, $send_staff_id, $latitude = 0, $longitude = 0, $operate_staff_id = 0){
         if(!is_numeric($city_site_id)) $city_site_id = 0;
         // if(!is_numeric($order_id)) $order_id = 0;
 
@@ -636,6 +722,25 @@ class OrdersDBBusiness extends BasePublicDBBusiness
         // $maxOrderDoingId = 0;// Tool::getRedis('order:maxOrderDoingId', 3);
         // if(!is_numeric($maxOrderDoingId))  $maxOrderDoingId = 0;
 
+        // 更新派送人员位置坐标
+        if($send_staff_id > 0 && is_numeric($latitude) && is_numeric($longitude) && $latitude != 0 && $longitude != 0){
+            // 从缓存获取,不一样，则修改数据库
+            $staffData = Tool::getRedis('staff:latitudelongitude' . $send_staff_id, 2);
+            if(!is_array($staffData)) $staffData = [];
+            $temLat = $staffData['latitude'] ?? '';
+            $temlng = $staffData['longitude'] ?? '';
+            if($temLat != $latitude || $temlng != $longitude){
+                $staffData = [
+                    'operate_type' => 8,// 8 修改：如更新接单人员经纬度[频繁]
+                    'latitude' => $latitude,
+                    'longitude' => $longitude,
+                ];
+                StaffDBBusiness::replaceById($staffData, $company_id, $send_staff_id, $operate_staff_id, 0);
+                if(isset($staffData['operate_type'])) unset($staffData['operate_type']);
+                // 缓存用户经纬度
+                 Tool::setRedis('staff:', 'latitudelongitude' . $send_staff_id, $staffData, 0 , 2);
+            }
+        }
 
         $return = [
           'order_id' => date("Y-m-d H:i:s",time()),// $maxOrderDoingId,// 最新的订单id
