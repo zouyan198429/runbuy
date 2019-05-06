@@ -228,7 +228,7 @@
                   <a href="javascript:;">订单统计</a>
                   <dl class="layui-nav-child">
                     <dd>
-                      <a lay-href="{{ url('city/order/countOrders') }}">订单统计</a>
+                      <a lay-href="{{ url('city/order/countOrders') }}">完成订单统计</a>
                     </dd>
                     {{--<dd><a lay-href="">每日订单</a></dd>--}}
                     {{--<dd><a lay-href="">每月订单</a></dd>--}}

@@ -283,7 +283,7 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
                     $temAddr = $data_list[$k]['addr'] ?? [];
                     $addrLatitude = $temAddr['latitude'] ?? '';
                     $addrLongitude = $temAddr['longitude'] ?? '';
-                    Map::resolveDistance($staff_info, $addrLatitude, $addrLongitude, 'distance', 0, '', 'latitude', 'longitude', '');
+                    Map::resolveDistance($staff_info, $addrLatitude, $addrLongitude, 'distance', 400, '', 'latitude', 'longitude', '');
                 }
 
                 $data_list[$k]['sender'] = Tool::formatArrKeys($staff_info
@@ -363,14 +363,14 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
                     $temAddr = $data_list[$k]['addr'] ?? [];
                     $addrLatitude = $temAddr['latitude'] ?? '';
                     $addrLongitude = $temAddr['longitude'] ?? '';
-                    Map::resolveDistance($shop_history, $addrLatitude, $addrLongitude, 'distance', 0, '', 'latitude', 'longitude', '');
+                    Map::resolveDistance($shop_history, $addrLatitude, $addrLongitude, 'distance', 400, '', 'latitude', 'longitude', '');
                 }
                 // 送货人实时与店家的距离
                 if(isset($data_list[$k]['sender']) && !empty($shop_history)){
                     $temSendInfo = $data_list[$k]['sender'] ?? [];
                     $sendLatitude = $temSendInfo['latitude'] ?? '';
                     $sendLongitude = $temSendInfo['longitude'] ?? '';
-                    Map::resolveDistance($shop_history, $sendLatitude, $sendLongitude, 'distanceSend', 0, '', 'latitude', 'longitude', '');
+                    Map::resolveDistance($shop_history, $sendLatitude, $sendLongitude, 'distanceSend', 400, '', 'latitude', 'longitude', '');
                 }
 
 
