@@ -161,6 +161,14 @@ class ShopController extends BaseController
             // if(isset($v['resource_list']))  unset($data_list[$k]['resource_list']);
         }
         $data_list = array_values($data_list);
+
+        $data_list = Tool::formatTwoArrKeys($data_list, Tool::arrEqualKeyVal(['id', 'resource_url', 'shop_name', 'type_name'
+            , 'mon_sales_volume', 'per_price'
+            , 'area_name', 'addr', 'distanceStr', 'status_business_text', 'status_business', 'labelNnames'
+            , 'labelIdKV'
+//            , 'aaaa', 'aaaa', 'aaaa', 'aaaa', 'aaaa'
+//            , 'aaaa', 'aaaa', 'aaaa', 'aaaa', 'aaaa', 'aaaa'
+                ]), false);
         $result['result']['data_list'] = $data_list;
 
         return $result;
