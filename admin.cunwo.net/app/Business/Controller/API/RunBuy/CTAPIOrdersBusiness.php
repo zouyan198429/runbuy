@@ -205,6 +205,7 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
             if(isset($v['total_price'])) $data_list[$k]['total_price_format'] = Tool::formatMoney($v['total_price'], 2, '');
             if(isset($v['total_run_price'])) $data_list[$k]['total_run_price_format'] = Tool::formatMoney($v['total_run_price'], 2, '');
             if(isset($v['pay_run_amount'])) $data_list[$k]['pay_run_amount_format'] = Tool::formatMoney($v['pay_run_amount'], 2, '');
+            if(isset($v['refund_price'])) $data_list[$k]['refund_price_format'] = Tool::formatMoney($v['refund_price'], 2, '');
 
             $send_end_time_format = '';
             if(isset($v['send_end_time']) && !empty($v['send_end_time'])){
