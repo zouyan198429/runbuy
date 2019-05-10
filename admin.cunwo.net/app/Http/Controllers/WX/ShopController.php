@@ -130,20 +130,22 @@ class ShopController extends BaseController
                 }
                 array_push($temDataList, $data_list[$k]);
             }
-            $idsArr = array_column($temDataList,'id');
-            $ids = implode(',', $idsArr);
-            //   4根据id去获取需要的数据,包括 记录关系 --可缓存
-            CTAPIShopBusiness::mergeRequest($request, $this, [
-                'ids' => $ids,
-            ]);
+            if(!empty($temDataList)){
+                $idsArr = array_column($temDataList,'id');
+                $ids = implode(',', $idsArr);
+                //   4根据id去获取需要的数据,包括 记录关系 --可缓存
+                CTAPIShopBusiness::mergeRequest($request, $this, [
+                    'ids' => $ids,
+                ]);
 
-            if(isset($extParams['sqlParams']['select'])) unset($extParams['sqlParams']['select']);
+                if(isset($extParams['sqlParams']['select'])) unset($extParams['sqlParams']['select']);
 
-            $temResult = CTAPIShopBusiness::getList($request, $this, 1, [], $defaultRelations, $extParams);
-            $temDataList = $temResult['result']['data_list'] ?? [];
-            if(!empty($temDataList)) Map::resolveDistance($temDataList, $latitude, $longitude, 'distance', 400, '', 'latitude', 'longitude', '');
-            $temDataList = Tool::php_multisort($temDataList, $orderDistance);
-            $temDataList = array_values($temDataList);
+                $temResult = CTAPIShopBusiness::getList($request, $this, 1, [], $defaultRelations, $extParams);
+                $temDataList = $temResult['result']['data_list'] ?? [];
+                if(!empty($temDataList)) Map::resolveDistance($temDataList, $latitude, $longitude, 'distance', 400, '', 'latitude', 'longitude', '');
+                $temDataList = Tool::php_multisort($temDataList, $orderDistance);
+                $temDataList = array_values($temDataList);
+            }
 
             $data_list = $temDataList;
 
