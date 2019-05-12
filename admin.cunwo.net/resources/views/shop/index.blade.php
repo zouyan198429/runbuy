@@ -43,14 +43,14 @@
         </ul>
         <ul class="layui-nav layui-layout-right" lay-filter="layadmin-layout-right">
           
-          <li class="layui-nav-item" lay-unselect>
-            <a lay-href="{{ url('layui/app/message/index') }}" layadmin-event="message" lay-text="消息中心">
-              <i class="layui-icon layui-icon-notice"></i>  
-              
-              <!-- 如果有新消息，则显示小圆点 -->
-              <span class="layui-badge-dot"></span>
-            </a>
-          </li>
+          {{--<li class="layui-nav-item" lay-unselect>--}}
+            {{--<a lay-href="{{ url('layui/app/message/index') }}" layadmin-event="message" lay-text="消息中心">--}}
+              {{--<i class="layui-icon layui-icon-notice"></i>  --}}
+              {{----}}
+              {{--<!-- 如果有新消息，则显示小圆点 -->--}}
+              {{--<span class="layui-badge-dot"></span>--}}
+            {{--</a>--}}
+          {{--</li>--}}
           <li class="layui-nav-item layui-hide-xs" lay-unselect>
             <a href="javascript:;" layadmin-event="theme">
               <i class="layui-icon layui-icon-theme"></i>
@@ -92,7 +92,8 @@
       <!-- 侧边菜单 -->
       <div class="layui-side layui-side-menu">
         <div class="layui-side-scroll">
-          <div class="layui-logo" lay-href="{{ url('layui/home/console') }}">
+          {{--<div class="layui-logo" lay-href="{{ url('layui/home/console') }}">--}}
+          <div class="layui-logo" lay-href="{{ url('/help/help.html') }}">
             <span>极递网-店铺后台</span>
           </div>
           
@@ -104,7 +105,8 @@
               </a>
               <dl class="layui-nav-child">
                 <dd data-name="console" class="layui-this">
-                  <a lay-href="{{ url('layui/home/console') }}">控制台</a>
+                  {{--<a lay-href="{{ url('layui/home/console') }}">控制台</a>--}}
+                  <a lay-href="{{ url('/help/help.html') }}">操作指南</a>
                 </dd>
                 {{--<dd data-name="console">--}}
                   {{--<a lay-href="{{ url('layui/home/homepage1') }}">主页一</a>--}}
@@ -298,7 +300,8 @@
         </div>
         <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="layadmin-layout-tabs">
           <ul class="layui-tab-title" id="LAY_app_tabsheader">
-            <li lay-id="{{ url('layui/home/console') }}" lay-attr="{{ url('layui/home/console') }}" class="layui-this"><i class="layui-icon layui-icon-home"></i></li>
+              {{--<li lay-id="{{ url('layui/home/console') }}" lay-attr="{{ url('layui/home/console') }}" class="layui-this"><i class="layui-icon layui-icon-home"></i></li>--}}
+              <li lay-id="{{ url('/help/help.html') }}" lay-attr="{{ url('/help/help.html') }}" class="layui-this"><i class="layui-icon layui-icon-home"></i></li>
           </ul>
         </div>
       </div>
@@ -307,7 +310,8 @@
       <!-- 主体内容 -->
       <div class="layui-body" id="LAY_app_body">
         <div class="layadmin-tabsbody-item layui-show">
-          <iframe src="{{ url('layui/home/console') }}" frameborder="0" class="layadmin-iframe"></iframe>
+          {{--<iframe src="{{ url('layui/home/console') }}" frameborder="0" class="layadmin-iframe"></iframe>--}}
+          <iframe src="{{ url('/help/help.html') }}" frameborder="0" class="layadmin-iframe"></iframe>
         </div>
       </div>
       

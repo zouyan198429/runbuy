@@ -234,12 +234,15 @@ function ajax_form(){
     // }
 
     var linkman = $('input[name=linkman]').val();
-    if(!judge_validate(4,'联系人',linkman,true,'length',1,30)){
+    if(!judge_validate(4,'联系人',linkman,false,'length',1,30)){
         return false;
     }
 
     var mobile = $('input[name=mobile]').val();
-    if(!judge_validate(4,'手机',mobile,true,'mobile','','')){
+    // if(!judge_validate(4,'手机',mobile,true,'mobile','','')){
+    //     return false;
+    // }
+    if(!judge_validate(4,'手机',mobile,true,'length',6,30)){
         return false;
     }
 

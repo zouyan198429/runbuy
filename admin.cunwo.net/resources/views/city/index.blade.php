@@ -43,14 +43,14 @@
         </ul>
         <ul class="layui-nav layui-layout-right" lay-filter="layadmin-layout-right">
           
-          <li class="layui-nav-item" lay-unselect>
-            <a lay-href="{{ url('layui/app/message/index') }}" layadmin-event="message" lay-text="消息中心">
-              <i class="layui-icon layui-icon-notice"></i>  
-              
-              <!-- 如果有新消息，则显示小圆点 -->
-              <span class="layui-badge-dot"></span>
-            </a>
-          </li>
+          {{--<li class="layui-nav-item" lay-unselect>--}}
+            {{--<a lay-href="{{ url('layui/app/message/index') }}" layadmin-event="message" lay-text="消息中心">--}}
+              {{--<i class="layui-icon layui-icon-notice"></i>  --}}
+              {{----}}
+              {{--<!-- 如果有新消息，则显示小圆点 -->--}}
+              {{--<span class="layui-badge-dot"></span>--}}
+            {{--</a>--}}
+          {{--</li>--}}
           <li class="layui-nav-item layui-hide-xs" lay-unselect>
             <a href="javascript:;" layadmin-event="theme">
               <i class="layui-icon layui-icon-theme"></i>
@@ -92,28 +92,30 @@
       <!-- 侧边菜单 -->
       <div class="layui-side layui-side-menu">
         <div class="layui-side-scroll">
-          <div class="layui-logo" lay-href="{{ url('layui/home/console') }}">
+          {{--<div class="layui-logo" lay-href="{{ url('layui/home/console') }}">--}}
+          <div class="layui-logo" lay-href="{{ url('/help/index.html') }}">
             <span>极递网-城市代理商后台</span>
           </div>
           
           <ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
-            <li data-name="home" class="layui-nav-item layui-nav-itemed">
-              <a href="javascript:;" lay-tips="主页" lay-direction="2">
-                <i class="layui-icon layui-icon-home"></i>
-                <cite>主页</cite>
-              </a>
-              <dl class="layui-nav-child">
-                <dd data-name="console" class="layui-this">
-                  <a lay-href="{{ url('layui/home/console') }}">控制台</a>
-                </dd>
+            {{--<li data-name="home" class="layui-nav-item layui-nav-itemed">--}}
+              {{--<a href="javascript:;" lay-tips="主页" lay-direction="2">--}}
+                {{--<i class="layui-icon layui-icon-home"></i>--}}
+                {{--<cite>主页</cite>--}}
+              {{--</a>--}}
+              {{--<dl class="layui-nav-child">--}}
+                {{--<dd data-name="console" class="layui-this">--}}
+                  {{--<a lay-href="{{ url('layui/home/console') }}">控制台</a>--}}
+                  {{--<a lay-href="{{ url('/help/index.html') }}">控制台</a>--}}
+                {{--</dd>--}}
                 {{--<dd data-name="console">--}}
                   {{--<a lay-href="{{ url('layui/home/homepage1') }}">主页一</a>--}}
                 {{--</dd>--}}
                 {{--<dd data-name="console">--}}
                   {{--<a lay-href="{{ url('layui/home/homepage2') }}">主页二</a>--}}
                 {{--</dd>--}}
-              </dl>
-            </li>
+              {{--</dl>--}}
+            {{--</li>--}}
             <li data-name="set" class="layui-nav-item">
               <a href="javascript:;" lay-tips="设置" lay-direction="2">
                 <i class="layui-icon layui-icon-set"></i>
@@ -298,7 +300,8 @@
         </div>
         <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="layadmin-layout-tabs">
           <ul class="layui-tab-title" id="LAY_app_tabsheader">
-            <li lay-id="{{ url('layui/home/console') }}" lay-attr="{{ url('layui/home/console') }}" class="layui-this"><i class="layui-icon layui-icon-home"></i></li>
+            {{--<li lay-id="{{ url('layui/home/console') }}" lay-attr="{{ url('layui/home/console') }}" class="layui-this"><i class="layui-icon layui-icon-home"></i></li>--}}
+            <li lay-id="{{ url('/help/index.html') }}" lay-attr="{{ url('/help/index.html') }}" class="layui-this"><i class="layui-icon layui-icon-home"></i></li>
           </ul>
         </div>
       </div>
@@ -307,7 +310,8 @@
       <!-- 主体内容 -->
       <div class="layui-body" id="LAY_app_body">
         <div class="layadmin-tabsbody-item layui-show">
-          <iframe src="{{ url('layui/home/console') }}" frameborder="0" class="layadmin-iframe"></iframe>
+          {{--<iframe src="{{ url('layui/home/console') }}" frameborder="0" class="layadmin-iframe"></iframe>--}}
+          <iframe src="{{ url('/help/index.html') }}" frameborder="0" class="layadmin-iframe"></iframe>
         </div>
       </div>
       

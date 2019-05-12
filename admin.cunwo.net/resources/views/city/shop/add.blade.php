@@ -143,7 +143,7 @@
                 </td>
             </tr>
             <tr>
-                <th>联系人<span class="must">*</span></th>
+                <th>联系人<span class="must"></span></th>
                 <td>
                     <input type="text" class="inp wnormal"  name="linkman" value="{{ $info['linkman'] or '' }}" placeholder="请输入联系人"/>
                 </td>

@@ -57,9 +57,9 @@ class ShopDBBusiness extends BasePublicDBBusiness
             throws('店铺名称不能为空！');
         }
 
-        if(isset($saveData['linkman']) && empty($saveData['linkman'])  ){
-            throws('联系人不能为空！');
-        }
+//        if(isset($saveData['linkman']) && empty($saveData['linkman'])  ){
+//            throws('联系人不能为空！');
+//        }
 
         if(isset($saveData['mobile']) && empty($saveData['mobile'])  ){
             throws('手机不能为空！');
