@@ -116,36 +116,7 @@
                 {{--</dd>--}}
               </dl>
             </li>
-            <li data-name="set" class="layui-nav-item">
-              <a href="javascript:;" lay-tips="设置" lay-direction="2">
-                <i class="layui-icon layui-icon-set"></i>
-                <cite>设置</cite>
-              </a>
-              <dl class="layui-nav-child">
-                {{--
-                  <dd class="layui-nav-itemed">
-                    <a href="javascript:;">系统设置</a>
-                    <dl class="layui-nav-child">
-                      <dd>
-                        <a lay-href="{{ url('shop/shopType') }}">店铺分类</a>
-                      </dd>
-                      <dd>
-                        <a lay-href="{{ url('shop/labels') }}">搜索标签</a>
-                      </dd>
-                      <dd><a lay-href="{{ url('shop/siteIntro') }}">站点介绍</a></dd>
-                      <dd><a lay-href="{{ url('shop/feeScale') }}">收费标准</a></dd>
-                    </dl>
-                  </dd>
-                  --}}
-                <dd class="layui-nav-itemed">
-                  <a href="javascript:;">我的设置</a>
-                  <dl class="layui-nav-child">
-                    <dd><a lay-href="{{ url('shop/info') }}">基本资料</a></dd>
-                    <dd><a lay-href="{{ url('shop/password') }}">修改密码</a></dd>
-                  </dl>
-                </dd>
-              </dl>
-            </li>
+            
             {{--
             <li data-name="user" class="layui-nav-item">
               <a href="javascript:;" lay-tips="城市管理" lay-direction="2">
@@ -275,6 +246,36 @@
                 --}}
                 <dd>
                   <a lay-href="">常用地址</a>
+                </dd>
+              </dl>
+            </li>
+            <li data-name="set" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="设置" lay-direction="2">
+                <i class="layui-icon layui-icon-set"></i>
+                <cite>设置</cite>
+              </a>
+              <dl class="layui-nav-child">
+                {{--
+                  <dd class="layui-nav-itemed">
+                    <a href="javascript:;">系统设置</a>
+                    <dl class="layui-nav-child">
+                      <dd>
+                        <a lay-href="{{ url('shop/shopType') }}">店铺分类</a>
+                      </dd>
+                      <dd>
+                        <a lay-href="{{ url('shop/labels') }}">搜索标签</a>
+                      </dd>
+                      <dd><a lay-href="{{ url('shop/siteIntro') }}">站点介绍</a></dd>
+                      <dd><a lay-href="{{ url('shop/feeScale') }}">收费标准</a></dd>
+                    </dl>
+                  </dd>
+                  --}}
+                <dd class="layui-nav-itemed">
+                  <a href="javascript:;">我的设置</a>
+                  <dl class="layui-nav-child">
+                    <dd><a lay-href="{{ url('shop/info') }}">基本资料</a></dd>
+                    <dd><a lay-href="{{ url('shop/password') }}">修改密码</a></dd>
+                  </dl>
                 </dd>
               </dl>
             </li>
