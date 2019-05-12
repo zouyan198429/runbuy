@@ -157,7 +157,7 @@ class ShopDBBusiness extends BasePublicDBBusiness
                 'admin_password' => $saveData['admin_password'] ?? '',
                 'issuper' => 1,
                 'account_status' => 0,
-                'real_name' => $saveData['linkman'] ?? '',
+                // 'real_name' => $saveData['linkman'] ?? '',
                 'sex' => $saveData['sex'] ?? '0',
                 'tel' => $saveData['tel'] ?? '',
                 'mobile' => $saveData['mobile'] ?? '',
@@ -167,6 +167,7 @@ class ShopDBBusiness extends BasePublicDBBusiness
                 'addr' => $saveData['addr'] ?? '',
                 'operate_staff_id' => $operate_staff_id,
             ];
+            if(isset($saveData['linkman']) && !empty($saveData['linkman'])) $staffInfo['real_name'] = $saveData['linkman'] ?? '';
             // 电话已存在，则为空
             if( isset($saveData['mobile']) && StaffDBBusiness::judgeFieldExist($company_id, $id ,"mobile", $saveData['mobile'], [], 1)){
                 $staffInfo['mobile'] = '';
