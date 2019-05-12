@@ -137,7 +137,7 @@ body{background-color:#f8f8f8}
 
 .order_list .order_info{line-height:40px;background-color:#f7f7f7}
 .order_list .order_info span{float:left;padding-left:20px}
-.order_list .order_info .shop{margin-left:120px;}
+.order_list .order_info .shop{margin-left:20px;}
 .order_list .order_info .shop .chat{display:inline-block;width:40px;height:40px;background:url(../img/s-common.png) no-repeat 6px -2644px;vertical-align:bottom;*+vertical-align:middle}
 .order_list .order_info a{float: right;color:#333333;}
 .order_list .order_info i{float:right;width:40px;height:40px;margin-right:-10px;padding-right:22px;background:url(../img/userCenter.png) no-repeat 14px -734px;font-style:normal;cursor:pointer}
