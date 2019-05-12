@@ -273,9 +273,9 @@
                   <a lay-href="{{ url('shop/staffUser') }}">用户</a>
                 </dd>
                 --}}
-                <dd>
-                  <a lay-href="">常用地址</a>
-                </dd>
+                {{--<dd>--}}
+                  {{--<a lay-href="">常用地址</a>--}}
+                {{--</dd>--}}
               </dl>
             </li>
           </ul>
