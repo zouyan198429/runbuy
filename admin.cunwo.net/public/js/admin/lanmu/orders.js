@@ -290,7 +290,11 @@ function cancelOrder(order_no,pay_type){
     document.write("                <tr>");
     document.write("                    <td>");
     document.write("                        <span class=\"shop\">店铺：<%=shopitem.shop.shop_name%><\/span>");
-    document.write("                        <span>地址：<%=shopitem.city.city_name%><%=shopitem.area.city_name%><%=shopitem.shop.addr%><\/span>");
+    document.write("                        <span>地址：");
+    document.write("                        <%=shopitem.city?shopitem.city.city_name:''%>");
+    document.write("                        <%=shopitem.area?shopitem.area.city_name:''%>");
+    document.write("                        <%=shopitem.shop.addr%>");
+    document.write("                        <\/span>");
     document.write("                        <span>金额：<%=shopitem.total_price%>元(共<%=shopitem.total_amount%>份)<\/span>");
     document.write("                    <\/td>");
     document.write("                <\/tr>");

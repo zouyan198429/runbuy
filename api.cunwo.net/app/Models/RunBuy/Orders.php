@@ -184,7 +184,7 @@ class Orders extends BasePublicModel
     /**
      * 获取订单的城市分站历史--一维
      */
-    public function cityHistory()
+    public function citySiteHistory()
     {
         return $this->belongsTo('App\Models\RunBuy\CityHistory', 'city_site_id_history', 'id');
     }
