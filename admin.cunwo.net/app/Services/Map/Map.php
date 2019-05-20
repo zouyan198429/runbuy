@@ -71,7 +71,7 @@ class Map
             $earthDistance = static::getDistance($latitude, $longitude, $temLatitude, $temLongitude);
 //            $dataList[$k]['distance'] = $earthDistance + 400;
 //            $dataList[$k]['distanceStr'] =static::distanceShow($earthDistance, 2);
-            $earthDistance = $earthDistance + $correctionDistance;// 400
+            if($earthDistance > 1000)  $earthDistance = $earthDistance + $correctionDistance;// 400
             $dataList[$k][$dataUboundName] = $earthDistance;// 400
             $dataList[$k][$dataUboundName . 'Str'] =static::distanceShow($earthDistance, 2);
             if($maxDistance < $earthDistance ) $maxDistance = $earthDistance;
