@@ -250,7 +250,7 @@ class OrderController extends BaseController
                         'count' => 0,
                     ],
                     [
-                        'text' => '配送中',
+                        'text' => '已接单',// '配送中',
                         'status' => 4,
                         'count' => 0,
                     ],
