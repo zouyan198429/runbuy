@@ -13,8 +13,6 @@
   <link rel="stylesheet" href="{{asset('layui-admin-v1.2.1/src/layuiadmin/style/admin.css')}}" media="all">
 </head>
 <body>
-
-{{--<div id="crumb"><i class="fa fa-reorder fa-fw" aria-hidden="true"></i> 我的同事</div>--}}
 <div class="mm">
   <div class="mmhead" id="mywork">
 
@@ -69,16 +67,29 @@
   </div>
 --}}
   <table lay-even class="layui-table"  lay-size="lg"  id="dynamic-table"  class="table2">
+    <colgroup>
+        <col width="30">
+        <col width="">
+        <col width="">  
+        <col width="">  
+        <col width="">  
+        <col width="">  
+        <col width="">  
+        <col width="">  
+        <col width="">  
+        <col width="250">
+        <col>
+    </colgroup> 
     <thead>
     <tr>
       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
+          <!-- <span class="lbl">全选</span> -->
         </label>
       </th>
       <th>ID</th>
-      <th>所属<hr/>经纬度</th>
+      <th>所属</th>
       <th>名称</th>
       <th>城市代码</th>
       <th>拼音简写</th>
@@ -87,7 +98,7 @@
       {{--<th>电话</th>--}}
       <th>是否城市分站</th>
       <th>热门城市</th>
-      <th style="width: 150px;">操作</th>
+      <th>操作</th>
     </tr>
     </thead>
     <tbody id="data_list">

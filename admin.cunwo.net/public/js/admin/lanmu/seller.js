@@ -127,8 +127,8 @@ var otheraction = {
     document.write("            <td><%=item.tel%><\/td>");
     // document.write("            <td><%=item.province_name%><%=item.city_name%><%=item.area_name%><%=item.addr%><\/td>");
     document.write("           <td>");
-    document.write("            <%=item.province_name%><%=item.city_name%><%=item.area_name%><%=item.addr%>");
-    document.write("            <hr/><%=item.longitude%><br/><%=item.latitude%>");
+    document.write("            <%=item.city_name%><%=item.area_name%><%=item.addr%>"); //<%=item.province_name%>
+    // document.write("            <hr/><%=item.longitude%><br/><%=item.latitude%>");
     document.write("           <\/td>");
     // document.write("            <td><%=item.intro%><\/td>");
     document.write("            <td><%=item.status_text%><\/td>");
@@ -147,19 +147,19 @@ var otheraction = {
     document.write("                <\/a>");
     document.write("                <%}%>");
     document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.staffSeller(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.id%>,'<%=item.seller_name%>-帐号管理')\">");
-    document.write("                    <i class=\"ace-icon fa fa-user-circle-o bigger-60\"> 帐号管理<\/i>");
+    document.write("                    <i class=\"ace-icon fa fa-user-circle-o bigger-60\"> 帐号<\/i>");
     document.write("                <\/a>");
     document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.shop(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.id%>,'<%=item.seller_name%>-店铺管理')\">");
-    document.write("                    <i class=\"ace-icon fa fa-university bigger-60\"> 店铺管理<\/i>");
+    document.write("                    <i class=\"ace-icon fa fa-university bigger-60\"> 店铺<\/i>");
     document.write("                <\/a>");
     document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.props(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.id%>,'<%=item.seller_name%>-商品属性管理')\">");
-    document.write("                    <i class=\"ace-icon fa fa-cube bigger-60\"> 商品属性管理<\/i>");
+    document.write("                    <i class=\"ace-icon fa fa-cube bigger-60\"> 商品属性<\/i>");
     document.write("                <\/a>");
     document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.goods(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.id%>,'<%=item.seller_name%>-商品管理')\">");
-    document.write("                    <i class=\"ace-icon fa fa-shopping-basket bigger-60\"> 商品管理<\/i>");
+    document.write("                    <i class=\"ace-icon fa fa-shopping-basket bigger-60\"> 商品<\/i>");
     document.write("                <\/a>");
     document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.orders(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.id%>,'<%=item.seller_name%>-订单管理')\">");
-    document.write("                    <i class=\"ace-icon fa fa-cart-arrow-down bigger-60\"> 订单管理<\/i>");
+    document.write("                    <i class=\"ace-icon fa fa-cart-arrow-down bigger-60\"> 订单<\/i>");
     document.write("                <\/a>");
     document.write("");
     document.write("            <\/td>");

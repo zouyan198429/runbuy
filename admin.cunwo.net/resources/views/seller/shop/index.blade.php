@@ -86,24 +86,48 @@
   </div>
 --}}
   <table lay-even class="layui-table"  lay-size="lg"  id="dynamic-table"  class="table2">
+    <colgroup>
+        <col width="30">
+        <col width="">
+        <col width="100">
+        <col width="150">
+        <col width="">
+        <col width="">
+        <col width="">
+        <col width="">
+        <col width="">
+        <col width="">
+        <col width="">
+        <col width="">
+        <col width="">  
+        <col width="150">
+        <col>
+    </colgroup>
     <thead>
     <tr>
       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
-        </label>
+<!--           <span class="lbl">全选</span>
+ -->        </label>
       </th>
-      <th>城市分站<hr/>城市合伙人<hr/>商家</th>
-      <th>店铺名称<hr/>联系人</th>
-      <th>手机<hr/>电话</th>
-      <th>所在地址<hr/>经纬度<hr/>图片</th>
-      <th>分类<hr/>标签</th>
-      <th>总销量<hr/>月销量<hr/>更新时间</th>
+<!--       <th>城市分站<hr/>城市合伙人<hr/>商家</th>
+ -->      <th>店铺名称</th>
+      <th>联系人</th>
+      <th>手机 | 电话</th>
+      <th>所在地址</th>
+      <th>图片</th>
+      <th>分类</th>
+      <th>标签</th>
+      <th>总销量|月销量</th>
+      <th>更新时间</th>
       <th>营业时间</th>
-      <th>综合排序<hr/>人均<hr/>审核状态<hr/>营业状态</th>
+      <th>综合排序</th>
+      <th>人均</th>
+      <th>审核状态</th>
+      <th>营业状态</th>
       {{--<th>介绍</th>--}}
-      <th style="width: 150px;">操作</th>
+      <th>操作</th>
     </tr>
     </thead>
     <tbody id="data_list" class=" baguetteBoxOne gallery" >

@@ -14,7 +14,6 @@
 </head>
 <body>
 
-{{--<div id="crumb"><i class="fa fa-reorder fa-fw" aria-hidden="true"></i> 我的同事</div>--}}
 <div class="mm">
   <div class="mmhead" id="mywork">
 
@@ -76,21 +75,35 @@
   </div>
 --}}
   <table lay-even class="layui-table"  lay-size="lg"  id="dynamic-table"  class="table2">
+    <colgroup>
+        <col width="30">
+        <col width="60">
+        <col width="">  
+        <col width="150">
+        <col>
+    </colgroup>
     <thead>
     <tr>
       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
-        </label>
+<!--           <span class="lbl">全选</span>
+ -->        </label>
       </th>
-      <th>城市<hr/>城市代理</th>
-      <th>商家<hr/>店铺</th>
-      <th>用户名<hr/>真实姓名</th>
-      <th>类型<hr/>性别</th>
-      <th>电话<hr/>手机</th>
-      <th>QQ\email\微信<hr/>地址<hr/>经纬度</th>
-      <th>是否超级帐户<hr/>状态</th>
+<!--       <th>城市<hr/>城市代理</th>
+ -->  
+      <th>店铺</th>
+      <th>用户名</th>
+      <th>真实姓名</th>
+      <th>类型</th>
+      <th>性别</th>
+      <th>电话</th>
+      <th>手机</th>
+      <th>QQ\email\微信</th>
+      <th>地址</th>
+      <th>经纬度</th>
+      <th>是否超级帐户</th>
+      <th>状态</th>
       <th>最近登陆</th>
       <th style="width: 150px;">操作</th>
     </tr>

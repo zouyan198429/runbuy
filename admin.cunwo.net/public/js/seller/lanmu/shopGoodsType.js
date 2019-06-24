@@ -48,10 +48,10 @@ function reset_list_self(is_read_page, ajax_async, reset_total, do_num){
     document.write("                  <span class=\"lbl\"><\/span>");
     document.write("                <\/label>");
     document.write("            <\/td>");
-    document.write("            <td><%=item.id%><\/td>");
-    document.write("            <td><%=item.site_name%><\/td>");
-    document.write("            <td><%=item.partner_name%><\/td>");
-    document.write("            <td><%=item.seller_name%><\/td>");
+   document.write("            <td><%=item.id%><\/td>");
+   // document.write("            <td><%=item.site_name%><\/td>");
+   // document.write("            <td><%=item.partner_name%><\/td>");
+   // document.write("            <td><%=item.seller_name%><\/td>");
     document.write("            <td><%=item.shop_name%><\/td>");
     document.write("            <td><%=item.type_name%><\/td>");
     document.write("            <td><%=item.sort_num%><\/td>");

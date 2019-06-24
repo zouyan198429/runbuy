@@ -14,14 +14,11 @@
 </head>
 <body>
 
-{{--<div id="crumb"><i class="fa fa-reorder fa-fw" aria-hidden="true"></i> 我的同事</div>--}}
 <div class="mm">
   <div class="mmhead" id="mywork">
 
     @include('common.pageParams')
-    {{--<div class="tabbox" >--}}
-      {{--<a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加店铺</a>--}}
-    {{--</div>--}}
+ 
     <form onsubmit="return false;" class="form-horizontal" role="form" method="post" id="search_frm" action="#">
       <div class="msearch fr" style="width:700px; display:none;">
         <input type="hidden" name="ids" value="{{ $shop_id or 0 }}" />
@@ -76,35 +73,37 @@
       </div>
     </form>
   </div>
-  {{--
-  <div class="table-header">
-    { {--<button class="btn btn-danger  btn-xs batch_del"  onclick="action.batchDel(this)">批量删除</button>--} }
-    <button class="btn btn-success  btn-xs export_excel"  onclick="action.batchExportExcel(this)" >导出[按条件]</button>
-    <button class="btn btn-success  btn-xs export_excel"  onclick="action.exportExcel(this)" >导出[勾选]</button>
-    <button class="btn btn-success  btn-xs import_excel"  onclick="action.importExcelTemplate(this)">导入模版[EXCEL]</button>
-    <button class="btn btn-success  btn-xs import_excel"  onclick="action.importExcel(this)">导入城市</button>
-    <div style="display:none;" ><input type="file" class="import_file img_input"></div>{ {--导入file对象--} }
-  </div>
---}}
   <table lay-even class="layui-table"  lay-size="lg"  id="dynamic-table"  class="table2">
+     <colgroup>
+        <col width="">
+        <col width="">
+        <col width="">  
+        <col width="">
+        <col>
+    </colgroup>
     <thead>
     <tr>
-      <th>
+<!--       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
         </label>
-      </th>
-      <th>城市分站<hr/>城市合伙人<hr/>商家</th>
-      <th>店铺名称<hr/>联系人</th>
-      <th>手机<hr/>电话</th>
-      <th>所在地址<hr/>经纬度<hr/>图片</th>
-      <th>分类<hr/>标签</th>
-      <th>总销量<hr/>月销量<hr/>更新时间</th>
+      </th> -->
+     <!--  <th>城市分站/城市合伙人</th> -->
+      <th>商家</th>
+      <th>店铺名称</th>
+      <th>图片</th>
+      <th>联系人</th>
+      <th>手机 | 电话</th>
+      <th>所在地址</th>
+      <th>分类</th>
+      <th>标签</th>
+      <th>总销量/月销量</th>
+      <th>更新时间</th>
       <th>营业时间</th>
-      <th>综合排序<hr/>人均<hr/>审核状态<hr/>营业状态</th>
-      {{--<th>介绍</th>--}}
-      <th style="width: 150px;">操作</th>
+      <th>综合排序/人均</th>
+      <th>审核状态</th>
+      <th>营业状态</th> 
+      <th>操作</th>
     </tr>
     </thead>
     <tbody id="data_list" class=" baguetteBoxOne gallery" >

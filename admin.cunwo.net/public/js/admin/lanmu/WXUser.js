@@ -112,7 +112,7 @@ function initPic(){
     // document.write("            <td><%=item.mp_openid%><\/td>");
     document.write("            <td><%=item.nickname%><\/td>");
     document.write("            <td><%=item.sex_text%><\/td>");
-    document.write("            <td><%=item.country%><\/td>");
+    //document.write("            <td><%=item.country%><\/td>");
     document.write("            <td><%=item.province%><\/td>");
     document.write("            <td><%=item.city%><\/td>");
     document.write("           <td>");
@@ -121,7 +121,8 @@ function initPic(){
     // document.write("              </a>");
     document.write("           <\/td>");
     // document.write("            <td><%=item.issuper_text%><hr/><%=item.account_status_text%><\/td>");
-    document.write("            <td><%=item.created_at%><hr/><%=item.updated_at%><\/td>");
+    document.write("            <td><%=item.created_at%>");
+    document.write("            <td><%=item.updated_at%><\/td>");
     document.write("            <td style='display: none;'>");
     document.write("                <%if( false){%>");
     document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"action.show(<%=item.id%>)\">");

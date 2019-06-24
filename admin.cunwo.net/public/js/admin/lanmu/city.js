@@ -118,7 +118,7 @@ var otheraction = {
     // document.write("            <td><%=item.cityPath%><\/td>");
     document.write("           <td>");
     document.write("            <%=item.cityPath%>");
-    document.write("            <hr/><%=item.longitude%><br/><%=item.latitude%>");
+  //  document.write("            <hr/><%=item.longitude%><br/><%=item.latitude%>");
     document.write("           <\/td>");
     document.write("            <td><%=item.city_name%><\/td>");
     document.write("            <td><%=item.code%><\/td>");

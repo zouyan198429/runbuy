@@ -48,12 +48,25 @@
   </div>
 --}}
   <table lay-even class="layui-table table2"  lay-size="lg"  id="dynamic-table" >
+    <colgroup>
+        <col width="30">
+        <col width="80">
+        <col width="120">  
+        <col width="120">  
+        <col width="150">  
+        <col width="">  
+        <col width="">  
+        <col width="">  
+        <col width="100">   
+        <col width="150">
+        <col>
+    </colgroup>  
     <thead>
     <tr>
       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
+          <!-- <span class="lbl">全选</span> -->
         </label>
       </th>
       <th>ID</th>
@@ -64,7 +77,7 @@
       <th>属性名称</th>
       <th>属性值</th>
       <th>排序[降序]</th>
-      <th style="width: 150px;">操作</th>
+      <th>操作</th>
     </tr>
     </thead>
     <tbody id="data_list">

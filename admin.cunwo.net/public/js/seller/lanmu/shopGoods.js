@@ -65,8 +65,8 @@ function initPic(){
     document.write("                <\/label>");
     document.write("            <\/td>");
     document.write("            <td><%=item.id%><\/td>");
-    document.write("            <td><%=item.site_name%><hr/><%=item.partner_name%><\/td>");
-    document.write("            <td><%=item.seller_name%><hr/><%=item.shop_name%><\/td>");
+    // document.write("            <td><%=item.site_name%><hr/><%=item.partner_name%> <%=item.seller_name%><hr/><\/td>");
+    document.write("            <td><%=item.shop_name%><\/td>");
     document.write("            <td><%=item.goods_name%><\/td>");
     document.write("           <td>");
     document.write("            <%for(var j = 0; j<resource_list.length;j++){");
@@ -78,7 +78,7 @@ function initPic(){
     document.write("            <%}%>");
     document.write("           <\/td>");
     document.write("            <td>");
-    document.write("            <%=item.type_name%><hr/>");
+    document.write("            <%=item.type_name%></td><td>");
     document.write("            <%for(var j = 0; j<price_list.length;j++){");
     document.write("                var jitem = price_list[j];");
     document.write("                 %>");
@@ -86,9 +86,9 @@ function initPic(){
     document.write("            <%}%>");
     document.write("           <\/td>");
     document.write("            <td><%=item.sort_num%><\/td>");
-    document.write("            <td><%=item.sales_volume%><hr/><%=item.mon_sales_volume%><\/td>");
-    document.write("            <td><%=item.is_hot_text%><hr/><%=item.is_sale_text%><\/td>");
-    document.write("            <td><%=item.intro%><\/td>");
+    document.write("            <td><%=item.sales_volume%>|<%=item.mon_sales_volume%><\/td>");
+    document.write("            <td><%=item.is_hot_text%>|<%=item.is_sale_text%><\/td>");
+    // document.write("            <td><%=item.intro%><\/td>");
     document.write("            <td>");
     document.write("                <%if( false){%>");
     document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"action.show(<%=item.id%>)\">");

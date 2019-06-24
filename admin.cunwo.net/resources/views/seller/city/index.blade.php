@@ -74,8 +74,8 @@
       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
-        </label>
+<!--           <span class="lbl">全选</span>
+ -->        </label>
       </th>
       <th>ID</th>
       <th>所属<hr/>经纬度</th>

@@ -76,17 +76,27 @@
   </div>
 --}}
   <table lay-even class="layui-table"  lay-size="lg"  id="dynamic-table"  class="table2">
+     <colgroup>
+            <col width="30">
+            <col width="120">
+            <col width="">
+            <col width="120">
+            <col width="120">
+            <col width="160">
+            <col width="120">
+            <col width="120">
+            <col>
+      </colgroup>
     <thead>
     <tr>
       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
-        </label>
+<!--           <span class="lbl">全选</span>
+ -->        </label>
       </th>
       <th>城市<hr/>城市代理</th>
-      {{--<th>商家<hr/>店铺</th>--}}
-      <th>用户名<hr/>真实姓名</th>
+       <th>用户名<hr/>真实姓名</th>
       <th>类型<hr/>性别</th>
       <th>电话<hr/>手机</th>
       <th>QQ\email\微信<hr/>地址<hr/>经纬度</th>

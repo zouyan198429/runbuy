@@ -78,25 +78,37 @@
   </div>
 --}}
   <table lay-even class="layui-table"  lay-size="lg"  id="dynamic-table"  class="table2">
+     <colgroup>
+            <col width="30">
+            <col width="">
+            <col width="90">
+            <col width="120">
+            <col width="120">
+            <col width="120">
+            <col width="180">
+            <col width="180">
+            <col>
+      </colgroup>
     <thead>
     <tr>
       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
-        </label>
+<!--           <span class="lbl">全选</span>
+ -->        </label>
       </th>
       {{--<th>微信 unionid</th>--}}
       {{--<th>小程序 openid</th>--}}
       {{--<th>服务号 openid</th>--}}
       <th>昵称</th>
       <th>性别</th>
-      <th>国家</th>
+      {{--<th>国家</th>--}}
       <th>省份</th>
       <th>城市</th>
       <th>头像</th>
       {{--<th>是否超级帐户<hr/>状态</th>--}}
-      <th>添加时间<hr/>更新时间</th>
+      <th>添加时间</th>
+      <th>更新时间</th>
       <th style="width: 150px;display: none;">操作</th>
     </tr>
     </thead>

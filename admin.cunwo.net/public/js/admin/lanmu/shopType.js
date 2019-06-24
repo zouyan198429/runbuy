@@ -55,7 +55,7 @@ function initPic(){
     document.write("                var jitem = resource_list[j];");
     document.write("                 %>");
     document.write("               <a href=\"<%=jitem.resource_url%>\">");
-    document.write("                <img  src=\"<%=jitem.resource_url%>\"  style=\"width:100px;\">");
+    document.write("                <img  src=\"<%=jitem.resource_url%>\"  style=\"width:60px;\">");
     document.write("              </a>");
     document.write("            <%}%>");
     document.write("           <\/td>");

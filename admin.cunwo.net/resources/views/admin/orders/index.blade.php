@@ -13,12 +13,10 @@
   <link rel="stylesheet" href="{{asset('layui-admin-v1.2.1/src/layuiadmin/style/admin.css')}}" media="all">
 
     <link rel="stylesheet" type="text/css" href="{{asset('css/basic.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('css/myOrder.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('css/myOrder.css?54545')}}">
 </head>
 <body>
-
-{{--<div id="crumb"><i class="fa fa-reorder fa-fw" aria-hidden="true"></i> 我的同事</div>--}}
-<div class="mm">
+  <div class="mm">
   <div class="mmhead" id="mywork">
 
     @include('common.pageParams')
@@ -28,59 +26,63 @@
 
     <form onsubmit="return false;" class="form-horizontal" role="form" method="post" id="search_frm" action="#">
 
-      <div class="msearch fr" style="width:100%;">
-        <div class="layui-tab layui-tab-brief"  style="float:left;">
-          <ul class="layui-tab-title">
-            <li><a href="javascript:void(0);"  data-status="" class="status_click">全部</a></li>
-            @foreach ($status as $k=>$txt)
-              <li @if ($k == $defaultStatus) class="layui-this" @endif><a href="javascript:void(0)" data-status="{{ $k }}" class="status_click  ">
-                {{ $txt }}
-                @if(in_array($k,$countStatus))
-                  <span class="layui-badge status_count_{{ $k }}" data-old_count="0">0</span>
-                @endif
-              </a></li>
-            @endforeach
-          </ul>
-          <div class="layui-tab-content"></div>
+      <div  style="width:100%;">
+        <div class="layui-tab layui-tab-brief">          
+          <div class="layui-tab-content">
+              <ul class="layui-tab-title">
+                <li><a href="javascript:void(0);"  data-status="" class="status_click">全部</a></li>
+                @foreach ($status as $k=>$txt)
+                  <li @if ($k == $defaultStatus) class="layui-this" @endif><a href="javascript:void(0)" data-status="{{ $k }}" class="status_click  ">
+                    {{ $txt }}
+                    @if(in_array($k,$countStatus))
+                      <span class="layui-badge status_count_{{ $k }}" data-old_count="0">0</span>
+                    @endif
+                  </a></li>
+                @endforeach
+              </ul>            
+          </div>
         </div>
-        <input type="hidden" name="city_site_id" value="{{ $city_site_id or 0 }}" />
-        <input type="hidden" name="city_partner_id" value="{{ $city_partner_id or 0 }}" />
-        <input type="hidden" name="seller_id" value="{{ $seller_id or 0 }}" />
-        <input type="hidden" name="shop_id" value="{{ $shop_id or 0 }}" />
-        <select style="width:60px; height:28px; display: none;" name="status" >
-          <option value="">全部</option>
-          @foreach ($status as $k=>$txt)
-            <option value="{{ $k }}"   @if ($k == $defaultStatus) selected @endif >{{ $txt }}</option>
-          @endforeach
-        </select>
-        <select class="wnormal" name="province_id" style="width: 80px;display: none;">
-          <option value="">请选择省</option>
-          @foreach ($province_kv as $k=>$txt)
-            <option value="{{ $k }}"  @if(isset($defaultProvince) && $defaultProvince == $k) selected @endif >{{ $txt }}</option>
-          @endforeach
-        </select>
-        <select class="wnormal" name="city_id" style="width: 80px;display: none;">
-          <option value="">请选择市</option>
-        </select>
-        <select class="wnormal" name="area_id" style="width: 80px;display: none;">
-          <option value="">请选择区县</option>
-        </select>
-        {{--<select class="wmini" name="province_id" style="width: 55px;">--}}
-          {{--<option value="">全部</option>--}}
-          {{--@foreach ($adminType as $k=>$txt)--}}
-            {{--<option value="{{ $k }}"  @if(isset($defaultAdminType) && $defaultAdminType == $k) selected @endif >{{ $txt }}</option>--}}
-          {{--@endforeach--}}
-        {{--</select>--}}
-        <select style="width:80px; height:28px;" name="field">
-          <option value="order_no">订单号</option>
-          {{--<option value="admin_username">用户名</option>--}}
-          {{--<option value="real_name">真实姓名</option>--}}
-          {{--<option value="tel">电话</option>--}}
-          {{--<option value="mobile">手机</option>--}}
-          {{--<option value="qq_number">QQ\email\微信</option>--}}
-        </select>
-        <input type="text" value=""    name="keyword"  placeholder="请输入关键字"/>
-        <button class="btn btn-normal search_frm">搜索</button>
+
+        <div class="msearch fr"></div>
+              <input type="hidden" name="city_site_id" value="{{ $city_site_id or 0 }}" />
+              <input type="hidden" name="city_partner_id" value="{{ $city_partner_id or 0 }}" />
+              <input type="hidden" name="seller_id" value="{{ $seller_id or 0 }}" />
+              <input type="hidden" name="shop_id" value="{{ $shop_id or 0 }}" />
+              <select style="width:60px; height:28px; display: none;" name="status" >
+                <option value="">全部</option>
+                @foreach ($status as $k=>$txt)
+                  <option value="{{ $k }}"   @if ($k == $defaultStatus) selected @endif >{{ $txt }}</option>
+                @endforeach
+              </select>
+              <select class="wnormal" name="province_id" style="width: 80px;display: none;">
+                <option value="">请选择省</option>
+                @foreach ($province_kv as $k=>$txt)
+                  <option value="{{ $k }}"  @if(isset($defaultProvince) && $defaultProvince == $k) selected @endif >{{ $txt }}</option>
+                @endforeach
+              </select>
+              <select class="wnormal" name="city_id" style="width: 80px;display: none;">
+                <option value="">请选择市</option>
+              </select>
+              <select class="wnormal" name="area_id" style="width: 80px;display: none;">
+                <option value="">请选择区县</option>
+              </select>
+              {{--<select class="wmini" name="province_id" style="width: 55px;">--}}
+                {{--<option value="">全部</option>--}}
+                {{--@foreach ($adminType as $k=>$txt)--}}
+                  {{--<option value="{{ $k }}"  @if(isset($defaultAdminType) && $defaultAdminType == $k) selected @endif >{{ $txt }}</option>--}}
+                {{--@endforeach--}}
+              {{--</select>--}}
+              <select style="width:80px; height:28px;" name="field">
+                <option value="order_no">订单号</option>
+                {{--<option value="admin_username">用户名</option>--}}
+                {{--<option value="real_name">真实姓名</option>--}}
+                {{--<option value="tel">电话</option>--}}
+                {{--<option value="mobile">手机</option>--}}
+                {{--<option value="qq_number">QQ\email\微信</option>--}}
+              </select>
+              <input type="text" value=""  name="keyword"  placeholder="请输入关键字"  style="border:1px solid #ddd; " />
+              <button class="btn btn-normal search_frm">搜索</button>
+        </div>
       </div>
     </form>
   </div>
@@ -97,7 +99,7 @@
 
 <!--5. 订单表格表头-order_caption-->
     <div  id="dynamic-table">
-        <div class="order_caption clearfix"  style="margin-top: 50px;">
+    <!--<div class="order_caption clearfix"  style="margin-top: 50px;">
         <span class="wd1 order_time sub_list">
             {{--<i>近期三个月订单</i>--}}
             {{--<ul>--}}
@@ -123,13 +125,9 @@
                 {{--<li>已取消</li>--}}
                 {{--</ul>--}}
         </span>
-            <span class="wd7">操作</span>
-        </div>
-
-
-        <div class="order_list baguetteBoxOne gallery" id="data_list" >
-
-        </div>
+            <span class="wd7">操作</span>            
+        </div> -->
+        <div class="order_list baguetteBoxOne gallery" id="data_list" ></div>
 
     </div>
 
@@ -167,22 +165,17 @@
       {{--</tr>--}}
     {{--</tbody>--}}
   {{--</table>--}}
-  <!--6. 订单列表-order_list-->
-  <div class="mmfoot">
-    <div class="mmfleft"></div>
-    <div class="pagination">
-    </div>
-  </div>
-
-</div>
+  <!--6. 订单列表-order_list--> 
 
   <script src="{{asset('js/jquery-3.3.1.min.js')}}"></script>
   <script src="{{asset('layui-admin-v1.2.1/src/layuiadmin/layui/layui.all.js')}}"></script>
   {{--<script src="{{asset('layui-admin-v1.2.1/src/layuiadmin/layui/layui.js')}}"></script>--}}
   @include('public.dynamic_list_foot')
 
-<div style="display:none;">
-  @include('public.scan_sound')
+  <div style="display:none;">
+    @include('public.scan_sound')
+  </div>
+
 </div>
   <script type="text/javascript">
       var OPERATE_TYPE = <?php echo isset($operate_type)?$operate_type:0; ?>;

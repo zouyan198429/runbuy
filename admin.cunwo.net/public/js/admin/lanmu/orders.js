@@ -231,74 +231,80 @@ function cancelOrder(order_no,pay_type){
     document.write("    var item = data_list[i];");
     document.write("    %>");
     document.write("    <div class=\"w-wrap4 order_status obligation clearfix\">");
-    document.write("        <div class=\"order_info clearfix\">");
-    document.write("            <span><%=item.created_at%><\/span>");
-    document.write("            <span>订单号:<%=item.order_no_format%><\/span>");
-    document.write("            <span class=\"shop\"><%=item.addr.addr%>  <%=item.addr.real_name%>(<%=item.addr.mobile_format%>)<\/span>");
-    // document.write("            <span>餐具数量:<%=item.tableware%>份<\/span>");
-    document.write("            <span>希望速度:<%=item.second_num%>分钟(<%=item.send_end_time%>)<\/span>");
-    document.write("            <span>商品金额:<%=item.total_price%>元(共<%=item.total_amount%>份)<\/span>");
-    document.write("            <span>跑腿费:<%=item.pay_run_amount%>元(<%=item.pay_run_price_text%>)<\/span>");
-    document.write("            <span>退费:<%=item.refund_price%>元(<%=item.has_refund_text%>)<\/span>");
+    document.write("        <table class=\"order_info clearfix\">");
+    document.write("            <thead><tr><td>订单号<\/td><td>地址|客户（电话）<\/td><td>希望速度（到达时间）<\/td><td>商品金额<\/td><td>跑腿费 /退费（未支付）<\/td><td>下单时间<\/td><td>订单状态<\/td><\/tr><\/thead>");
+   // document.write("            <span><%=item.created_at%><\/span>");
+   document.write("             <tbody><tr>        ");
+    document.write("            <td><%=item.order_no_format%><\/td>");
+    document.write("            <td class=\"shop\"><%=item.addr.addr%>  <%=item.addr.real_name%>(<%=item.addr.mobile_format%>)<\/td>");
+    // document.write("            <td>餐具数量:<%=item.tableware%>份<\/td>");
+    document.write("            <td><%=item.second_num%>分钟(<%=item.send_end_time%>)<\/td>"); //希望速度:
+    document.write("            <td><%=item.total_price%>元(共<%=item.total_amount%>份)<\/td>"); //商品金额:
+    document.write("            <td><%=item.pay_run_amount%>元(<%=item.pay_run_price_text%>) "); //跑腿费:
+    document.write("             退费:<%=item.refund_price%>元(<%=item.has_refund_text%>)<\/td>");
     document.write("            <%if(item.refund_time){%>");
-    document.write("            <span>退费时间:<%=item.refund_time%><\/span>");
+    document.write("            <td>t-<%=item.refund_time%><\/td>");//退费时间:
     document.write("            <%}%>");
     document.write("            <%if(item.order_time){%>");
-    document.write("            <span>下单时间:<%=item.order_time%><\/span>");
+    document.write("            <td>x-<%=item.order_time%><\/td>");//下单时间:
     document.write("            <%}%>");
+    document.write("            <td class=\"status\">");
+    document.write("                <span><%=item.status_text%><\/span>");
+    document.write("            <\/td>");
+    document.write("            <\/tr><\/tbody><\/table><table><tr>");
+    document.write("            <td>付款时间 <\/td> <td>接单时间 <\/td> <td>取消时间 <\/td> <td>完成时间 <\/td><\/tr> <\/tbody><\/table><table><tr>");
     document.write("            <%if(item.pay_time){%>");
-    document.write("            <span>付款时间:<%=item.pay_time%><\/span>");
+    document.write("            <td>f-<%=item.pay_time%><\/td>"); //付款时间:
     document.write("            <%}%>");
     document.write("            <%if(item.receipt_time){%>");
-    document.write("            <span>接单时间:<%=item.receipt_time%><\/span>");
+    document.write("            <td>j-<%=item.receipt_time%><\/td>"); //接单时间:
     document.write("            <%}%>");
     document.write("            <%if(item.cancel_time){%>");
-    document.write("            <span>取消时间:<%=item.cancel_time%><\/span>");
+    document.write("            <td>q-<%=item.cancel_time%><\/td>");//取消时间:
     document.write("            <%}%>");
     document.write("            <%if(item.finish_time){%>");
-    document.write("            <span>完成时间:<%=item.finish_time%><\/span>");
+    document.write("            <td>w-<%=item.finish_time%><\/td>");//完成时间:
     document.write("            <%}%>");
+    document.write("            <\/tr><\/tbody><\/table><table><tr>");
     document.write("            <%if(item.send_staff_id > 0){%>");
-    document.write("            <span>接单人id:<%=item.send.staff_id%><\/span>");
-    document.write("            <span>接单人妮称:<%=item.send.nickname%>&nbsp;&nbsp;<img  src=\"<%=item.send.avatar_url%>\"  style=\"width:30px;\"><\/span>");
+    document.write("            <td>接单人:<%=item.send.real_name%> (<%=item.send.staff_id%>:<%=item.send.nickname%> )<img  src=\"<%=item.send.avatar_url%>\"  style=\"width:30px;\"><\/td>");
     document.write("            <%if(item.send.real_name){%>");
-    document.write("            <span>接单人姓名:<%=item.send.real_name%><\/span>");
+    document.write("            <td>接单人姓名:<\/td>");
     document.write("            <%}%>");
     document.write("            <%if(item.send.mobile){%>");
-    document.write("            <span>接单人手机:<%=item.send.mobile_format%><\/span>");
+    document.write("            <td>接单人手机:<%=item.send.mobile_format%><\/td>");
     document.write("            <%}%>");
     document.write("            <%if(item.send.tel){%>");
-    document.write("            <span>接单人电话:<%=item.send.tel%><\/span>");
+    document.write("            <td>接单人电话:<%=item.send.tel%><\/td>");
     document.write("            <%}%>");
     document.write("            <%}%>");
     document.write("            <i><\/i>");
-    document.write("        <\/div>");
-    document.write("        <div class=\"w-wrap5 clearfix\">");
+    document.write("            <\/tr><\/tbody><\/table>");
+    document.write("            <\/div>");
+    document.write("            <div class=\"w-wrap5 clearfix\">");
     document.write("            <div class=\"operate\">");
     document.write("                <%if(item.status == 2){%>");
     document.write("                <a class=\"cancel\" href=\"javascript:void(0);\" onclick=\"otheraction.cancel(this,\'<%=item.order_no%>\',\'<%=item.pay_type%>\')\" >取消订单<\/a>");
     document.write("                <%}%>");
     document.write("            <\/div>");
-    document.write("            <div class=\"status\">");
-    document.write("                <span><%=item.status_text%><\/span>");
-    document.write("            <\/div>");
+
     document.write("            <%for(var j = 0; j<item.shopList.length;j++){");
     document.write("            var shopitem = item.shopList[j];");
     document.write("            var orders_goods = shopitem.orders_goods;");
     document.write("            %>");
-    document.write("            <table style=\"margin-top: 5px;margin-bottom: 20px;\">");
+    document.write("            <table style=\"margin-top: 5px;margin-bottom: 20px; border:1px solid #ddd;\">");
     document.write("                <tr>");
     document.write("                    <td>");
-    document.write("                        <span class=\"shop\">店铺：<%=shopitem.shop.shop_name%><\/span>");
+    document.write("                        <span class=\"shop\">店铺：<%=shopitem.shop.shop_name%><\/span><br>");
     document.write("                        <span>地址：");
     document.write("                        <%=shopitem.city?shopitem.city.city_name:''%>");
     document.write("                        <%=shopitem.area?shopitem.area.city_name:''%>");
     document.write("                        <%=shopitem.shop.addr%>");
-    document.write("                        <\/span>");
+    document.write("                        <\/span><br>");
     document.write("                        <span>金额：<%=shopitem.total_price%>元(共<%=shopitem.total_amount%>份)<\/span>");
     document.write("                    <\/td>");
-    document.write("                <\/tr>");
-    document.write("                <tr>");
+    //document.write("                <\/tr>");
+    //document.write("                <tr>");
     document.write("                    <td>");
     document.write("                        <!--循序输出-->");
     document.write("                        <%for(var k = 0; k<orders_goods.length;k++){");
@@ -306,15 +312,15 @@ function cancelOrder(order_no,pay_type){
     document.write("                        %>");
     document.write("                        <div class=\"single_item clearfix\">");
     document.write("                                    <span class=\"pro_info\">");
-    document.write("                                        <a href=\"<%=gooditem.resource_url%>\">");
-    document.write("                                        <img width=\"58\" height=\"58\" src=\"<%=gooditem.resource_url%>\" \/>");
-    document.write("                                        <\/a>");
-    document.write("                                        <span>");
+    // document.write("                                        <a href=\"<%=gooditem.resource_url%>\">");
+    // document.write("                                        <img width=\"40\" height=\"40\" src=\"<%=gooditem.resource_url%>\" \/>");
+    // document.write("                                        <\/a>");
+    // document.write("                                        <span>");
     document.write("                                        <%=gooditem.goods_name%>");
     document.write("                                        <%if(gooditem.pricePropValName  && gooditem.pricePropValName !=\'\'){%>");
     document.write("                                        [<%=gooditem.pricePropName%>:<%=gooditem.pricePropValName%> ]");
     document.write("                                        <%}%>");
-    document.write("                                        <\/span>");
+    document.write("                                        ");//<\/span>
     document.write("                                        <%if(gooditem.prop){%>");
     document.write("                                            <%for(var h = 0; h<gooditem.prop.length;h++){");
     document.write("                                                var propitem = gooditem.prop[h];");

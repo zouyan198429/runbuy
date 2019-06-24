@@ -59,23 +59,30 @@
   </div>
 --}}
   <table lay-even class="layui-table"  lay-size="lg"  id="dynamic-table"  class="table2">
+    <colgroup>
+        <col width="30">
+        <col width="60">
+        <col width="">  
+        <col width="150">
+        <col>
+    </colgroup>
     <thead>
     <tr>
       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
-        </label>
+<!--           <span class="lbl">全选</span>
+ -->        </label>
       </th>
       <th>ID</th>
-      <th>城市分站<hr/>城市合伙人</th>
-      <th>商家<hr/>店铺</th>
+      <th>城市|合伙人</th>
+      <th>商家<hr>店铺</th>
       <th>商品名称</th>
       <th>图片</th>
-      <th>分类<hr/>价格</th>
+      <th>分类|价格</th>
       <th>排序[降序]</th>
-      <th>总销量<hr/>月销量</th>
-      <th>是否热销<hr/>是否上架</th>
+      <th>总销量|月销量</th>
+      <th>热销|上架</th>
       <th>介绍</th>
       <th style="width: 150px;">操作</th>
     </tr>

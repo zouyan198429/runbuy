@@ -84,30 +84,41 @@
   </div>
 --}}
   <table lay-even class="layui-table"  lay-size="lg"  id="dynamic-table"  class="table2">
+     <colgroup>
+            <col width="30">
+            <col width="120">
+            <col width="">
+            <col width="120">
+            <col width="120">
+            <col width="160">
+            <col width="120">
+            <col width="120">
+            <col>
+      </colgroup>
     <thead>
     <tr>
       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
-        </label>
+<!--           <span class="lbl">全选</span>
+ -->        </label>
       </th>
-      <th>城市<hr/>城市代理</th>
-      <th>真实姓名<hr/>手机</th>
+      <th>城市:城市代理</th>
+      <th>真实姓名:手机</th>
       {{--<th>微信 unionid</th>--}}
       {{--<th>小程序 openid</th>--}}
       {{--<th>服务号 openid</th>--}}
       <th>昵称</th>
       <th>性别</th>
-      <th>国家</th>
+      <!-- <th>国家</th>
       <th>省份</th>
-      <th>城市</th>
+      <th>城市</th> -->
       <th>头像</th>
       <th>上班状态</th>
-      <th>审核<hr/>冻洁</th>
-      {{--<th>是否超级帐户<hr/>状态</th>--}}
-      <th>添加时间<hr/>更新时间</th>
-      <th style="width: 150px;">操作</th>
+      <th>审核|冻洁</th>
+      {{--<th>是否超级帐户|状态</th>--}}
+      <th>添加时间|更新时间</th>
+      <th style="width:200px;">操作</th>
     </tr>
     </thead>
     <tbody id="data_list" class=" baguetteBoxOne gallery">

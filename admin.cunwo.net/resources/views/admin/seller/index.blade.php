@@ -68,12 +68,24 @@
   </div>
 --}}
   <table lay-even class="layui-table"  lay-size="lg"  id="dynamic-table"  class="table2">
+    <colgroup>
+        <col width="30">
+        <col width="100">
+        <col width="100">  
+        <col width="">  
+        <col width="100">  
+        <col width="">  
+        <col width="">  
+        <col width="">  
+        <col width="120">  
+        <col width="250">
+    </colgroup> 
     <thead>
     <tr>
       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
+          <!-- <span class="lbl">全选</span> -->
         </label>
       </th>
       {{--<th>ID</th>--}}
@@ -83,10 +95,10 @@
       <th>联系人</th>
       <th>手机</th>
       <th>电话</th>
-      <th>所在地址<hr/>经纬度</th>
+      <th>所在地址</th>
       {{--<th>介绍</th>--}}
       <th>状态</th>
-      <th style="width: 150px;">操作</th>
+      <th>操作</th>
     </tr>
     </thead>
     <tbody id="data_list">

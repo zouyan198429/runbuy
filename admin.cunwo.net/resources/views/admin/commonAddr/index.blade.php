@@ -9,7 +9,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
   @include('admin.layout_public.pagehead')
-  <link rel="stylesheet" href="{{asset('layui-admin-v1.2.1/src/layuiadmin/layui/css/layui.css')}}" media="all">
+  <link rel="stylesheet" href="{{asset('layui-admin-v1.2.1/src/layuiadmin/layui/css/layui.css?1')}}" media="all">
   <link rel="stylesheet" href="{{asset('layui-admin-v1.2.1/src/layuiadmin/style/admin.css')}}" media="all">
 </head>
 <body>
@@ -50,24 +50,39 @@
   </div>
 --}}
   <table lay-even class="layui-table"  lay-size="lg"  id="dynamic-table"  class="table2">
+    <colgroup>
+        <col width="30">
+        <col width="120">
+        <col width="">
+
+        <col width="180">
+        <col width="">
+        <col width="">
+
+        <col width="120">
+        <col width="150">  
+        <col width="80">
+    </colgroup>
     <thead>
     <tr>
       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
-        </label>
+<!--           <span class="lbl">全选</span>-->
+         </label>
       </th>
       <th>ID</th>
       <th>所属</th>
       <th>联系人</th>
-      <th>性别</th>
-      <th>手机</th>
+<!--       <th>性别</th>-->
+       <th>手机</th>
       {{--<th>地址名称</th>--}}
       <th>地址详情</th>
-      <th>是否默认<hr/>添加时间<hr/>更新时间</th>
-      <th>经纬度</th>
-      <th style="width: 150px;">操作</th>
+      <th>是否默认</th>
+      <th>添加时间</th>
+      <th>更新时间</th>
+<!--       <th>经纬度</th>-->
+       <th>操作</th>
     </tr>
     </thead>
     <tbody id="data_list">

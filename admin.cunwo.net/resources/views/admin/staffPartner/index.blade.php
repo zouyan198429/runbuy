@@ -9,7 +9,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
   @include('admin.layout_public.pagehead')
-  <link rel="stylesheet" href="{{asset('layui-admin-v1.2.1/src/layuiadmin/layui/css/layui.css')}}" media="all">
+  <link rel="stylesheet" href="{{asset('layui-admin-v1.2.1/src/layuiadmin/layui/css/layui.css?83')}}" media="all">
   <link rel="stylesheet" href="{{asset('layui-admin-v1.2.1/src/layuiadmin/style/admin.css')}}" media="all">
 </head>
 <body>
@@ -76,23 +76,36 @@
   </div>
 --}}
   <table lay-even class="layui-table"  lay-size="lg"  id="dynamic-table"  class="table2">
+    <colgroup>
+        <col width="30">
+        <col width="120">
+        <col width="">
+
+        <col width="180">
+        <col width="">
+        <col width="">
+
+        <col width="120">
+        <col width="150">  
+        <col width="80">
+    </colgroup>
     <thead>
     <tr>
       <th>
         <label class="pos-rel">
           <input type="checkbox"  class="ace check_all"  value="" onclick="action.seledAll(this)"/>
-          <span class="lbl">全选</span>
-        </label>
+<!--           <span class="lbl">全选</span>
+ -->        </label>
       </th>
-      <th>城市<hr/>城市代理</th>
-      {{--<th>商家<hr/>店铺</th>--}}
-      <th>用户名<hr/>真实姓名</th>
-      <th>类型<hr/>性别</th>
-      <th>电话<hr/>手机</th>
-      <th>QQ\email\微信<hr/>地址<hr/>经纬度</th>
-      <th>是否超级帐户<hr/>状态</th>
+      <th>城市|城市代理</th>
+      {{--<th>商家|店铺</th>--}}
+      <th>用户名|真实姓名</th>
+      <th>类型|性别</th>
+      <th>电话|手机</th>
+      <th>QQ\email\微信|地址</th>
+      <th>帐户|状态</th>
       <th>最近登陆</th>
-      <th style="width: 150px;">操作</th>
+      <th>操作</th>
     </tr>
     </thead>
     <tbody id="data_list">
