@@ -284,6 +284,19 @@ Route::post('admin/feeScale/ajax_import_staff','Admin\FeeScaleController@ajax_im
 Route::post('admin/feeScale/import', 'Admin\FeeScaleController@import');// 导入excel
 Route::post('admin/feeScale/ajax_get_ids', 'Admin\FeeScaleController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
+
+//收费标准-时间段
+Route::any('admin/feeScaleTime/ajax_alist', 'Admin\FeeScaleTimeController@ajax_alist');//ajax获得列表数据
+Route::post('admin/feeScaleTime/ajax_del', 'Admin\FeeScaleTimeController@ajax_del');// 删除
+Route::post('admin/feeScaleTime/ajax_save', 'Admin\FeeScaleTimeController@ajax_save');// 新加/修改
+Route::post('admin/feeScaleTime/ajax_save_bath', 'Admin\FeeScaleTimeController@ajax_save_bath');// 新加/修改--按城市批量
+Route::post('admin/feeScaleTime/ajax_get_child', 'Admin\FeeScaleTimeController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('admin/feeScaleTime/ajax_get_areachild', 'Admin\FeeScaleTimeController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('admin/feeScaleTime/ajax_import_staff','Admin\FeeScaleTimeController@ajax_import'); // 导入员工
+
+Route::post('admin/feeScaleTime/import', 'Admin\FeeScaleTimeController@import');// 导入excel
+Route::post('admin/feeScaleTime/ajax_get_ids', 'Admin\FeeScaleTimeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
 //订单
 Route::any('admin/order/ajax_alist', 'Admin\OrdersController@ajax_alist');//ajax获得列表数据
 Route::post('admin/order/ajax_del', 'Admin\OrdersController@ajax_del');// 删除
@@ -1106,6 +1119,7 @@ Route::any('shopGoodsType/ajax_alist', 'WX\ShopGoodsTypeController@ajax_alist');
 Route::any('cart/ajax_save', 'WX\CartController@ajax_save');// 添加单个商品到购物车，已有的，数量+n
 // Route::any('cart/addGoodCount', 'WX\CartController@addGoodCount');// 修改商品数量
 Route::any('cart/ajax_initCart', 'WX\CartController@ajax_initCart');// 根据城市id,获得购物车数据
+Route::any('cart/ajax_getStartPrice', 'WX\CartController@ajax_getStartPrice');// 根据城市id,获得购物车的配送费用数据
 // Route::any('cart/ajax_alist', 'WX\CartController@ajax_alist');//获得当前用户所有的购物车商品，按商户分组
 // Route::any('cart/ajax_del', 'WX\CartController@ajax_del');//  移除商品
 Route::any('cart/ajax_del_shop', 'WX\CartController@ajax_del_shop');//  移除商品--通过店铺id

@@ -1762,7 +1762,138 @@ class Tool
     }
 
     /**
-     * 格式化金额
+     * 格式化数字保留多少位小数 如:1234.15  3向下取[正负:往小的数取];4 向上取[正负:往大的数取];
+     *
+     * @param int/float $num 整数或小数
+     * @param int $decimalDigits 保留小数位数
+     * @param int $type 类型 1 四舍五入;2不四舍五入;3向下取[正负:往小的数取];4 向上取[正负:往大的数取];
+     * @param float $sign
+     * @return string
+     */
+    public static function formatFloat($num, $decimalDigits = 2, $type = 2){
+        // 判断是否有小数点
+        $decNum = 0;// 小数点位数
+        if(strpos($num, '.') !== false){ // 没有小数点
+            $decNum = strlen($num) - (strpos($num, '.') + 1);// 小数点位数
+        }
+        switch ($type)
+        {
+            case 1:// // 保留两位小数并且四舍五入
+                // $num = 123213.666666;
+                // sprintf("%.2f", $num);
+                return sprintf("%." . $decimalDigits . "f", $num);
+                break;
+            case 2:// 保留两位小数并且不四舍五入
+            case 3:// 向下取
+                // $num = 123213.666666;
+                // echo sprintf("%.2f",substr(sprintf("%.3f", $num), 0, -1));
+                if( $decimalDigits <  $decNum){
+                    for($i = 1; $i <= $decimalDigits; $i++){
+                        $num *= 10;
+                    }
+                    $numArr = explode('.', $num);
+                    if(count($numArr) == 2){
+                        $intNum = $numArr[0] ?? 0;
+                        $digitNum = $numArr[1] ?? 0;
+
+                        // 向下取整
+                        // $num = floor($num);
+                        $num = $intNum;
+                    }
+
+                    for($i = 1; $i <= $decimalDigits; $i++){
+                        $num /= 10;
+                    }
+                }
+                return sprintf("%." . $decimalDigits . "f", $num);
+                // return sprintf("%." . $decimalDigits . "f",substr(sprintf("%." . ($decimalDigits + 1) . "f", $num), 0, -1));
+                break;
+            case 4:// 4 向上取
+                if( $decimalDigits <  $decNum){
+                    for($i = 1; $i <= $decimalDigits; $i++){
+                        $num *= 10;
+                    }
+                    $numArr = explode('.', $num);
+                    if(count($numArr) == 2){
+                        $intNum = $numArr[0] ?? 0;
+                        $digitNum = $numArr[1] ?? 0;
+
+                        // 向上取整
+                        // $num = ceil($num);
+                        $num = $intNum;
+                        if( $digitNum > 0 ) $num += 1;
+                    }
+
+                    for($i = 1; $i <= $decimalDigits; $i++){
+                        $num /= 10;
+                    }
+                }
+                return sprintf("%." . $decimalDigits . "f", $num);
+            default:
+        }
+        return $num;
+    }
+
+
+    /**
+     * 格式化数字保留多少位小数 如:1234.15  3向下取[正:往小的数取;负:往大的负数取];4 向上取[正:往大的数取;负:往小的数负取];
+     *
+     * @param int/float $num 整数或小数
+     * @param int $decimalDigits 保留小数位数
+     * @param int $type 类型 1 四舍五入;2不四舍五入;3向下取[正:往小的数取;负:往大的负数取];4 向上取[正:往大的数取;负:往小的数负取];
+     * @param float $sign
+     * @return string
+     */
+    public static function formatFloatVal($num, $decimalDigits = 2, $type = 2){
+        // 判断是否有小数点
+        $decNum = 0;// 小数点位数
+        if(strpos($num, '.') !== false){ // 没有小数点
+            $decNum = strlen($num) - (strpos($num, '.') + 1);// 小数点位数
+        }
+        switch ($type)
+        {
+            case 1:// // 保留两位小数并且四舍五入
+                return static::formatFloat($num, $decimalDigits, 1);
+                break;
+            case 2:// 保留两位小数并且不四舍五入
+                return static::formatFloat($num, $decimalDigits, 2);
+                break;
+            case 3:// 向下取
+                // $num = 123213.666666;
+                // echo sprintf("%.2f",substr(sprintf("%.3f", $num), 0, -1));
+                if( $decimalDigits <  $decNum){
+                    for($i = 1; $i <= $decimalDigits; $i++){
+                        $num *= 10;
+                    }
+
+                    // 向下取整
+                    $num = floor($num);
+
+                    for($i = 1; $i <= $decimalDigits; $i++){
+                        $num /= 10;
+                    }
+                }
+                return sprintf("%." . $decimalDigits . "f", $num);
+                break;
+            case 4:// 4 向上取
+                if( $decimalDigits <  $decNum){
+                    for($i = 1; $i <= $decimalDigits; $i++){
+                        $num *= 10;
+                    }
+                    // 向上取整
+                    $num = ceil($num);
+                    for($i = 1; $i <= $decimalDigits; $i++){
+                        $num /= 10;
+                    }
+                }
+                return sprintf("%." . $decimalDigits . "f", $num);
+            default:
+        }
+        return $num;
+    }
+
+    /**
+     * 格式化金额-仅显示用 如:￥1,234.15
      *
      * @param int $money
      * @param int $len

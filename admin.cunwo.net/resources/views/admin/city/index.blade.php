@@ -147,7 +147,8 @@
       const AREA_ID = "{{ $info['area_id'] or 0 }}";// 区默认值
 
       var NOTICE_LIST_URL = "{{ url('admin/notice') }}"; //城市公告管理
-      var FEESCALE_MODIFY_URL = "{{ url('admin/feeScale/add/') }}/"; //收费标准管理
+      var FEESCALE_MODIFY_URL = "{{ url('admin/feeScale/add/') }}/"; //收费标准管理[文字]
+      var FEESCALETIME_MODIFY_URL = "{{ url('admin/feeScaleTime/addBath/') }}/"; //收费标准管理[时间段]
   </script>
   <script src="{{asset('js/common/list.js')}}"></script>
   <script src="{{ asset('js/admin/lanmu/city.js') }}"  type="text/javascript"></script>

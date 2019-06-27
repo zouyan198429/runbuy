@@ -343,6 +343,14 @@ Route::get('admin/feeScale/add/{id}', 'Admin\FeeScaleController@add');// 添加
 Route::get('admin/feeScale/export', 'Admin\FeeScaleController@export');// 导出
 Route::get('admin/feeScale/import_template', 'Admin\FeeScaleController@import_template');// 导入模版
 
+// 收费标准-时间段
+Route::get('admin/feeScaleTime', 'Admin\FeeScaleTimeController@index');// 列表
+Route::get('admin/feeScaleTime/add/{id}', 'Admin\FeeScaleTimeController@add');// 添加
+Route::get('admin/feeScaleTime/addBath/{city_site_id}', 'Admin\FeeScaleTimeController@addBath');// 添加--按城市批量
+// Route::get('admin/feeScaleTime/select', 'Admin\FeeScaleTimeController@select');// 选择-弹窗
+Route::get('admin/feeScaleTime/export', 'Admin\FeeScaleTimeController@export');// 导出
+Route::get('admin/feeScaleTime/import_template', 'Admin\FeeScaleTimeController@import_template');// 导入模版
+
 // 订单
 Route::get('admin/order', 'Admin\OrdersController@index');// 列表
 Route::get('admin/order/add/{id}', 'Admin\OrdersController@add');// 添加

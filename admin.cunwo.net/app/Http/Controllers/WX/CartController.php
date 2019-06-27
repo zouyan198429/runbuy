@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\WX;
 
 use App\Business\Controller\API\RunBuy\CTAPICartBusiness;
+use App\Business\Controller\API\RunBuy\CTAPICityBusiness;
+use App\Business\Controller\API\RunBuy\CTAPICommonAddrBusiness;
+use App\Business\Controller\API\RunBuy\CTAPIFeeScaleTimeBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIShopGoodsBusiness;
+use App\Services\Map\Map;
 use App\Services\Request\CommonRequest;
 use App\Services\Tool;
 use Illuminate\Http\Request;
@@ -141,6 +145,138 @@ class CartController extends BaseController
         $result['result']['data_list'] = $formatList;
         return $result;
     }
+
+    // 获得当前用户所有的购物车商品，按商户分组
+    // 参数都必填 city_site_id:当前城市id; addr_id:收货地址id;second_num:送货速度 24:急递;36:极递;60:快递
+    public function ajax_getStartPrice(Request $request)
+    {
+        $startPrice = 0;
+        // 参数 city_site_id 城市id
+        $this->InitParams($request);
+        $city_site_id = CommonRequest::getInt($request, 'city_site_id');// 当前城市id
+        if( empty($city_site_id) || !is_numeric($city_site_id) ) return ajaxDataArr(1, $startPrice, '');
+
+        $addr_id = CommonRequest::getInt($request, 'addr_id');// 收货地址id
+        if(!is_numeric($addr_id) || $addr_id <=0) return ajaxDataArr(1, $startPrice, '');
+
+        $second_num = CommonRequest::getInt($request, 'second_num');// 送货速度 24:急递;36:极递;60:快递
+        $second_num_arr = [24, 36, 60];
+        if( !in_array($second_num, $second_num_arr) )  return ajaxDataArr(1, $startPrice, '');
+
+        // 获得城市信息
+        $cityInfo = CTAPICityBusiness::getInfoData($request, $this, $city_site_id, ['price_distance_default', 'price_distance_every', 'price_shop_default', 'price_shop_every'], '');
+        if(empty($cityInfo))   return ajaxDataArr(1, $startPrice, '');
+        $price_distance_every = $cityInfo['price_distance_every'] ?? 0;
+        $price_shop_every = $cityInfo['price_shop_every'] ?? 0;
+
+        // 获得地址信息
+        $addrInfo = CTAPICommonAddrBusiness::getInfoData($request, $this, $addr_id, ['real_name', 'longitude', 'latitude']);// , ['city']
+        if(empty($addrInfo))   return ajaxDataArr(1, $startPrice, '');
+        $longitude = $addrInfo['longitude'] ?? '';
+        $latitude = $addrInfo['latitude'] ?? '';
+        if(empty($longitude) || empty($latitude))   return ajaxDataArr(1, $startPrice, '');
+
+        //  显示到定位点的距离
+        CTAPICartBusiness::mergeRequest($request, $this, [
+            'staff_id' => $this->user_id,
+        ]);
+        $result = CTAPICartBusiness::getList($request, $this, 1, [], [
+            'shop'
+        ]);
+        $data_list = $result['result']['data_list'] ?? [];
+
+        if( empty($data_list) ) return ajaxDataArr(1, $startPrice, '');
+        // 整理店铺信息
+        $hasShopIds = [];
+        $shopList = [];
+        foreach($data_list as $k => $v){
+            if(!in_array($v['shop_id'], $hasShopIds)){
+                $tShop = $v['shop'] ?? [];
+                if( empty($tShop) ) continue;
+                $temShopInfo = [
+                    'id' =>  $tShop['id'],
+                    'shop_name' =>  $tShop['shop_name'],
+                    'longitude' =>  $tShop['longitude'],
+                    'latitude' =>  $tShop['latitude'],
+                ];
+                array_push($shopList, $temShopInfo);
+                array_push($hasShopIds, $v['shop_id']);
+            }
+        }
+        $hasShopIds = array_sort($hasShopIds);
+        // 获得当前城市当前时间的时间段价格
+
+        $nowTime =  date('H:i:s');
+        $queryParams = [
+            'where' => [
+                ['city_site_id', '=', $city_site_id],
+                ['begin_time', '<=', $nowTime],
+                ['end_time', '>=', $nowTime],
+            ],
+            // 'whereIn' => [
+            //   'id' => $subjectHistoryIds,
+            //],
+//            'select' => [
+//                'id'
+//            ],
+//            'orderBy' => ['is_default'=>'desc', 'id'=>'desc'],
+        ];
+        $timeInfo = CTAPIFeeScaleTimeBusiness::getInfoByQuery($request, $this, '', $this->company_id, $queryParams);
+        if( empty($timeInfo) ) return ajaxDataArr(1, $startPrice, '');
+        $init_price = $timeInfo['init_price'] ?? '';
+        if(!is_numeric($init_price) || $init_price <0) return ajaxDataArr(1, $startPrice, '');
+
+        // 计算各店铺到买家的距离
+        Map::resolveDistance($shopList, $latitude, $longitude, 'distance', 0, 'desc', 'latitude', 'longitude', '');
+        $shopList = array_values($shopList);
+        $distanceTotal = 0;
+        $dataCount = count($shopList);
+        if($dataCount > 1){
+            foreach($shopList as $k => $v){
+                // $temDistance = $v['distance'] ?? 0;
+                $latitudeTem = $v['latitude'];
+                $longitudeTem = $v['longitude'];
+                if( ($k + 1) < $dataCount ){
+                    $temLatitude = $shopList[$k + 1]['latitude'];
+                    $temLongitude = $shopList[$k + 1]['longitude'];
+                }else{
+                    $temLatitude = $latitude;
+                    $temLongitude = $longitude;
+                }
+
+                $temDistance = Map::getDistance($latitudeTem, $longitudeTem, $temLatitude, $temLongitude);
+                if(!is_numeric($temDistance) || $temDistance <= 0 ) continue;
+                $distanceTotal += $temDistance;
+            }
+        }else{
+            $distanceTotal =  $shopList[0]['distance'] ?? 0;
+        }
+        if($distanceTotal > 1000)  $distanceTotal = $distanceTotal + 400;// 400
+        $disVal = ceil($distanceTotal / 1000); // 距离换成公里:向上取整
+        if($disVal <= 2){
+            $startPrice = $init_price + ($dataCount - 1) * $price_shop_every;
+        }else{
+            $startPrice = $init_price + ($disVal - 2) * $price_distance_every + ($dataCount - 1) * $price_shop_every;
+        }
+
+        // 急递 +2  极递 +0;快递 -1
+        switch ($second_num)
+        {
+            case 24:// 急递
+                $startPrice += 2;
+                break;
+            case 36:// 极递
+                $startPrice += 0;
+                break;
+            case 60:// 快递
+                $startPrice -= 1;
+                break;
+            default:
+        }
+        $startPrice = Tool::formatFloat($startPrice, 2, 4);
+        return ajaxDataArr(1, $startPrice, '');
+    }
+
 
     // 获得当前用户所有的购物车商品，按商户分组
 //    public function ajax_alist(Request $request){

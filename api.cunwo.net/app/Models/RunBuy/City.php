@@ -102,4 +102,11 @@ class City extends BasePublicModel
         return $this->hasOne('App\Models\RunBuy\FeeScale', 'city_site_id', 'id');
     }
 
+    /**
+     * 获取关联到的收费标准---一维
+     */
+    public function feescaletime()
+    {
+        return $this->hasOne('App\Models\RunBuy\FeeScaleTime', 'city_site_id', 'id');
+    }
 }
