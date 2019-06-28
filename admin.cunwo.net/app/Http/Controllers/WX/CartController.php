@@ -185,7 +185,7 @@ class CartController extends BaseController
             'staff_id' => $this->user_id,
         ]);
         $result = CTAPICartBusiness::getList($request, $this, 1, [], [
-            'shop'
+            'shop','goods'
         ]);
         $data_list = $result['result']['data_list'] ?? [];
         Log::info('根据距离算运费---当前城市，购物车的店铺信息',[$data_list]);
@@ -196,6 +196,22 @@ class CartController extends BaseController
         $shopList = [];
         foreach($data_list as $k => $v){
             if(!in_array($v['shop_id'], $hasShopIds)){
+                $goods = $v['goods'] ?? [];
+                if(empty($goods)) continue;
+
+                $shop = $v['shop'] ?? [];
+                if(empty($shop)) continue;
+                // 店铺状态  状态0待审核1审核通过2审核未通过4冻结(禁用)
+                $shop_status = $v['shop']['status'] ?? 0;
+                if($shop_status != 1) continue;
+                // 店铺 status_business  经营状态  1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]
+                $shop_status_business = $v['shop']['status_business'] ?? 4;
+                if($shop_status_business != 1) continue;
+
+                // 商品 是否上架1上架2下架
+                $is_sale = $v['goods']['is_sale'] ?? 2;
+                if($is_sale != 1) continue;
+
                 $tShop = $v['shop'] ?? [];
                 if( empty($tShop) ) continue;
                 $temShopInfo = [
