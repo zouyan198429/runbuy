@@ -12,6 +12,7 @@ use App\Services\Request\CommonRequest;
 use App\Services\Tool;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 
 class CartController extends BaseController
 {
@@ -166,12 +167,15 @@ class CartController extends BaseController
         // 获得城市信息
         $cityInfo = CTAPICityBusiness::getInfoData($request, $this, $city_site_id, ['price_distance_default', 'price_distance_every', 'price_shop_default', 'price_shop_every'], '');
         if(empty($cityInfo))   return ajaxDataArr(1, $startPrice, '');
+        Log::info('根据距离算运费---City',[$cityInfo]);
         $price_distance_every = $cityInfo['price_distance_every'] ?? 0;
         $price_shop_every = $cityInfo['price_shop_every'] ?? 0;
 
         // 获得地址信息
         $addrInfo = CTAPICommonAddrBusiness::getInfoData($request, $this, $addr_id, ['real_name', 'longitude', 'latitude']);// , ['city']
         if(empty($addrInfo))   return ajaxDataArr(1, $startPrice, '');
+
+        Log::info('根据距离算运费---CommonAddr',[$addrInfo]);
         $longitude = $addrInfo['longitude'] ?? '';
         $latitude = $addrInfo['latitude'] ?? '';
         if(empty($longitude) || empty($latitude))   return ajaxDataArr(1, $startPrice, '');
@@ -222,6 +226,7 @@ class CartController extends BaseController
 //            'orderBy' => ['is_default'=>'desc', 'id'=>'desc'],
         ];
         $timeInfo = CTAPIFeeScaleTimeBusiness::getInfoByQuery($request, $this, '', $this->company_id, $queryParams);
+        Log::info('根据距离算运费---FeeScaleTime',[$timeInfo]);
         if( empty($timeInfo) ) return ajaxDataArr(1, $startPrice, '');
         $init_price = $timeInfo['init_price'] ?? '';
         if(!is_numeric($init_price) || $init_price <0) return ajaxDataArr(1, $startPrice, '');
@@ -229,6 +234,7 @@ class CartController extends BaseController
         // 计算各店铺到买家的距离
         Map::resolveDistance($shopList, $latitude, $longitude, 'distance', 0, 'desc', 'latitude', 'longitude', '');
         $shopList = array_values($shopList);
+        Log::info('根据距离算运费---各店铺到买家的距离',[$shopList]);
         $distanceTotal = 0;
         $dataCount = count($shopList);
         if($dataCount > 1){
@@ -245,20 +251,25 @@ class CartController extends BaseController
                 }
 
                 $temDistance = Map::getDistance($latitudeTem, $longitudeTem, $temLatitude, $temLongitude);
+
+                Log::info('根据距离算运费---店铺' . $k . '与店铺' . ($k + 1) . '距离',[$temDistance]);
                 if(!is_numeric($temDistance) || $temDistance <= 0 ) continue;
                 $distanceTotal += $temDistance;
             }
         }else{
             $distanceTotal =  $shopList[0]['distance'] ?? 0;
         }
+        Log::info('根据距离算运费---总距离[单位米]',[$distanceTotal]);
         if($distanceTotal > 1000)  $distanceTotal = $distanceTotal + 400;// 400
         $disVal = ceil($distanceTotal / 1000); // 距离换成公里:向上取整
+        Log::info('根据距离算运费---总距离[单位公里]',[$disVal]);
         if($disVal <= 2){
             $startPrice = $init_price + ($dataCount - 1) * $price_shop_every;
         }else{
             $startPrice = $init_price + ($disVal - 2) * $price_distance_every + ($dataCount - 1) * $price_shop_every;
         }
-
+        Log::info('根据距离算运费---second_num',[$second_num]);
+        Log::info('根据距离算运费---second_num前的运费',[$startPrice]);
         // 急递 +2  极递 +0;快递 -1
         switch ($second_num)
         {
@@ -273,6 +284,7 @@ class CartController extends BaseController
                 break;
             default:
         }
+        Log::info('根据距离算运费---最终运费',[$startPrice]);
         $startPrice = Tool::formatFloat($startPrice, 2, 4);
         return ajaxDataArr(1, $startPrice, '');
     }
