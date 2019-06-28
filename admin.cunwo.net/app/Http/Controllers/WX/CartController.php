@@ -188,7 +188,7 @@ class CartController extends BaseController
             'shop','goods'
         ]);
         $data_list = $result['result']['data_list'] ?? [];
-        Log::info('根据距离算运费---当前城市，购物车的店铺信息',[$data_list]);
+        // Log::info('根据距离算运费---当前城市，购物车的店铺信息',[$data_list]);
 
         if( empty($data_list) ) return ajaxDataArr(1, $startPrice, '');
         // 整理店铺信息
@@ -216,6 +216,7 @@ class CartController extends BaseController
                 if( empty($tShop) ) continue;
                 $temShopInfo = [
                     'id' =>  $tShop['id'],
+                    'city_site_id' =>  $tShop['city_site_id'],
                     'shop_name' =>  $tShop['shop_name'],
                     'longitude' =>  $tShop['longitude'],
                     'latitude' =>  $tShop['latitude'],
