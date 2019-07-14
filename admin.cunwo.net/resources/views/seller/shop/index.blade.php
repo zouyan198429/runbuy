@@ -181,6 +181,9 @@
       var GOODS_LIST_URL = "{{ url('seller/shopGoods') }}"; // 商品管理
       var ORDERS_LIST_URL = "{{ url('seller/order') }}"; // 订单管理
       var OPEN_TIME_LIST_URL = "{{ url('seller/shopOpenTime') }}"; // 营业时间管理
+
+      var SAVE_URL_CLOSE = "{{ url('api/seller/shop/ajax_save_close') }}";// ajax保存记录-息业
+      var SAVE_URL_OPEN = "{{ url('api/seller/shop/ajax_save_open') }}";// ajax保存记录-开业
   </script>
 
 <link rel="stylesheet" href="{{asset('js/baguetteBox.js/baguetteBox.min.css')}}">

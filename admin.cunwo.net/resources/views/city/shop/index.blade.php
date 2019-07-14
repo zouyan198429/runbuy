@@ -157,6 +157,9 @@
       var GOODS_LIST_URL = "{{ url('city/shopGoods') }}"; // 商品管理
       var ORDERS_LIST_URL = "{{ url('city/order') }}"; // 订单管理
       var OPEN_TIME_LIST_URL = "{{ url('city/shopOpenTime') }}"; // 营业时间管理
+
+      var SAVE_URL_CLOSE = "{{ url('api/city/shop/ajax_save_close') }}";// ajax保存记录-息业
+      var SAVE_URL_OPEN = "{{ url('api/city/shop/ajax_save_open') }}";// ajax保存记录-开业
   </script>
 
 <link rel="stylesheet" href="{{asset('js/baguetteBox.js/baguetteBox.min.css')}}">

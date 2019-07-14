@@ -8,14 +8,46 @@ $(function(){
 //is_read_page 是否读取当前页,否则为第一页 true:读取,false默认第一页
 // ajax_async ajax 同步/导步执行 //false:同步;true:异步  需要列表刷新同步时，使用自定义方法reset_list_self；异步时没有必要自定义
 // reset_total 是否重新从数据库获取总页数 true:重新获取,false不重新获取  ---ok
-// do_num 调用时: 1 初始化页面时[默认];2 初始化页面后的调用
 function reset_list_self(is_read_page, ajax_async, reset_total, do_num){
     console.log('is_read_page', typeof(is_read_page));
     console.log('ajax_async', typeof(ajax_async));
     reset_list(is_read_page, false, reset_total, do_num);
     // initList();
+    let tr_num = $('#data_list').find('.item_tr').length;
+    console.log('加载成功' + tr_num);
+    if(tr_num  > 0){
+        $('#addBtnDiv').css('display','none');
+    }else{
+        $('#addBtnDiv').css('display','block');
+    }
 }
 
+//业务逻辑部分
+var otheraction = {
+    feeScale: function(obj, id, city_site_id, text){// 收费标准管理
+        var obj = $(obj);
+        //获得表单各name的值
+        var data = get_frm_values(SURE_FRM_IDS);// {} parent.get_frm_values(SURE_FRM_IDS)
+        console.log(FEESCALE_MODIFY_URL);
+        console.log(data);
+        // data.city_site_id = city_site_id;
+        var url_params = get_url_param(data);// parent.get_url_param(data)
+        var weburl = FEESCALE_MODIFY_URL + id + '?' + url_params;
+        console.log(weburl);
+        // go(SHOW_URL + id);
+        // location.href='/pms/Supplier/show?supplier_id='+id;
+        // var weburl = SHOW_URL + id;
+        // var weburl = '/pms/Supplier/show?supplier_id='+id+"&operate_type=1";
+        var tishi = text;//"添加/修改供应商";
+        var operateText = "添加";
+        if(id > 0){
+            operateText = "修改";
+        }
+        tishi = operateText + tishi;
+        layeriframe(weburl,tishi,950,600,IFRAME_MODIFY_CLOSE_OPERATE);
+        return false;
+    },
+};
 (function() {
     document.write("");
     document.write("    <!-- 前端模板部分 -->");
@@ -30,7 +62,7 @@ function reset_list_self(is_read_page, ajax_async, reset_total, do_num){
     //document.write("        }");
     document.write("        %>");
     document.write("");
-    document.write("        <tr>");
+    document.write("        <tr class='item_tr'>");
     document.write("            <td>");
     document.write("                <label class=\"pos-rel\">");
     document.write("                    <input  onclick=\"action.seledSingle(this)\" type=\"checkbox\" class=\"ace check_item\" <%if( false &&  !can_modify){%> disabled <%}%>  value=\"<%=item.id%>\"\/>");

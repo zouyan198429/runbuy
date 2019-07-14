@@ -19,8 +19,9 @@
   <div class="mmhead" id="mywork">
 
     @include('common.pageParams')
-    <div class="tabbox"  style="display: none;">
-      <a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加收费标准</a>
+    <div class="tabbox"  id="addBtnDiv"   style="display: none;">
+      {{--<a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加收费标准</a>--}}
+      <a href="javascript:void(0);" class="on" onclick="otheraction.feeScaleTime(this,{{ $city_site_id or 0 }},'收费标准')">添加收费标准</a>
     </div>
     <form onsubmit="return false;" class="form-horizontal" role="form" method="post" id="search_frm" action="#">
       <div class="msearch fr" style="display: none;">
@@ -101,6 +102,8 @@
       var IMPORT_EXCEL_TEMPLATE_URL = "{{ url('admin/feeScaleTime/import_template') }}";//导入EXCEL模版地址
       var IMPORT_EXCEL_URL = "{{ url('api/admin/feeScaleTime/import') }}";//导入EXCEL地址
       var IMPORT_EXCEL_CLASS = "import_file";// 导入EXCEL的file的class
+
+      var FEESCALETIME_MODIFY_URL = "{{ url('admin/feeScaleTime/addBath/') }}/"; //收费标准管理[时间段]
   </script>
   <script src="{{asset('js/common/list.js')}}"></script>
   <script src="{{ asset('js/admin/lanmu/feeScaleTime.js') }}"  type="text/javascript"></script>

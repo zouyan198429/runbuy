@@ -64,6 +64,7 @@ function ajaxPageList(dynamic_id,baidu_template_page,ajax_url,is_read_page,frm_i
     var layer_index = layer.load();//layer.msg('加载中', {icon: 16});
     console.log(ajax_url);
     console.log(data);
+    console.log('ajax_async=', ajax_async);
     $.ajax({
         'async': ajax_async,// true,//false:同步;true:异步
         'type' : 'POST',

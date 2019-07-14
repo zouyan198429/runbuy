@@ -56,7 +56,7 @@ class FeeScaleController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        $city_site_id = $this->city_site_id;//  CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         $info = [
             'id'=>$id,
           //   'department_id' => 0,
@@ -135,7 +135,7 @@ class FeeScaleController extends WorksController
         $this->InitParams($request);
         $id = CommonRequest::getInt($request, 'id');
         // CommonRequest::judgeEmptyParams($request, 'id', $id);
-        $city_site_id =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id = $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         // $city_site_id_history = CommonRequest::getInt($request, 'city_site_id_history');
         $title = CommonRequest::get($request, 'title');
         $resource = CommonRequest::get($request, 'resource');

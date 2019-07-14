@@ -249,7 +249,8 @@
                     </dd>
                     <dd><a lay-href="{{ url('admin/siteIntro') }}">站点介绍</a></dd>
                     <dd><a lay-href="{{ url('admin/siteIntroRuner') }}">站点介绍(跑腿)</a></dd>
-                    <dd><a lay-href="{{ url('admin/feeScale') }}">收费标准</a></dd>
+                    {{--<dd><a lay-href="{{ url('admin/feeScale') }}">收费标准[文字]</a></dd>--}}
+                    {{--<dd><a lay-href="{{ url('admin/feeScaleTime') }}">收费标准[时间段]</a></dd>--}}
                     <dd><a lay-href="{{ url('admin/notice') }}">公告</a></dd>
                   </dl>
                 </dd>

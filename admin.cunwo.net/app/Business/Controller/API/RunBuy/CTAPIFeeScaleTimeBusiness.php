@@ -157,6 +157,8 @@ class CTAPIFeeScaleTimeBusiness extends BasicPublicCTAPIBusiness
             $data_list[$k]['city_site_name'] = $v['city']['city_name'] ?? '';
             // $data_list[$k]['city_site_id'] = $v['city']['id'] ?? 0;
             if(isset($data_list[$k]['city'])) unset($data_list[$k]['city']);
+
+            if(isset($data_list[$k]['init_price'])) $data_list[$k]['init_price_format'] = Tool::formatMoney($data_list[$k]['init_price'], 2, '');
         }
         $result['data_list'] = $data_list;
         // 导出功能

@@ -24,7 +24,7 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
     public static $statusBusinessArr = [
         '1' => '营业中',
         '2' => '歇业中',
-        //'4' => '停业中',
+        '4' => '息业中',// '停业中',
         //'8' => '关业中',
     ];
 
@@ -292,6 +292,7 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
         // 营业时间
             if(isset($info['open_times'])){
                 $openTimes = $info['open_times'] ?? [];
+                $openTimeArr = [];
                 // 排序
                 $openTimeDistance = [
                     ['key' => 'sort_num', 'sort' => 'desc', 'type' => 'numeric'],
@@ -304,10 +305,15 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
                     $range_time = '';
                     $open_time = $o_v['open_time'] ?? '';
                     $close_time = $o_v['close_time'] ?? '';
+                    $tem_is_open = $o_v['is_open'] ?? 1;// 是否开启1未开启2已开启
                     if(!empty($open_time) && !empty($close_time)) $range_time = $open_time . ' - ' . $close_time;
                     $openTimes[$o_k]['range_time'] = $range_time;
+                    if($tem_is_open == 2) array_push($openTimeArr, $range_time);
+
                 }
                 $info['open_times'] = $openTimes;
+                $info['open_times_ok'] = $openTimeArr;
+                $info['open_times_txt'] = implode('、', $openTimeArr);
                 // if(isset($info['open_times'])) unset($info['open_times']);
             }
         // 分类
@@ -741,4 +747,65 @@ class CTAPIShopBusiness extends BasicPublicCTAPIBusiness
         return $shop_ids;
     }
 
+    /**
+     * 根根据id息业
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param int $city_site_id 城市id
+     * @param int  $city_partner_id 城市合伙人id
+     * @param int  $seller_id 商家ID
+     * @param string $shop_ids 店铺id ；多条用逗号分隔
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 店铺id数组 ---一维
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function closeById(Request $request, Controller $controller, $city_site_id = 0, $city_partner_id = 0, $seller_id = 0, $shop_ids = '', $notLog = 0)
+    {
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+        // 调用新加或修改接口
+        $apiParams = [
+            'city_site_id' => $city_site_id,// 城市id
+            'city_partner_id' => $city_partner_id,// 城市合伙人id
+            'seller_id' => $seller_id,// 商家ID
+            'shop_ids' => $shop_ids,// 店铺id ；多条用逗号分隔
+            'company_id' => $company_id,
+            'operate_staff_id' => $user_id,
+            'modifAddOprate' => 0,
+        ];
+        $res = static::exeDBBusinessMethodCT($request, $controller, '', 'closeById', $apiParams, $company_id, $notLog);
+        return $res;
+    }
+
+    /**
+     * 根根据id息业
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param int $city_site_id 城市id
+     * @param int  $city_partner_id 城市合伙人id
+     * @param int  $seller_id 商家ID
+     * @param string $shop_ids 店铺id ；多条用逗号分隔
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 店铺id数组 ---一维
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function openById(Request $request, Controller $controller, $city_site_id = 0, $city_partner_id = 0, $seller_id = 0, $shop_ids = '', $notLog = 0)
+    {
+        $company_id = $controller->company_id;
+        $user_id = $controller->user_id;
+        // 调用新加或修改接口
+        $apiParams = [
+            'city_site_id' => $city_site_id,// 城市id
+            'city_partner_id' => $city_partner_id,// 城市合伙人id
+            'seller_id' => $seller_id,// 商家ID
+            'shop_ids' => $shop_ids,// 店铺id ；多条用逗号分隔
+            'company_id' => $company_id,
+            'operate_staff_id' => $user_id,
+            'modifAddOprate' => 0,
+        ];
+        $res = static::exeDBBusinessMethodCT($request, $controller, '', 'openById', $apiParams, $company_id, $notLog);
+        return $res;
+    }
 }

@@ -525,4 +525,137 @@ class ShopDBBusiness extends BasePublicDBBusiness
         return $shopIds;
     }
 
+    /**
+     * 根据id息业
+     *
+     * @param int  $city_site_id 城市分站id
+     * @param int  $city_partner_id 城市合伙人id
+     * @param int  $seller_id 商家ID
+     * @param string $shop_ids 店铺id ；多条用逗号分隔
+     * @param int  $company_id 企业id
+     * @param int $operate_staff_id 操作人id
+     * @param int $modifAddOprate 修改时是否加操作人，1:加;0:不加[默认]
+     * @return  int 记录id值
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function closeById($city_site_id = 0, $city_partner_id = 0, $seller_id = 0, $shop_ids = '', $company_id = 0, $operate_staff_id = 0, $modifAddOprate = 0)
+    {
+        if (empty($shop_ids)) {
+            throws('店铺id不能为空！');
+        }
+        // 获得当前的店铺信息
+        $queryParams = [
+            'where' => [
+                // ['status', '=', $status],
+                // ['status_business', '=', $status_business],
+            ],
+            'select' => ['id', 'status_business'],
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+        if($city_partner_id > 0 )  array_push($queryParams['where'], ['city_partner_id', '=', $city_partner_id]);
+        if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);
+
+        if (strpos($shop_ids, ',') === false) { // 单条
+            array_push($queryParams['where'], ['id', $shop_ids]);
+        } else {
+            $queryParams['whereIn']['id'] = explode(',', $shop_ids);
+        }
+        $shopList = static::getAllList($queryParams, '')->toArray();
+        if(empty($shopList)) return true;
+
+        foreach($shopList as $k => $v){
+            $shop_id = $v['id'];
+            $status_business = $v['status_business'];
+            if(!in_array($status_business,[1,2])) throws('店铺[' . $shop_id . ']非营业中或歇业中状态，不可进行息业操作！');
+        }
+
+        $shopIds = array_values(array_column($shopList, 'id'));
+        // 修改状态为息业状态
+        $modelObj = null;
+        $queryParams = [
+            'where' => [
+//                ['ower_type', $ower_type],
+//                ['ower_id', $ower_id],
+            ],
+        ];
+        if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+        if($city_partner_id > 0 )  array_push($queryParams['where'], ['city_partner_id', '=', $city_partner_id]);
+        if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);
+
+        if (strpos($shop_ids, ',') === false) { // 单条
+            array_push($queryParams['where'], ['id', $shop_ids]);
+        } else {
+            $queryParams['whereIn']['id'] = explode(',', $shop_ids);
+        }
+        $saveBoolen = static::save(['status_business' => 4], $queryParams, $modelObj);
+        return $saveBoolen;
+    }
+
+    /**
+     * 根据id开业
+     *
+     * @param int  $city_site_id 城市分站id
+     * @param int  $city_partner_id 城市合伙人id
+     * @param int  $seller_id 商家ID
+     * @param string $shop_ids 店铺id ；多条用逗号分隔
+     * @param int  $company_id 企业id
+     * @param int $operate_staff_id 操作人id
+     * @param int $modifAddOprate 修改时是否加操作人，1:加;0:不加[默认]
+     * @return  int 记录id值
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function openById($city_site_id = 0, $city_partner_id = 0, $seller_id = 0, $shop_ids = '', $company_id = 0, $operate_staff_id = 0, $modifAddOprate = 0)
+    {
+        if (empty($shop_ids)) {
+            throws('店铺id不能为空！');
+        }
+        // 获得当前的店铺信息
+        $queryParams = [
+            'where' => [
+                // ['status', '=', $status],
+                // ['status_business', '=', $status_business],
+            ],
+            'select' => ['id', 'status_business'],
+            //   'orderBy' => [ 'id'=>'desc'],//'sort_num'=>'desc',
+        ];
+        if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+        if($city_partner_id > 0 )  array_push($queryParams['where'], ['city_partner_id', '=', $city_partner_id]);
+        if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);
+
+        if (strpos($shop_ids, ',') === false) { // 单条
+            array_push($queryParams['where'], ['id', $shop_ids]);
+        } else {
+            $queryParams['whereIn']['id'] = explode(',', $shop_ids);
+        }
+        $shopList = static::getAllList($queryParams, '')->toArray();
+        if(empty($shopList)) return true;
+
+        foreach($shopList as $k => $v){
+            $shop_id = $v['id'];
+            $status_business = $v['status_business'];
+            if(!in_array($status_business,[4])) throws('店铺[' . $shop_id . ']非息业状态，不可进行开业操作！');
+        }
+
+        $shopIds = array_values(array_column($shopList, 'id'));
+        // 修改状态为息业状态
+        $modelObj = null;
+        $queryParams = [
+            'where' => [
+//                ['ower_type', $ower_type],
+//                ['ower_id', $ower_id],
+            ],
+        ];
+        if($city_site_id > 0 )  array_push($queryParams['where'], ['city_site_id', '=', $city_site_id]);
+        if($city_partner_id > 0 )  array_push($queryParams['where'], ['city_partner_id', '=', $city_partner_id]);
+        if($seller_id > 0 )  array_push($queryParams['where'], ['seller_id', '=', $seller_id]);
+
+        if (strpos($shop_ids, ',') === false) { // 单条
+            array_push($queryParams['where'], ['id', $shop_ids]);
+        } else {
+            $queryParams['whereIn']['id'] = explode(',', $shop_ids);
+        }
+        $saveBoolen = static::save(['status_business' => 2], $queryParams, $modelObj);
+        return $saveBoolen;
+    }
 }

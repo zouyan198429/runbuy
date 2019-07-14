@@ -19,11 +19,12 @@
   <div class="mmhead" id="mywork">
 
     @include('common.pageParams')
-    <div class="tabbox"  style="display: none;">
-      <a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加收费标准</a>
+    <div class="tabbox" id="addBtnDiv"  style="display: none;">
+      {{--<a href="javascript:void(0);" class="on" onclick="action.iframeModify(0)">添加收费标准</a>--}}
+      <a href="javascript:void(0);" class="on" onclick="otheraction.feeScale(this,0,{{ $city_site_id or 0 }},'收费标准[文字]')">添加收费标准</a>
     </div>
     <form onsubmit="return false;" class="form-horizontal" role="form" method="post" id="search_frm" action="#">
-      <div class="msearch fr"  style="display: none;">
+      <div class="msearch fr" style="display: none;">
         <input type="hidden" name="city_site_id" value="{{ $city_site_id or 0 }}" />
         <select style="width:80px; height:28px;" name="field">
           <th>ID</th>
@@ -101,6 +102,8 @@
       var IMPORT_EXCEL_TEMPLATE_URL = "{{ url('city/feeScale/import_template') }}";//导入EXCEL模版地址
       var IMPORT_EXCEL_URL = "{{ url('api/city/feeScale/import') }}";//导入EXCEL地址
       var IMPORT_EXCEL_CLASS = "import_file";// 导入EXCEL的file的class
+
+      var FEESCALE_MODIFY_URL = "{{ url('city/feeScale/add/') }}/"; //收费标准管理[文字]
   </script>
   <script src="{{asset('js/common/list.js')}}"></script>
   <script src="{{ asset('js/city/lanmu/feeScale.js') }}"  type="text/javascript"></script>

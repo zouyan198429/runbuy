@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\City;
 
 use App\Business\Controller\API\RunBuy\CTAPICityBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIFeeScaleTimeBusiness;
@@ -22,8 +22,8 @@ class FeeScaleTimeController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
-        return view('admin.feeScaleTime.index', $reDataArr);
+        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+        return view('city.feeScaleTime.index', $reDataArr);
     }
 
     /**
@@ -40,8 +40,8 @@ class FeeScaleTimeController extends WorksController
 //        $reDataArr['province_kv'] = CTAPIFeeScaleTimeBusiness::getCityByPid($request, $this,  0);
 //        $reDataArr['province_kv'] = CTAPIFeeScaleTimeBusiness::getChildListKeyVal($request, $this, 0, 1 + 0, 0);
 //        $reDataArr['province_id'] = 0;
-//        $reDataArr['city_site_id'] =  CommonRequest::getInt($request, 'city_site_id');
-//        return view('admin.feeScaleTime.select', $reDataArr);
+//        $reDataArr['city_site_id'] =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+//        return view('city.feeScaleTime.select', $reDataArr);
 //    }
 
     /**
@@ -56,7 +56,7 @@ class FeeScaleTimeController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        $city_site_id =  CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
 
         // return ajaxDataArr(0, null, '参数有误！');
         $info = [
@@ -85,7 +85,7 @@ class FeeScaleTimeController extends WorksController
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         $reDataArr['info'] = $info;
         $reDataArr['operate'] = $operate;
-        return view('admin.feeScaleTime.add', $reDataArr);
+        return view('city.feeScaleTime.add', $reDataArr);
     }
 
     /**
@@ -100,7 +100,7 @@ class FeeScaleTimeController extends WorksController
     {
         $this->InitParams($request);
         $reDataArr = $this->reDataArr;
-        // $city_site_id =  CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id =  $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         if(empty($city_site_id) || !is_numeric($city_site_id)) return ajaxDataArr(0, null, '参数有误！');
 
         $info = [
@@ -164,7 +164,7 @@ class FeeScaleTimeController extends WorksController
         $reDataArr['info'] = $info;
         $reDataArr['timeList'] = $timeCityList;
         $reDataArr['operate'] = $operate;
-        return view('admin.feeScaleTime.addBath', $reDataArr);
+        return view('city.feeScaleTime.addBath', $reDataArr);
     }
 
     /**
@@ -220,7 +220,7 @@ class FeeScaleTimeController extends WorksController
         $this->InitParams($request);
         $id = CommonRequest::getInt($request, 'id');
         // CommonRequest::judgeEmptyParams($request, 'id', $id);
-        $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id = $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         // $city_site_id_history = CommonRequest::getInt($request, 'city_site_id_history');
 //        $title = CommonRequest::get($request, 'title');
 //        $resource = CommonRequest::get($request, 'resource');
@@ -258,7 +258,7 @@ class FeeScaleTimeController extends WorksController
         $this->InitParams($request);
 //        $id = CommonRequest::getInt($request, 'id');
         // CommonRequest::judgeEmptyParams($request, 'id', $id);
-        $city_site_id = CommonRequest::getInt($request, 'city_site_id');
+        $city_site_id = $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
         // $city_site_id_history = CommonRequest::getInt($request, 'city_site_id_history');
 //        $title = CommonRequest::get($request, 'title');
 //        $resource = CommonRequest::get($request, 'resource');

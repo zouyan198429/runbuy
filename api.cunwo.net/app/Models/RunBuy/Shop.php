@@ -23,7 +23,7 @@ class Shop extends BasePublicModel
     public $statusBusinessArr = [
         '1' => '营业中',
         '2' => '歇业中',
-        '4' => '停业中',
+        '4' => '息业中',// '停业中',
         '8' => '关业中',
     ];
 

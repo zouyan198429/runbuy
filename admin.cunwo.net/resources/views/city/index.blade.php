@@ -161,6 +161,8 @@
                 </dd>
                 --}}
                 <dd><a lay-href="{{ url('city/notice') }}">公告</a></dd>
+                <dd><a lay-href="{{ url('city/feeScale') }}">收费标准[文字]</a></dd>
+                <dd><a lay-href="{{ url('city/feeScaleTime') }}">收费标准[时间段]</a></dd>
               </dl>
             </li>
 

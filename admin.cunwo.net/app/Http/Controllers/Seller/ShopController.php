@@ -294,6 +294,46 @@ class ShopController extends WorksController
     }
 
     /**
+     * ajax保存数据-息业
+     *
+     * @param int $id
+     * @return Response
+     * @author zouyan(305463219@qq.com)
+     */
+    public function ajax_save_close(Request $request)
+    {
+        $this->InitParams($request);
+        $city_site_id = $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+        $city_partner_id = $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
+        $seller_id = $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
+
+        $shop_ids = CommonRequest::getInt($request, 'shop_ids');
+
+        $resultDatas = CTAPIShopBusiness::closeById($request, $this, $city_site_id, $city_partner_id , $seller_id, $shop_ids);
+        return ajaxDataArr(1, $resultDatas, '');
+    }
+
+    /**
+     * ajax保存数据-开业
+     *
+     * @param int $id
+     * @return Response
+     * @author zouyan(305463219@qq.com)
+     */
+    public function ajax_save_open(Request $request)
+    {
+        $this->InitParams($request);
+        $city_site_id = $this->city_site_id;// CommonRequest::getInt($request, 'city_site_id');
+        $city_partner_id = $this->city_partner_id;// CommonRequest::getInt($request, 'city_partner_id');
+        $seller_id = $this->seller_id;// CommonRequest::getInt($request, 'seller_id');
+
+        $shop_ids = CommonRequest::getInt($request, 'shop_ids');
+
+        $resultDatas = CTAPIShopBusiness::openById($request, $this, $city_site_id, $city_partner_id , $seller_id, $shop_ids);
+        return ajaxDataArr(1, $resultDatas, '');
+    }
+
+    /**
      * ajax获得列表数据
      *
      * @param Request $request

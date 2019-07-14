@@ -44,6 +44,7 @@ class Map
      */
     public static function resolveDistance(&$dataList, $latitude, $longitude, $dataUboundName = 'distance', $correctionDistance = 0, $distanceOrder = '', $latitudeUbound = 'latitude', $longitudeUbound= 'longitude', $notLatLonStr = ''){
         if(empty($latitude)  || empty($longitude)) return $dataList;
+        if(empty($dataList)) return $dataList;
 
         $isMultiArr = false; // true:二维;false:一维
         foreach($dataList as $k => $v){
@@ -83,10 +84,10 @@ class Map
             $dataUboundName => $maxDistance + 1,
             $dataUboundName . 'Str' => $notLatLonStr,
         ];
+
         foreach($lastList as $k => $v){
             $dataList[$k] = array_merge($v, $temDistance);
         }
-
         // 排序处理
         if(in_array($distanceOrder, ['asc', 'desc'])){
             $dataList = array_values($dataList);

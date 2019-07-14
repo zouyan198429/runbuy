@@ -498,6 +498,21 @@ Route::get('city/notice/add/{id}', 'City\NoticeController@add');// 添加
 Route::get('city/notice/export', 'City\NoticeController@export');// 导出
 Route::get('city/notice/import_template', 'City\NoticeController@import_template');// 导入模版
 
+// 收费标准
+Route::get('city/feeScale', 'City\FeeScaleController@index');// 列表
+Route::get('city/feeScale/add/{id}', 'City\FeeScaleController@add');// 添加
+// Route::get('city/feeScale/select', 'City\FeeScaleController@select');// 选择-弹窗
+Route::get('city/feeScale/export', 'City\FeeScaleController@export');// 导出
+Route::get('city/feeScale/import_template', 'City\FeeScaleController@import_template');// 导入模版
+
+// 收费标准-时间段
+Route::get('city/feeScaleTime', 'City\FeeScaleTimeController@index');// 列表
+Route::get('city/feeScaleTime/add/{id}', 'City\FeeScaleTimeController@add');// 添加
+Route::get('city/feeScaleTime/addBath/{city_site_id}', 'City\FeeScaleTimeController@addBath');// 添加--按城市批量
+// Route::get('city/feeScaleTime/select', 'City\FeeScaleTimeController@select');// 选择-弹窗
+Route::get('city/feeScaleTime/export', 'City\FeeScaleTimeController@export');// 导出
+Route::get('city/feeScaleTime/import_template', 'City\FeeScaleTimeController@import_template');// 导入模版
+
 // 订单
 Route::get('city/order', 'City\OrdersController@index');// 列表
 Route::get('city/order/add/{id}', 'City\OrdersController@add');// 添加

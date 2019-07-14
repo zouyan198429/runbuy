@@ -114,7 +114,84 @@ var otheraction = {
         layuiGoIframe(href, text);
         return false;
     },
+    close: function(id){// 息业
+        var index_query = layer.confirm('确定息业当前记录？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            other_operate_ajax('close',id);
+            layer.close(index_query);
+        }, function(){
+        });
+        return false;
+    },
+    open: function(id){// 开业
+        var index_query = layer.confirm('确定开业当前记录？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            other_operate_ajax('open',id);
+            layer.close(index_query);
+        }, function(){
+        });
+        return false;
+    },
 };
+
+//操作
+function other_operate_ajax(operate_type,id){
+    if(operate_type=='' || id==''){
+        err_alert('请选择需要操作的数据');
+        return false;
+    }
+    var operate_txt = "";
+    var data ={};
+    var ajax_url = "";
+    var reset_total = true;// 是否重新从数据库获取总页数 true:重新获取,false不重新获取  ---ok
+    switch(operate_type)
+    {
+        case 'close'://息业
+            operate_txt = "息业";
+            data = {'shop_ids':id};
+            ajax_url = SAVE_URL_CLOSE;// /pms/Supplier/ajax_del?operate_type=1
+            reset_total = false;
+            break;
+        case 'open'://开业
+            operate_txt = "开业";
+            data = {'shop_ids':id};
+            reset_total = false;
+            ajax_url = SAVE_URL_OPEN;// "/pms/Supplier/ajax_del?operate_type=2";
+            break;
+        default:
+            break;
+    }
+    console.log('ajax_url:',ajax_url);
+    console.log('data:',data);
+    var layer_index = layer.load();//layer.msg('加载中', {icon: 16});
+    $.ajax({
+        'type' : 'POST',
+        'url' : ajax_url,//'/pms/Supplier/ajax_del',
+        'data' : data,
+        'dataType' : 'json',
+        'success' : function(ret){
+            console.log('ret:',ret);
+            if(!ret.apistatus){//失败
+                //alert('失败');
+                // countdown_alert(ret.errorMsg,0,5);
+                layer_alert(ret.errorMsg,3,0);
+            }else{//成功
+                var msg = ret.errorMsg;
+                if(msg === ""){
+                    msg = operate_txt+"成功";
+                }
+                // countdown_alert(msg,1,5);
+                layer_alert(msg,1,0);
+                // reset_list(true, true);
+                console.log(LIST_FUNCTION_NAME);
+                eval( LIST_FUNCTION_NAME + '(' + true +', ' + true +', ' + reset_total + ', 2)');
+            }
+            layer.close(layer_index)//手动关闭
+        }
+    });
+}
 
 (function() {
     document.write("");
@@ -124,6 +201,7 @@ var otheraction = {
     document.write("");
     document.write("        <%for(var i = 0; i<data_list.length;i++){");
     document.write("        var item = data_list[i];");
+    document.write("        var status_business = item.status_business;");
     document.write("        var resource_list = item.resource_list;");
     document.write("        var open_times = item.open_times;");
     //document.write("        var can_modify = false;");
@@ -204,6 +282,16 @@ var otheraction = {
     // document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.orders(this,<%=item.city_site_id%>,<%=item.city_partner_id%>,<%=item.seller_id%>,<%=item.id%>,'<%=item.shop_name%>-订单管理')\">");
     // document.write("                    <i class=\"ace-icon fa fa-cart-arrow-down bigger-60\"> 订单管理<\/i>");
     // document.write("                <\/a>");
+    document.write("                <%if( status_business == 1 || status_business == 2){%>");// 1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]
+    document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.close(<%=item.id%>)\">");
+    document.write("                    <i class=\"ace-icon fa fa-times bigger-60\"> 息业<\/i>");
+    document.write("                <\/a>");
+    document.write("                <%}%>");
+    document.write("                <%if( status_business == 4){%>");// 1营业中 2 歇业中 4 停业[店铺人工操作 8  关业[店铺平台操作]
+    document.write("                <a href=\"javascript:void(0);\" class=\"btn btn-mini btn-success\"  onclick=\"otheraction.open(<%=item.id%>)\">");
+    document.write("                    <i class=\"ace-icon fa fa-check bigger-60\"> 开业<\/i>");
+    document.write("                <\/a>");
+    document.write("                <%}%>");
     document.write("");
     document.write("            <\/td>");
     document.write("        <\/tr>");

@@ -13,12 +13,16 @@ $(document).on("click",".closeIframe",function(){
 //刷新父窗口列表
 // reset_total 是否重新从数据库获取总页数 true:重新获取,false不重新获取
 function parent_only_reset_list(reset_total){
-    window.parent.reset_list(true, true, reset_total, 2);//刷新父窗口列表
+    // window.parent.reset_list(true, true, reset_total, 2);//刷新父窗口列表
+    let list_fun_name = window.parent.LIST_FUNCTION_NAME || 'reset_list';
+    eval( 'window.parent.' + list_fun_name + '(' + true +', ' + true +', ' + reset_total +', 2)');
 }
 //关闭弹窗,并刷新父窗口列表
 // reset_total 是否重新从数据库获取总页数 true:重新获取,false不重新获取
 function parent_reset_list_iframe_close(reset_total){
-    window.parent.reset_list(true, true, reset_total, 2);//刷新父窗口列表
+    // window.parent.reset_list(true, true, reset_total, 2);//刷新父窗口列表
+    let list_fun_name = window.parent.LIST_FUNCTION_NAME || 'reset_list';
+    eval( 'window.parent.' + list_fun_name + '(' + true +', ' + true +', ' + reset_total +', 2)');
     parent.layer.close(PARENT_LAYER_INDEX);
 }
 //关闭弹窗
@@ -46,7 +50,8 @@ $(function(){
         // }, function(){
         //});
         return false;
-    })
+    });
+    // console.log('window.parent.LIST_FUNCTION_NAME',window.parent.LIST_FUNCTION_NAME);
 
 });
 
