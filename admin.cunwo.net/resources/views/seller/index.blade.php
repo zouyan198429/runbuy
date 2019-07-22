@@ -104,7 +104,7 @@
                 <cite>主页</cite>
               </a>
             </li>
-             <!-- 
+             
            
             <li data-name="user" class="layui-nav-item" >
               <a href="javascript:;" lay-tips="商品管理" lay-direction="2">
@@ -128,7 +128,7 @@
                 <i class="layui-icon layui-icon-cart"></i>
                 <cite>订单管理</cite>
               </a>
-            </li> -->
+            </li> 
 
             <li data-name="user" class="layui-nav-item">
               <a href="javascript:;" lay-href="{{ url('seller/shop') }}" lay-tips="店铺管理" lay-direction="2">
