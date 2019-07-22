@@ -218,7 +218,7 @@ class ShopController extends WorksController
 //            'group_id' => $group_id,
 //            'position_id' => $position_id,
             'shop_name' => $shop_name,
-//            'status' => $status,
+            'status' => $status,
             'per_price' => $per_price,
             'linkman' => $linkman,
             'mobile' => $mobile,
