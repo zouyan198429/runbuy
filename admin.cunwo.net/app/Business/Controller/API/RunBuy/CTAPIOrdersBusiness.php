@@ -426,7 +426,7 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
                     $goodInfo['prop'] = array_values($formatProps);
 
                     array_push($formatGoods, Tool::formatArrKeys($goodInfo
-                        , Tool::arrEqualKeyVal(['goods_id', 'goods_name', 'price', 'price_format', 'amount', 'total_price', 'total_price_format', 'resource_url'
+                        , Tool::arrEqualKeyVal(['cart_id', 'goods_id', 'goods_name', 'price', 'price_format', 'amount', 'total_price', 'total_price_format', 'resource_url'
                             , 'pricePropName', 'pricePropValName', 'prop']), true ));
 
 

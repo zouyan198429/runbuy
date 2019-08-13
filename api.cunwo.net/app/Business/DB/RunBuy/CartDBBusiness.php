@@ -982,6 +982,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                 $cart_list = array_values(array_reverse($cart_list));// 反转数组
                 foreach($cart_list as $goodInfo){
                     $goods_id = $goodInfo['goods_id'] ;
+                    $cart_id = $goodInfo['id'] ?? 0;
                     if(isset($cacheData['goods_id'][$goods_id]) && $cacheData['goods_id'][$goods_id] > 0){
                         $goods_id_history = $cacheData['goods_id'][$goods_id];
                     }else{
@@ -1033,6 +1034,7 @@ class CartDBBusiness extends BasePublicDBBusiness
                         'amount' => $amount,// 数量
                         'total_price' => $totalPrice,// 总价(商品)
                         'resource_id_history' => $resource_id_history,// 资源历史id
+                        'cart_id' => $cart_id,// 购物车id[显示作用]
                         'operate_staff_id' => $operate_staff_id,// 操作员工id
                         'operate_staff_id_history' => $operate_staff_id_history,// 操作员工历史id
                     ];

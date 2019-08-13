@@ -316,7 +316,7 @@ function cancelOrder(order_no,pay_type){
     // document.write("                                        <img width=\"40\" height=\"40\" src=\"<%=gooditem.resource_url%>\" \/>");
     // document.write("                                        <\/a>");
     // document.write("                                        <span>");
-    document.write("                                        <%=gooditem.goods_name%>");
+    document.write("                                        <%=gooditem.goods_name%>----<%=gooditem.cart_id%>");
     document.write("                                        <%if(gooditem.pricePropValName  && gooditem.pricePropValName !=\'\'){%>");
     document.write("                                        [<%=gooditem.pricePropName%>:<%=gooditem.pricePropValName%> ]");
     document.write("                                        <%}%>");
