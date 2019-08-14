@@ -428,10 +428,16 @@ class CTAPIOrdersBusiness extends BasicPublicCTAPIBusiness
                     array_push($formatGoods, Tool::formatArrKeys($goodInfo
                         , Tool::arrEqualKeyVal(['cart_id', 'goods_id', 'goods_name', 'price', 'price_format', 'amount', 'total_price', 'total_price_format', 'resource_url'
                             , 'pricePropName', 'pricePropValName', 'prop']), true ));
-
-
-                    $data_list[$k]['orders_goods'] = $formatGoods;
                 }
+                // 重新排序--按cart_id
+                if( !empty($formatGoods) ){
+                    $cartIdDistance = [
+                        ['key' => 'cart_id', 'sort' => 'asc', 'type' => 'numeric'],
+                    ];
+                    $formatGoods = Tool::php_multisort($formatGoods, $cartIdDistance);
+                    $formatGoods = array_values($formatGoods);
+                }
+                $data_list[$k]['orders_goods'] = $formatGoods;
 
             }
             // 所属人员
