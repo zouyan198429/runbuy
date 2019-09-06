@@ -213,14 +213,40 @@ class StaffDBBusiness extends BasePublicDBBusiness
         if(is_numeric($id) &&  $id <= 0 &&  isset($saveData['mini_openid']) ){
             $otherWhere = [];
             if(isset($saveData['admin_type'])  && $saveData['admin_type'] > 0 ) array_push($otherWhere, ['admin_type', $saveData['admin_type']]) ;
-            if( isset($saveData['wx_unionid']) ) array_push($otherWhere, ['wx_unionid', $saveData['wx_unionid']]);
-            $info = static::judgeFieldExist($company_id, 0 ,"mini_openid", $saveData['mini_openid']
-                , $otherWhere,2);
+            $wx_unionid = $saveData['wx_unionid'] ?? '';
+            $wx_unionid = trim($wx_unionid);
+            if(!empty($wx_unionid)){
+                $temOtherWhere = $otherWhere;
+
+                // if( isset($saveData['wx_unionid']) ) array_push($temOtherWhere, ['wx_unionid', $saveData['wx_unionid']]);
+                $info = static::judgeFieldExist($company_id, 0 ,"wx_unionid", $wx_unionid
+                    , $temOtherWhere,2);
+
+                // 如果是空，则按mini_openid再查一下
+                if( empty($info) ){
+                    array_push($temOtherWhere, ['wx_unionid', '']);// 是空的，也要加，因为索引
+                    $info = static::judgeFieldExist($company_id, 0 ,"mini_openid", $saveData['mini_openid']
+                        , $temOtherWhere,2);
+                }
+
+            }else{// 为空
+                // if( isset($saveData['wx_unionid']) ) array_push($otherWhere, ['wx_unionid', $saveData['wx_unionid']]);// 是空的，也要加，因为索引
+                array_push($otherWhere, ['wx_unionid', '']);// 是空的，也要加，因为索引
+                $info = static::judgeFieldExist($company_id, 0 ,"mini_openid", $saveData['mini_openid']
+                    , $otherWhere,2);
+            }
+
             if(!empty($info)) $id = $info['id'];
         }
 
         if($id <= 0 && isset($saveData['admin_type']) && $saveData['admin_type'] == 32){
             $saveData['open_status'] = 1;// 审核状态1待审核2审核通过3审核未通过--32快跑人员用
+            // 如果是app登录
+            if($saveData['admin_type'] == 32){
+                $nickName = $saveData['nickname'] ?? '';
+                if ( empty($nickName) ) throws('新用户昵称不能为空！');
+                // if (isset($saveData['avatar_url']) && empty($saveData['avatar_url'])) throws('新用户头像不能为空！');
+            }
         }
         $res = static::replaceById($saveData, $company_id,$id, $operate_staff_id, $modifAddOprate);
         return $res;

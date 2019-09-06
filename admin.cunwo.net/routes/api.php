@@ -1088,6 +1088,7 @@ Route::any('staff/ajax_save_operate', 'WX\StaffController@ajax_save_operate');//
 Route::any('miniProgram/test', 'WX\MiniProgramController@test');// 测试
 Route::any('miniProgram/login', 'WX\MiniProgramController@ajax_login');// 登陆-用户
 Route::any('miniProgram/login_run', 'WX\MiniProgramController@ajax_login_run');// 登陆-快跑人员小程序
+Route::any('miniProgram/login_app', 'WX\MiniProgramController@ajax_login_app');// 登陆-快跑人员app
 
 // 平台相关的
 // Route::any('platForm/getLabels', 'WX\platFormController@getLabels');// 获得店铺标签--有分页
