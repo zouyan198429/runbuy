@@ -12,5 +12,6 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPICountUserRegBusiness extends BasicPublicCTAPIBusiness
 {
     public static $model_name = 'API\RunBuy\CountUserRegAPI';
+    public static $table_name = 'count_user_reg';// 表名称
 
 }

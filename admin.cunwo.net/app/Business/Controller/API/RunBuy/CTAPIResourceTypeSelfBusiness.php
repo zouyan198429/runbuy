@@ -12,5 +12,6 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPIResourceTypeSelfBusiness extends BasicPublicCTAPIBusiness
 {
     public static $model_name = 'API\RunBuy\ResourceTypeSelfAPI';
+    public static $table_name = 'resource_type_self';// 表名称
 
 }

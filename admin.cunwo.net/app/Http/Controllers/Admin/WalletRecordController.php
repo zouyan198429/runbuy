@@ -61,7 +61,7 @@ class WalletRecordController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIWalletRecordBusiness::getInfoData($request, $this, $id, [], '');
+            $info = CTAPIWalletRecordBusiness::getInfoData($request, $this, $id, [], '', []);
         }
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         $reDataArr['info'] = $info;

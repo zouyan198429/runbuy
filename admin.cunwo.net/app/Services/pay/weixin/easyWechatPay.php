@@ -11,13 +11,13 @@ class easyWechatPay
      * @param $app  obj 当前对象
      * @param $params  参数 参考 https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_1
      *
-        $params = [
-            'openid' => '', // 必填  用户标识
-            'body' => '', // 必填商品描述 String(128)
-            'out_trade_no' => '', // 必填 商户订单号 String(32) 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一
-            'total_fee' => '', // 标价金额 Int 订单总金额，单位为分
-            'trade_type' => '', // 交易类型  小程序取值如下：JSAPI
-        ];
+     *   $params = [
+     *       'openid' => '', // 必填  用户标识
+     *      'body' => '', // 必填商品描述 String(128)
+     *       'out_trade_no' => '', // 必填 商户订单号 String(32) 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一
+     *       'total_fee' => '', // 标价金额 Int 订单总金额，单位为分
+     *       'trade_type' => '', // 交易类型  小程序取值如下：JSAPI
+     *   ];
      * @param int  $operateType 1 小程序 2 app 4 js  8   16
      * @return  mixed
      * @author zouyan(305463219@qq.com)

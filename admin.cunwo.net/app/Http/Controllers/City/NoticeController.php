@@ -67,7 +67,7 @@ class NoticeController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPINoticeBusiness::getInfoData($request, $this, $id, [], ['city']);
+            $info = CTAPINoticeBusiness::getInfoData($request, $this, $id, [], ['city'], []);
         }else{
             if($city_site_id > 0 ){
                 $cityInfo = CTAPICityBusiness::getInfoHistoryId($request, $this, $city_site_id, []);
@@ -101,7 +101,7 @@ class NoticeController extends WorksController
         ];
 
         if ($id > 0) { // 获得详情数据
-            $infoDatas =CTAPINoticeBusiness::getInfoData($request, $this, $id, [], ['oprateStaffHistory']);
+            $infoDatas =CTAPINoticeBusiness::getInfoData($request, $this, $id, [], ['oprateStaffHistory'], []);
             // 修改点击点
             $id = $infoDatas['id'] ??  0;
             $volume = $infoDatas['volume'] ??  0;
@@ -115,10 +115,10 @@ class NoticeController extends WorksController
         $reDataArr['info'] = $infoDatas;
 
         // 上一条
-        $preList = CTAPINoticeBusiness::getNearList($request, $this, $id, 1, 1, 0, [], '');
+        $preList = CTAPINoticeBusiness::getNearList($request, $this, $id, 1, 1, 0, [], '', []);
         $reDataArr['preList'] = $preList;
         // 下一条
-        $nextList = CTAPINoticeBusiness::getNearList($request, $this, $id, 2, 1, 0, [], '');
+        $nextList = CTAPINoticeBusiness::getNearList($request, $this, $id, 2, 1, 0, [], '', []);
         $reDataArr['nextList'] = $nextList;
         return view('manage.notice.info', $reDataArr);
     }

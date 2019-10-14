@@ -12,5 +12,6 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPIPropValHistoryBusiness extends CTAPIPropValBusiness
 {
     public static $model_name = 'API\RunBuy\PropValHistoryAPI';
+    public static $table_name = 'prop_val_history';// 表名称
 
 }

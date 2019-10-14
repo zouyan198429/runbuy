@@ -36,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
             'shop'                 => 'App\Models\RunBuy\Shop',           // 店铺图片
             'shop_goods'             => 'App\Models\RunBuy\ShopGoods',       // 商品图片
             'shop_type'             => 'App\Models\RunBuy\ShopType',       // 店铺分类
+            'tables'                 => 'App\Models\RunBuy\Tables',           // 桌位或包间图片
         ]);
 
         DB::listen(function ($query) {

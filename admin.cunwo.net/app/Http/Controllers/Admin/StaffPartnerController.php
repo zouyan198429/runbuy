@@ -87,7 +87,7 @@ class StaffPartnerController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIStaffBusiness::getInfoData($request, $this, $id, [], ['cityPartner']);
+            $info = CTAPIStaffBusiness::getInfoData($request, $this, $id, [], ['cityPartner'], []);
         }else{
             if($city_partner_id > 0 ){
                 $partnerInfo = CTAPICityPartnerBusiness::getInfoHistoryId($request, $this, $city_partner_id, []);
@@ -141,7 +141,7 @@ class StaffPartnerController extends WorksController
         $admin_password = CommonRequest::get($request, 'admin_password');
         $sure_password = CommonRequest::get($request, 'sure_password');
 
-        $partnerInfo = CTAPICityPartnerBusiness::getInfoData($request, $this, $city_partner_id,['id', 'city_site_id']);
+        $partnerInfo = CTAPICityPartnerBusiness::getInfoData($request, $this, $city_partner_id,['id', 'city_site_id'], '', []);
 
         $saveData = [
             'admin_type' => 4,

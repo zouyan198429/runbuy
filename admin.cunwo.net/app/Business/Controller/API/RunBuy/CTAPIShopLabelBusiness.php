@@ -11,4 +11,5 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPIShopLabelBusiness extends BasicPublicCTAPIBusiness
 {
     public static $model_name = 'API\RunBuy\ShopLabelAPI';
+    public static $table_name = 'shop_label';// 表名称
 }

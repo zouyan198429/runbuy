@@ -139,6 +139,24 @@
               </dl>
             </li>
             <li data-name="user" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="桌位/包间管理" lay-direction="2">
+                <i class="layui-icon layui-icon-app"></i>
+                <cite>桌位/包间管理</cite>
+              </a>
+              <dl class="layui-nav-child">
+                <dd>
+                  <a lay-href="{{ url('admin/tablePerson') }}">桌位/包间分类(按人数)</a>
+                </dd>
+                <dd>
+                  <a lay-href="{{ url('admin/tables') }}">桌位/包间</a>
+                </dd>
+                <dd>
+                  <a lay-href="{{ url('admin/aaaa') }}">桌位就餐流</a>
+                </dd>
+
+              </dl>
+            </li>
+            <li data-name="user" class="layui-nav-item">
               <a href="javascript:;" lay-tips="商品管理" lay-direction="2">
                 <i class="layui-icon layui-icon-app"></i>
                 <cite>商品管理</cite>
@@ -243,6 +261,9 @@
                     </dd>
                     <dd>
                       <a lay-href="{{ url('admin/labels') }}">搜索标签</a>
+                    </dd>
+                    <dd>
+                      <a lay-href="{{ url('admin/numPrefix') }}">单号前缀</a>
                     </dd>
                     <dd>
                       <a lay-href="{{ url('admin/city') }}">城市管理</a>

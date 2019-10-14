@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
+
 */
 // 文件上传 any(
 // Route::post('file/upload', 'IndexController@upload');
@@ -24,6 +25,8 @@ Route::get('excel/import_test','ExcelController@import_test'); // 导入 - 测�
 
 // ----大后台
 // admin
+
+Route::any('/test', 'IndexController@test');// 测试
 // 上传图片
 Route::post('admin/upload', 'Admin\UploadController@index');
 Route::post('admin/upload/ajax_del', 'Admin\UploadController@ajax_del');// 根据id删除文件
@@ -203,6 +206,33 @@ Route::any('admin/shopGoodsType/ajax_get_kv', 'Admin\ShopGoodsTypeController@aja
 Route::post('admin/shopGoodsType/import', 'Admin\ShopGoodsTypeController@import');// 导入excel
 Route::post('admin/shopGoodsType/ajax_get_ids', 'Admin\ShopGoodsTypeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
+//桌位人数分类[一级分类]
+Route::any('admin/tablePerson/ajax_alist', 'Admin\TablePersonController@ajax_alist');//ajax获得列表数据
+Route::post('admin/tablePerson/ajax_del', 'Admin\TablePersonController@ajax_del');// 删除
+Route::post('admin/tablePerson/ajax_save', 'Admin\TablePersonController@ajax_save');// 新加/修改
+Route::post('admin/tablePerson/ajax_get_child', 'Admin\TablePersonController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('admin/tablePerson/ajax_get_areachild', 'Admin\TablePersonController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('admin/tablePerson/ajax_import_staff','Admin\TablePersonController@ajax_import'); // 导入员工
+Route::any('admin/tablePerson/ajax_get_kv', 'Admin\TablePersonController@ajax_get_kv');// 根据店铺id，获得店铺分类信息
+
+Route::post('admin/tablePerson/import', 'Admin\TablePersonController@import');// 导入excel
+Route::post('admin/tablePerson/ajax_get_ids', 'Admin\TablePersonController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
+//桌位
+Route::any('admin/tables/ajax_alist', 'Admin\TablesController@ajax_alist');//ajax获得列表数据
+Route::post('admin/tables/ajax_del', 'Admin\TablesController@ajax_del');// 删除
+Route::post('admin/tables/ajax_save', 'Admin\TablesController@ajax_save');// 新加/修改
+Route::post('admin/tables/ajax_get_child', 'Admin\TablesController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('admin/tables/ajax_get_areachild', 'Admin\TablesController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('admin/tables/ajax_import_staff','Admin\TablesController@ajax_import'); // 导入员工
+Route::any('admin/tables/ajax_get_kv', 'Admin\TablesController@ajax_get_kv');// 根据店铺id，获得店铺分类信息
+
+Route::post('admin/tables/import', 'Admin\TablesController@import');// 导入excel
+Route::post('admin/tables/ajax_get_ids', 'Admin\TablesController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+Route::any('admin/tables/ajax_getCountByStatus', 'Admin\TablesController@ajax_getCountByStatus');//ajax获得统计数据
+Route::any('admin/tables/ajax_status_count', 'Admin\TablesController@ajax_status_count');// 状态统计
+Route::any('admin/tables/ajax_create_qrcode', 'Admin\TablesController@ajax_create_qrcode');// 生成二维码
+
 
 //店铺营业时间
 Route::post('admin/shopOpenTime/ajax_alist', 'Admin\ShopOpenTimeController@ajax_alist');//ajax获得列表数据
@@ -247,8 +277,20 @@ Route::post('admin/labels/ajax_get_areachild', 'Admin\LabelsController@ajax_get_
 Route::post('admin/labels/ajax_import_staff','Admin\LabelsController@ajax_import'); // 导入员工
 
 
-Route::post('admin/labels/import', 'Admin\LabelsController@import');// 导入excel
-Route::post('admin/labels/ajax_get_ids', 'Admin\LabelsController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+Route::post('admin/labels/import', 'Admin\NumPrefixController@import');// 导入excel
+Route::post('admin/labels/ajax_get_ids', 'Admin\NumPrefixController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
+// 单号前缀
+Route::post('admin/numPrefix/ajax_alist', 'Admin\NumPrefixController@ajax_alist');//ajax获得列表数据
+Route::post('admin/numPrefix/ajax_del', 'Admin\NumPrefixController@ajax_del');// 删除
+Route::post('admin/numPrefix/ajax_save', 'Admin\NumPrefixController@ajax_save');// 新加/修改
+Route::post('admin/numPrefix/ajax_get_child', 'Admin\NumPrefixController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('admin/numPrefix/ajax_get_areachild', 'Admin\NumPrefixController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('admin/numPrefix/ajax_import_staff','Admin\NumPrefixController@ajax_import'); // 导入员工
+
+
+Route::post('admin/numPrefix/import', 'Admin\NumPrefixController@import');// 导入excel
+Route::post('admin/numPrefix/ajax_get_ids', 'Admin\NumPrefixController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
 
 //地址[一级分类]
@@ -493,6 +535,19 @@ Route::any('city/shopGoodsType/ajax_get_kv', 'City\ShopGoodsTypeController@ajax_
 
 Route::post('city/shopGoodsType/import', 'City\ShopGoodsTypeController@import');// 导入excel
 Route::post('city/shopGoodsType/ajax_get_ids', 'City\ShopGoodsTypeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
+
+//桌位人数分类[一级分类]
+Route::any('city/tablePerson/ajax_alist', 'City\TablePersonController@ajax_alist');//ajax获得列表数据
+Route::post('city/tablePerson/ajax_del', 'City\TablePersonController@ajax_del');// 删除
+Route::post('city/tablePerson/ajax_save', 'City\TablePersonController@ajax_save');// 新加/修改
+Route::post('city/tablePerson/ajax_get_child', 'City\TablePersonController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('city/tablePerson/ajax_get_areachild', 'City\TablePersonController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('city/tablePerson/ajax_import_staff','City\TablePersonController@ajax_import'); // 导入员工
+Route::any('city/tablePerson/ajax_get_kv', 'City\TablePersonController@ajax_get_kv');// 根据店铺id，获得店铺分类信息
+
+Route::post('city/tablePerson/import', 'City\TablePersonController@import');// 导入excel
+Route::post('city/tablePerson/ajax_get_ids', 'City\TablePersonController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
 //店铺营业时间
 Route::post('city/shopOpenTime/ajax_alist', 'City\ShopOpenTimeController@ajax_alist');//ajax获得列表数据
@@ -757,6 +812,20 @@ Route::any('seller/shopGoodsType/ajax_get_kv', 'Seller\ShopGoodsTypeController@a
 Route::post('seller/shopGoodsType/import', 'Seller\ShopGoodsTypeController@import');// 导入excel
 Route::post('seller/shopGoodsType/ajax_get_ids', 'Seller\ShopGoodsTypeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
+
+//桌位人数分类[一级分类]
+Route::any('seller/tablePerson/ajax_alist', 'Seller\TablePersonController@ajax_alist');//ajax获得列表数据
+Route::post('seller/tablePerson/ajax_del', 'Seller\TablePersonController@ajax_del');// 删除
+Route::post('seller/tablePerson/ajax_save', 'Seller\TablePersonController@ajax_save');// 新加/修改
+Route::post('seller/tablePerson/ajax_get_child', 'Seller\TablePersonController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('seller/tablePerson/ajax_get_areachild', 'Seller\TablePersonController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('seller/tablePerson/ajax_import_staff','Seller\TablePersonController@ajax_import'); // 导入员工
+Route::any('seller/tablePerson/ajax_get_kv', 'Seller\TablePersonController@ajax_get_kv');// 根据店铺id，获得店铺分类信息
+
+Route::post('seller/tablePerson/import', 'Seller\TablePersonController@import');// 导入excel
+Route::post('seller/tablePerson/ajax_get_ids', 'Seller\TablePersonController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
+
 //店铺营业时间
 Route::post('seller/shopOpenTime/ajax_alist', 'Seller\ShopOpenTimeController@ajax_alist');//ajax获得列表数据
 Route::post('seller/shopOpenTime/ajax_del', 'Seller\ShopOpenTimeController@ajax_del');// 删除
@@ -997,6 +1066,20 @@ Route::any('shop/shopGoodsType/ajax_get_kv', 'Shop\ShopGoodsTypeController@ajax_
 
 Route::post('shop/shopGoodsType/import', 'Shop\ShopGoodsTypeController@import');// 导入excel
 Route::post('shop/shopGoodsType/ajax_get_ids', 'Shop\ShopGoodsTypeController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
+
+
+
+//桌位人数分类[一级分类]
+Route::any('shop/tablePerson/ajax_alist', 'Shop\TablePersonController@ajax_alist');//ajax获得列表数据
+Route::post('shop/tablePerson/ajax_del', 'Shop\TablePersonController@ajax_del');// 删除
+Route::post('shop/tablePerson/ajax_save', 'Shop\TablePersonController@ajax_save');// 新加/修改
+Route::post('shop/tablePerson/ajax_get_child', 'Shop\TablePersonController@ajax_get_child');// 根据部门id,小组id获得子类员工数组[kv一维数组]
+Route::post('shop/tablePerson/ajax_get_areachild', 'Shop\TablePersonController@ajax_get_areachild');// 根据区县id,街道id获得子类员工数组[kv一维数组]
+Route::post('shop/tablePerson/ajax_import_staff','Shop\TablePersonController@ajax_import'); // 导入员工
+Route::any('shop/tablePerson/ajax_get_kv', 'Shop\TablePersonController@ajax_get_kv');// 根据店铺id，获得店铺分类信息
+
+Route::post('shop/tablePerson/import', 'Shop\TablePersonController@import');// 导入excel
+Route::post('shop/tablePerson/ajax_get_ids', 'Shop\TablePersonController@ajax_get_ids');// 获得查询所有记录的id字符串，多个逗号分隔
 
 
 //店铺营业时间

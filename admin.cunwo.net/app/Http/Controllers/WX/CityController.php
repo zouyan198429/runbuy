@@ -47,7 +47,7 @@ class CityController extends BaseController
 //        $this->InitParams($request);
 //        $user_id = $this->user_id;
         $city_site_id = CommonRequest::getInt($request, 'city_site_id');
-        $info = CTAPICityBusiness::getInfoData($request, $this, $city_site_id, ['order_saturation'], '');
+        $info = CTAPICityBusiness::getInfoData($request, $this, $city_site_id, ['order_saturation'], '', []);
         $order_saturation = $info['order_saturation'] ?? 0;
         $re_num = 1;
         if($order_saturation > 1.3){

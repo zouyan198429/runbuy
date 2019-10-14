@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Services\Request\API\Sites\APIRunBuyRequest;
 use App\Services\Common;
-use App\Services\Request\API\HttpRequest;
+use App\Services\HttpRequest;
+use App\Services\Request\CommonRequest;
+use App\Services\Secure\AesDesCrypt;
 use App\Services\Tool;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Lvht\GeoHash;
 
@@ -21,6 +24,43 @@ class IndexController extends WorksController
      */
     public function test(Request $request)
     {
+//        dd(Tool::getIp());
+        $params = CommonRequest::getParamsByUbound($request, 2, false, [], []);
+        /**
+         *
+         *  服务端接到这个请求：
+         *  1 先验证sign签名是否合理，证明请求参数没有被中途篡改
+         *  2 再验证timestamp是否过期，证明请求是在最近60s被发出的
+         *  3 最后验证nonce是否已经有了，证明这个请求不是60s内的重放请求
+         *
+         */
+        $res = CommonRequest::apiJudgeSign($request, $params, 1,  '111222333');
+        if(is_string($res)) ajaxDataArr(0, null, $res);
+        return ajaxDataArr(1, $res, '');
+//        pr($res);
+//        $secureTypeArr = [];//['md5' => []];
+//        $nonceStr = HttpRequest::createNonce('',0, 10000, $secureTypeArr);
+        return ajaxDataArr(1, $nonceStr, '');
+//        $key = "456fggrhgfhhfghf中g";
+//        $method = 'des-ede3';
+//        $data = '中华人民共和国dfasfsdf1145';
+//        $pass = AesDesCrypt::CommonEncrypt($method,$data, $key, 0, false, false);
+//        echo $pass;
+//        echo "<br>";
+//
+//        $src = AesDesCrypt::CommonDecrypt($method,$pass,$key, OPENSSL_ZERO_PADDING);
+//
+//        echo $src;
+//        $hash = AesDesCrypt::hashHmac('sha1', $data, $key, false);
+//        echo "<br>";
+//        echo $hash;
+//        $signature = Tool::getSignature($data, $key);
+//        echo "<br>";
+//        echo $signature;
+//
+//        die;
+
+
         $lng = 117.031689;
         $lat = 36.65396;
         // $hash = GeoHash::encode($lng,$lat);// wwe0x0euu12

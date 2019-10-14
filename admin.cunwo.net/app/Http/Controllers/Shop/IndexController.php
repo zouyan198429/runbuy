@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Shop;
 
 use App\Business\Controller\API\RunBuy\CTAPIStaffBusiness;
 use App\Http\Controllers\WorksController;
+use App\Services\File\DownFile;
 use App\Services\Request\CommonRequest;
+use App\Services\Tool;
 use Illuminate\Http\Request;
 
 class IndexController extends WorksController
@@ -181,5 +183,23 @@ class IndexController extends WorksController
         ];
         $resultDatas = CTAPIStaffBusiness::replaceById($request, $this, $saveData, $id, true);
         return ajaxDataArr(1, $resultDatas, '');
+    }
+    /**
+     * 下载网页打印机驱动
+     *
+     * @param Request $request
+     * @return mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public function down_drive(Request $request)
+    {
+//        $this->InitParams($request);
+        // $this->source = 2;
+//        $reDataArr = $this->reDataArr;
+        // 下载二维码文件
+        $publicPath = Tool::getPath('public');
+        $fileName = '/CLodopPrint_Setup_for_Win32NT.exe';
+        $res = DownFile::downFilePath(2, $publicPath . '/' . $fileName);
+        if(is_string($res)) echo $res;
     }
 }

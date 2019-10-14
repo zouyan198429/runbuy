@@ -83,7 +83,6 @@
               <input type="text" value=""  name="keyword"  placeholder="请输入关键字"  style="border:1px solid #ddd; " />
               <button class="btn btn-normal search_frm">搜索</button>
         </div>
-      </div>
     </form>
   </div>
   {{--
@@ -170,6 +169,8 @@
   <script src="{{asset('js/jquery-3.3.1.min.js')}}"></script>
   <script src="{{asset('layui-admin-v1.2.1/src/layuiadmin/layui/layui.all.js')}}"></script>
   {{--<script src="{{asset('layui-admin-v1.2.1/src/layuiadmin/layui/layui.js')}}"></script>--}}
+
+  <script src="{{asset('/static/js/LodopFuncs.js')}}"></script>
   @include('public.dynamic_list_foot')
 
   <div style="display:none;">
@@ -210,6 +211,7 @@
       var NEED_PLAY_STATUS = "{{ $countPlayStatus }}";// 需要发声的状态，多个逗号,分隔
 
       var CANCEL_ORDER_URL = "{{ url('api/admin/order/refundOrder') }}";// 取消订单
+      var PRINT_ORDER_URL = "{{ url('admin/order/print/') }}";// 打印订单
 
   </script>
 <link rel="stylesheet" href="{{asset('js/baguetteBox.js/baguetteBox.min.css')}}">

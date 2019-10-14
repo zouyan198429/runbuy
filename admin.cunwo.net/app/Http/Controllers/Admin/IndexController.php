@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Business\Controller\API\RunBuy\CTAPIStaffBusiness;
 use App\Http\Controllers\WorksController;
+use App\Services\File\DownFile;
 use App\Services\Request\CommonRequest;
+use App\Services\Tool;
 use Illuminate\Http\Request;
 
 class IndexController extends WorksController
 {
 
     public function test(){
+
 //        $this->company_id = 1;
 //        $cityList = CTAPILrChinaCityBusiness::getList($request, $this, 2 + 4, [], []);
 //        pr($cityList);
@@ -181,5 +184,50 @@ class IndexController extends WorksController
         ];
         $resultDatas = CTAPIStaffBusiness::replaceById($request, $this, $saveData, $id, true);
         return ajaxDataArr(1, $resultDatas, '');
+    }   /**
+ * 下载二维码
+ *
+ * @param Request $request
+ * @param int $id id
+ * @return mixed
+ * @author zouyan(305463219@qq.com)
+ */
+    public function down(Request $request,$id = 0)
+    {
+        $this->InitParams($request);
+        // $this->source = 2;
+        $reDataArr = $this->reDataArr;
+        $relations = '';//  CTAPITablesBusiness::getExtendParamsConfig($request, $this, 'list_page_admin', 'relationsArr');
+
+        $info = CTAPITablesBusiness::getInfoData($request, $this, $id, ['id','table_name','has_qrcode','qrcode_url'], $relations, []);
+
+        $has_qrcode = $info['has_qrcode'] ?? 1;
+        $qrcode_url = $info['qrcode_url'] ?? '';//  http://runbuy.admin.cunwo.net/resource/company/1/images/qrcode/tables/1.png
+        $qrcode_url_old = $info['qrcode_url_old'] ?? '';// /resource/company/1/images/qrcode/tables/1.png
+        if($has_qrcode != 2 ) die('记录不存在或未生成二维码');
+        // 下载二维码文件
+        $publicPath = Tool::getPath('public');
+        $res = DownFile::downFilePath(2, $publicPath . $qrcode_url_old);
+        if(is_string($res)) echo $res;
     }
+
+    /**
+     * 下载网页打印机驱动
+     *
+     * @param Request $request
+     * @return mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public function down_drive(Request $request)
+    {
+//        $this->InitParams($request);
+        // $this->source = 2;
+//        $reDataArr = $this->reDataArr;
+        // 下载二维码文件
+        $publicPath = Tool::getPath('public');
+        $fileName = '/CLodopPrint_Setup_for_Win32NT.exe';
+        $res = DownFile::downFilePath(2, $publicPath . '/' . $fileName);
+        if(is_string($res)) echo $res;
+    }
+
 }

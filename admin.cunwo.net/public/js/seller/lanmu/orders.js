@@ -138,7 +138,7 @@ function ajax_status_count(from_id ,staff_id, operate_staff_id){
                         }
 
                         // 刷新列表-当前页
-                        if( from_id == 1 && selected_status == temStatus){
+                        if( from_id == 1 && (selected_status == temStatus || (needPlay && selected_status == '' ))){
                             console.log('刷新列表-当前页');
                             // reset_list(true, true);
                             reset_list_self(true,false,true, 2);

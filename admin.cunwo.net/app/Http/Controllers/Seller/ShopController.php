@@ -71,7 +71,7 @@ class ShopController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIShopBusiness::getInfoData($request, $this, $id, [], ['shopSeller', 'labels', 'siteResources', 'openTimes']);
+            $info = CTAPIShopBusiness::getInfoData($request, $this, $id, [], ['shopSeller', 'labels', 'siteResources', 'openTimes'], []);
             $intro = $info['intro'] ?? '';
             $info['intro'] = replace_enter_char($intro,2);
             $range_time = '';
@@ -203,8 +203,11 @@ class ShopController extends WorksController
         // 图片资源
         $resource_id = CommonRequest::get($request, 'resource_id');
         if(is_string($resource_id) || is_numeric($resource_id)){
-            $resource_id = explode(',' ,$resource_id);
+            if(strlen(trim($resource_id)) > 0){
+                $resource_id = explode(',' ,$resource_id);
+            }
         }
+        if(!is_array($resource_id)) $resource_id = [];
 
         $resource_ids = implode(',', $resource_id);
         if(!empty($resource_ids)) $resource_ids = ',' . $resource_ids . ',';

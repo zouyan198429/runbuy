@@ -101,6 +101,22 @@ class Shop extends BasePublicModel
     }
 
     /**
+     * 获取店铺的桌位分类(按人数)-二维
+     */
+    public function tablePersons()
+    {
+        return $this->hasMany('App\Models\RunBuy\TablePerson', 'shop_id', 'id');
+    }
+
+    /**
+     * 获取店铺的桌位-二维
+     */
+    public function tables()
+    {
+        return $this->hasMany('App\Models\RunBuy\Tables', 'shop_id', 'id');
+    }
+
+    /**
      * 获取店铺对应的城市分站--一维
      */
     public function shopCity()

@@ -73,7 +73,7 @@ class ShopOpenTimeController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIShopOpenTimeBusiness::getInfoData($request, $this, $id, [], ['shop']);
+            $info = CTAPIShopOpenTimeBusiness::getInfoData($request, $this, $id, [], ['shop'], []);
             $range_time = '';
             $open_time = $info['open_time'] ?? '';
             $close_time = $info['close_time'] ?? '';

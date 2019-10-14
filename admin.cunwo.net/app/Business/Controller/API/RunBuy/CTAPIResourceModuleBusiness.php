@@ -11,5 +11,6 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPIResourceModuleBusiness extends BasicPublicCTAPIBusiness
 {
     public static $model_name = 'API\RunBuy\ResourceModuleAPI';
+    public static $table_name = 'resource_module';// 表名称
 
 }

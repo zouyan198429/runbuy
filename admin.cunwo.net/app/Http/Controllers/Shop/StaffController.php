@@ -83,7 +83,7 @@ class StaffController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIStaffBusiness::getInfoData($request, $this, $id, [], '');
+            $info = CTAPIStaffBusiness::getInfoData($request, $this, $id, [], '', []);
         }
         $reDataArr['adminType'] =  CTAPIStaffBusiness::$adminType;
         $reDataArr['defaultAdminType'] = $info['admin_type'] ?? -1;// 列表页默认状态

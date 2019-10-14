@@ -889,7 +889,7 @@ class CommonDB
         // 历史表需要保存的字段
         $historyData = [];// 要保存的历史记录
         $historySearchConditon = [];// 历史表查询字段
-        $ignoreFields = array_merge($ignoreFields,['id','updated_at']);
+        $ignoreFields = array_merge($ignoreFields,['id','updated_at', 'version_history_id', 'version_num_history']);
         foreach($historyColumns as $field){
             if(isset($mainObj->$field) && !in_array($field,$ignoreFields) ){
                 $historyData[$field] = $mainObj->$field;
@@ -908,7 +908,14 @@ class CommonDB
         // 查找历史表当前版本
         self::firstOrCreate($historyObj, $historySearchConditon, $historyData );
         // $historyObj = $historyObj::firstOrCreate($historySearchConditon, $historyData);
-        return $historyObj->id ;
+        $version_history_id = $historyObj->id;
+        // 如果主表有当前历史记录id,且值不等于最新的历史记录id,则更新主表当前历史记录id值
+        if(isset($mainObj->version_history_id) && $mainObj->version_history_id != $version_history_id){
+            $mainObj->version_history_id = $version_history_id;
+            if(isset($mainObj->version_num_history)) $mainObj->version_num_history = $historyObj->version_num ;
+            $mainObj->save();
+        }
+        return $version_history_id;// $historyObj->id ;
     }
 
     /**
@@ -961,7 +968,7 @@ class CommonDB
         if(empty($historyInfoObj)) return $diffArr;// 没有历史记录,不用更新版本
 
         // 忽略的比较字段
-        $ignoreFields = array_merge($ignoreFields,['id', 'created_at', 'updated_at', 'version_num', 'staff_id', 'operate_staff_id_history']);
+        $ignoreFields = array_merge($ignoreFields,['id', 'version_history_id', 'version_num_history', 'created_at', 'updated_at', 'version_num', 'staff_id', 'operate_staff_id_history']);
 
         // 比较字段
         foreach($historyColumns as $field){

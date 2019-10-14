@@ -2,6 +2,7 @@
 
 namespace App\Services\Request\API;
 
+use App\Services\DBRelation\RelationDB;
 use App\Services\Tool;
 /**
  *具体业务通用接口类--请求api--公有接口
@@ -188,6 +189,7 @@ class APIBasicRequest
         }
 
         if (!empty($relations)) {
+            $relations = RelationDB::getDBRelation($relations);// 获得关系数组,为请求api使用
             $requestData['relations'] = $relations ;
         }
         // 生成带参数的测试get请求
@@ -255,6 +257,7 @@ class APIBasicRequest
         }
 
         if (!empty($relations)) {
+            $relations = RelationDB::getDBRelation($relations);// 获得关系数组,为请求api使用
             $requestData['relations'] = $relations ;
         }
         // 生成带参数的测试get请求
@@ -606,6 +609,7 @@ class APIBasicRequest
      * @author zouyan(305463219@qq.com)
      */
     public static function ajaxGetAllList($modelName, $pageParams, $companyId = null,$queryParams='' ,$relations = '', $notLog = 0){
+        $relations = RelationDB::getDBRelation($relations);// 获得关系数组,为请求api使用
         $requestData = [
             // 'company_id' => $companyId,
             'Model_name' => $modelName, // 模型
@@ -658,6 +662,7 @@ class APIBasicRequest
      * @author zouyan(305463219@qq.com)
      */
     public static function ajaxGetQueryList($modelName, $pageParams, $companyId = null,$queryParams='' ,$relations = '', $notLog = 0){
+        $relations = RelationDB::getDBRelation($relations);// 获得关系数组,为请求api使用
         $requestData = [
             // 'company_id' => $companyId,
             'Model_name' => $modelName, // 模型
@@ -711,6 +716,7 @@ class APIBasicRequest
      */
     public static function ajaxGetList($modelName, $pageParams, $companyId = null,$queryParams='' ,$relations = '', $notLog = 0)
     {
+        $relations = RelationDB::getDBRelation($relations);// 获得关系数组,为请求api使用
         $requestData = [
             // 'company_id' => $companyId,
             'Model_name' => $modelName, // 模型

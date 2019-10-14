@@ -3,6 +3,7 @@
 namespace App\Services;
 use App\Services\Lock\RedisesLock;
 use App\Services\Lock\RedisLock;
+use App\Services\Redis\RedisString;
 use App\Services\Request\CommonRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
@@ -189,7 +190,7 @@ class Tool
      */
     public static function createOrder(){
         $yCode = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J');
-        $orderSn = $yCode[intval(date('Y')) - 2011] . strtoupper(dechex(date('m'))) . date('d') . substr(time(), -5) . substr(microtime(), 2, 5) . sprintf('%02d', rand(0, 99));
+        $orderSn = $yCode[intval(date('Y')) - 2011] . strtoupper(dechex(date('m'))) . date('d') . substr(time(), -5) . substr(microtime(), 2, 5) . sprintf('%02d', mt_rand(0, 99));
         return $orderSn;
     }
 
@@ -272,13 +273,13 @@ class Tool
         {
             try {
                 $redisKey = 'FlowSn:' . ucfirst($namespace);
-                $insertId = Redis::incr($redisKey);
+                $insertId = RedisString::incr($redisKey);// Redis::incr($redisKey);
                 foreach($expireNums as $v){
                     if(count($v) < 3) continue;
                     $orderNums = [$v[0], $v[1]];
                     $orderNums = array_values($orderNums);
                     sort($orderNums);
-                    if($insertId >= $orderNums[0] && $insertId <= $orderNums[1]) Redis::expire($redisKey, $v[2] );  #设置过期时间 单位秒数 一年  365 * 24 * 60 * 60
+                    if($insertId >= $orderNums[0] && $insertId <= $orderNums[1]) RedisString::expire($redisKey, $v[2]);// Redis::expire($redisKey, $v[2] );  #设置过期时间 单位秒数 一年  365 * 24 * 60 * 60
                 }
             } catch ( \Exception $e) {
                 throws($e->getMessage(), $e->getCode());
@@ -347,17 +348,35 @@ class Tool
         return $password;
     }
 
+    /**
+     * 此方法用于生成 唯一用于id的的，  E27B37CA-C2C7-B2C5-9FED-6FE3773E77B6
+     * 适用于大并发情况下，生成唯一id
+     * @param int $length 字符串长度
+     * @param int $type 0:纯数字, 1:数字与字母
+     * @return string  E27B37CA-C2C7-B2C5-9FED-6FE3773E77B6
+     */
+    public static function getGUID() { //32
+        if (function_exists('com_create_guid')) return trim(com_create_guid(), '{}');
+        else {
+            //mt_srand((double) microtime() * 10000);
+            $charid = strtoupper(md5(uniqid(rand(), TRUE)));
+            $result = substr($charid, 0, 8) . '-' . substr($charid, 8, 4) . '-' . substr($charid, 12, 4)
+                . '-' . substr($charid, 16, 4) . '-' . substr($charid, 20, 12);
+            return $result;
+        }
+    }
+
     //----------------- 单个redis锁-------------------
     /**
      * 获得锁对象
      *
      * @param array
-        $config =[
-            'host' => '',// 默认 localhost
-            'port' => '',// 默认 6379
-            'auth' => '',// 默认空
-            'dbNum' => 0,// 默认 0
-        ];
+     *   $config =[
+     *       'host' => '',// 默认 localhost
+     *      'port' => '',// 默认 6379
+     *      'auth' => '',// 默认空
+     *      'dbNum' => 0,// 默认 0
+     *  ];
      * @return object
      */
     public static function getLockObjBase($config = []){
@@ -523,33 +542,34 @@ class Tool
      */
     public static function setRedis($pre = '', $key = null, $value = '', $expire = 0, $operate = 1)
     {
-        if(empty($key)){
-            $key = self::createUniqueNumber(25);
-        }
-        $key = $pre . $key;
-        // 序列化保存
-        try{
-            switch($operate){
-                case 1:
-                    if(is_array($value)){
-                        $value = json_encode($value);
-                    }
-                    break;
-                case 2:
-                    $value = serialize($value);
-                    break;
-                default:
-                    break;
-            }
-            if(is_numeric($expire) && $expire > 0){
-                Redis::setex($key, $expire, $value);
-            }else{
-                Redis::set($key, $value);
-            }
-        } catch ( \Exception $e) {
-            throws('redis[' . $key . ']保存失败；信息[' . $e->getMessage() . ']');
-        }
-        return $key;
+        return RedisString::setRedis($pre, $key, $value, $expire, $operate);
+//        if(empty($key)){
+//            $key = self::createUniqueNumber(25);
+//        }
+//        $key = $pre . $key;
+//        // 序列化保存
+//        try{
+//            switch($operate){
+//                case 1:
+//                    if(is_array($value)){
+//                        $value = json_encode($value);
+//                    }
+//                    break;
+//                case 2:
+//                    $value = serialize($value);
+//                    break;
+//                default:
+//                    break;
+//            }
+//            if(is_numeric($expire) && $expire > 0){
+//                Redis::setex($key, $expire, $value);
+//            }else{
+//                Redis::set($key, $value);
+//            }
+//        } catch ( \Exception $e) {
+//            throws('redis[' . $key . ']保存失败；信息[' . $e->getMessage() . ']');
+//        }
+//        return $key;
     }
 
     /**
@@ -561,23 +581,24 @@ class Tool
      */
     public static function getRedis($key, $operate = 1)
     {
-        $value = Redis::get($key);
-        if(is_bool($value) || is_null($value)){//string或BOOL 如果键不存在，则返回 FALSE。否则，返回指定键对应的value值。
-            return false;
-        }
-        switch($operate){
-            case 1:
-                if (!self::isNotJson($value)) {
-                    $value = json_decode($value, true);
-                }
-                break;
-            case 2:
-                $value = unserialize($value);
-                break;
-            default:
-                break;
-        }
-        return $value;
+        return RedisString::getRedis($key, $operate);
+//        $value = Redis::get($key);
+//        if(is_bool($value) || is_null($value)){//string或BOOL 如果键不存在，则返回 FALSE。否则，返回指定键对应的value值。
+//            return false;
+//        }
+//        switch($operate){
+//            case 1:
+//                if (!self::isNotJson($value)) {
+//                    $value = json_decode($value, true);
+//                }
+//                break;
+//            case 2:
+//                $value = unserialize($value);
+//                break;
+//            default:
+//                break;
+//        }
+//        return $value;
 
     }
     /**
@@ -588,7 +609,8 @@ class Tool
      */
     public static function delRedis($key)
     {
-        return Redis::del($key);
+        return RedisString::del($key);
+//        return Redis::del($key);
     }
 
 
@@ -698,6 +720,40 @@ class Tool
 
     // 数组操作
     /**
+     * 判断数组是否是二维数组
+     *
+     * @param array $dataList 源数据 一/二维数组
+     * @param boolean $convertMultiArr 如果是一维数组，是否转为二维数组 false:不转;true:转(注意空一维数组不会处理)
+     * @return boolean true:原数组是二维数组；false:原数组是一维数组或空数组
+     */
+    public static function isMultiArr(&$dataList, $convertMultiArr = false){
+        $isMultiArr = false; // true:二维;false:一维
+        foreach($dataList as $k => $v){
+            if(is_array($v)){
+                $isMultiArr = true;
+            }
+            break;
+        }
+        // 一维
+        if(!$isMultiArr && $convertMultiArr) $dataList = [$dataList];
+        return $isMultiArr;
+    }
+
+    /**
+     * 一/二维数组中指定某个字段的值 为 一维数组
+     *
+     * @param array $array 源数据 一/二维数组
+     * @param string $uboundField 字段名称下标
+     * @return array 一维数组
+     */
+    public static function getArrFields($array, $uboundField){
+        // 如果是一维数组,则转为二维数组
+        static::isMultiArr($array, true);
+        $fieldArr = array_column($array, $uboundField);
+        return $fieldArr;
+    }
+
+    /**
      * 二维数组中每个一维数组追加指定的一维数组值
      *
      * @param array $dataList 源数据 二维数组
@@ -751,9 +807,9 @@ class Tool
 
 
     /**
-     * 二维数组指定下标的值为下标,指定下标的值为值，的一维数组
+     * 一/二维数组指定下标的值为下标,指定下标的值为值，的一维数组
      *
-     * @param array $array 二维数组
+     * @param array $array 一/二维数组
      * @param string $uboundkey 值做为新数组的键的下标
      * @param string $uboundValKey 值做为新数组的键的下标
      * @return array 一维数组
@@ -761,6 +817,8 @@ class Tool
     public static function formatArrKeyVal($array, $keyUbound, $valUbound){
         $reArr = [];
         if (! is_array($array)) return $reArr;
+        // 如果是一维数组,则转为二维数组
+        static::isMultiArr($array, true);
         foreach ($array as $v) {
             if( !isset($v[$keyUbound]) || !isset($v[$valUbound])) continue;
             $reArr[$v[$keyUbound]] = $v[$valUbound];
@@ -792,16 +850,129 @@ class Tool
     }
 
     /**
-     * 二维数组返回指定下标数组的新的二维维数组,-以原数组下标为准，
+     * 一/二维数组返回指定下标数组的新的二维维数组,-以原数组下标为准，
      *
-     * @param array $array 二维数组
+     * @param array $array 一/二维数组
      * @param array $keys 要获取的下标数组 -维[ '新下标名' => '原下标名' ]
      * @param boolean $needNotIn  keys在数组中不存在的，false:不要，true：空值
-     * @return array 一维数组
+     * @return array 一/二维数组
      */
     public static function formatTwoArrKeys(&$array, $keys, $needNotIn = false){
+
+        // 如果是一维数组
+        if (!static::isMultiArr($array)){
+            self::formatArrKeys($array, $keys, $needNotIn );
+            return $array;
+        }
+
         foreach($array as $k => $v){
             self::formatArrKeys($array[$k], $keys, $needNotIn );
+        }
+        return $array;
+    }
+
+    /**
+     * [取指下下标、排除指定下标、修改下标名称]
+     * 一/二维数组返回指定下标数组的新的二维维数组或修改数组的下标名,-以原数组下标为准，
+     *  参数的意思请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+     * @param array $data_list 一/二维数组
+     * @param array $temFormatData // 格式化，为空，则不操作。
+     *       [    // 格式化数据 具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+     *           'needNotIn' => true, // keys在数组中不存在的，false:不要，true：空值 -- 用true的时候多
+     *           'includeUboundArr' => [],// 要获取的下标数组 [优先]--一维数组，可为空[ '新下标名' => '原下标名' ]  Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile'])
+     *           'exceptUboundArr' => [], // 要排除的下标数组 --一维数组，可为空[ '原下标名' ,....]
+     *       ]
+     * @return array 一/二维数组
+     */
+    public static function formatArrUboundDo(&$data_list, $temFormatData){
+        if(!empty($temFormatData) && is_array($temFormatData)){
+            $temNeedNotIn = $temFormatData['needNotIn'] ?? true;
+            $temIncludeUboundArr = $temFormatData['includeUboundArr'] ?? [];
+            $temExceptUboundArr = $temFormatData['exceptUboundArr'] ?? [];
+            static::formatArrUbound($data_list, $temNeedNotIn, $temIncludeUboundArr , $temExceptUboundArr);
+        }
+        return $data_list;
+    }
+
+    /**
+     * 一/二维数组返回指定下标数组的新的二维维数组或修改数组的下标名,-以原数组下标为准，
+     *  两个下标数组都不为空时，把排除数组中在包含数据中的去掉作为排除下标
+     *  只有包含，则只返回包含的:
+     * 只有排除的，则去除排除的；如果此时有包含的，则把包含的也加到,再去排除下标
+     *   1、仅包含--仅包含下标有值；
+     *   Tool::formatArrUbound($data_list, true, Tool::arrEqualKeyVal(['id', 'table_person_id', 'table_name', 'person_name']), []);
+     *   2仅排除--仅排除下标有值；
+     *   Tool::formatArrUbound($data_list, true, [], ['id', 'table_person_id', 'table_name', 'person_name']);
+     *   4先加入包含的，再排除去掉-加入些,排除些，修改一些下标名，并排除一些字段是很有用-- 两个下标都有值；   8包含中的，再去除排除的---没必要处理--可直接用仅包含
+     *    修改一些下标名，并排除一些字段是很有用-
+     * Tool::formatArrUbound($data_list, true, ['data_id' => 'id', 'person_id' => 'table_person_id', 'tablename' => 'table_name', 'personname' => 'person_name'], ['id', 'table_person_id', 'table_name', 'person_name']);
+     *   或
+            $changeUbound = ['data_id' => 'id', 'person_id' => 'table_person_id', 'tablename' => 'table_name', 'personname' => 'person_name'];
+            Tool::formatArrUbound($data_list, true, $changeUbound , array_values($changeUbound));
+     * @param array $array 一/二维数组
+     * @param boolean $needNotIn  keys在数组中不存在的，false:不要，true：空值 -- 用true的时候多
+     * @param array $includeUboundArr 要获取的下标数组 [优先]--一维数组，可为空[ '新下标名' => '原下标名' ]  Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile'])
+     * @param array $exceptUboundArr 要排除的下标数组 --一维数组，可为空[ '原下标名' ,....]
+     * @return array 一/二维数组
+     */
+    public static function formatArrUbound(&$array, $needNotIn = false, $includeUboundArr = [], $exceptUboundArr = []){
+        if(empty($array) || !is_array($array)) return $array;
+
+        // 下标数组，不是数组，则转为空数组
+        if(!is_array($includeUboundArr))  $includeUboundArr = [];
+        if(!is_array($exceptUboundArr))  $exceptUboundArr = [];
+
+        // 下标数组都为空，则直接返回
+        if(empty($includeUboundArr) && empty($exceptUboundArr))  return $array;
+
+        $operateType = 0;
+        if(!empty($includeUboundArr) ){
+            if(!empty($exceptUboundArr)){
+                $operateType = 4;
+            }else{
+                $operateType = 1;
+            }
+        }else{
+            $operateType = 2;
+        }
+
+        // 原数据中的下标
+        $dataUbounds = [];
+        if( !static::isMultiArr($array) ){// 一维数组
+            $dataUbounds = array_keys($array);
+        }else{
+            foreach($array as $info){
+                if(is_array($info)) $dataUbounds = array_keys($info);
+                break;
+            }
+        }
+
+        // 原下标为空，则直接返回
+        // if(empty($dataUbounds)) return $array;
+
+        switch($operateType) {
+            case 1:// 1、仅包含；
+                static::formatTwoArrKeys($array, $includeUboundArr, $needNotIn);
+                break;
+            case 2://  2仅排除；
+                $realUbound = array_values(array_diff($dataUbounds, $exceptUboundArr));
+                if(empty($realUbound)){// 下标都移除完了，自然为空数组了
+                    $array = [];
+                    return $array;
+                }
+                $realUbound = static::arrEqualKeyVal($realUbound);// 一维数组转换为键值相同的一维数组
+                static::formatTwoArrKeys($array, $realUbound, $needNotIn);
+                break;
+            case 4:// 4先加入包含的，再排除去掉-加入些,排除些，修改一些下标名，并排除一些字段是很有用-
+                $realUbound = $dataUbounds;
+                $realUbound = static::arrEqualKeyVal($realUbound);// 一维数组转换为键值相同的一维数组
+                $realUbound = array_merge($realUbound, $includeUboundArr);
+                $exceptUboundArrTem = static::arrEqualKeyVal($exceptUboundArr);
+                $realUbound = array_diff_key($realUbound, $exceptUboundArrTem);
+                static::formatTwoArrKeys($array, $realUbound, $needNotIn);
+                break;
+            default:
+                break;
         }
         return $array;
     }
@@ -2056,4 +2227,248 @@ class Tool
         }
         return true;
     }
+
+    /**
+     * 将字符串转换成二进制
+     * @param type $str
+     * @return type
+     */
+    public static function StrToBin($str){
+        //1.列出每个字符
+        $arr = preg_split('/(?<!^)(?!$)/u', $str);
+        //2.unpack字符
+        foreach($arr as &$v){
+            $temp = unpack('H*', $v);
+            $v = base_convert($temp[1], 16, 2);
+            unset($temp);
+        }
+
+        return join(' ',$arr);
+    }
+
+    /**
+     * 将二进制转换成字符串
+     * @param type $str
+     * @return type
+     */
+    public static function BinToStr($str){
+        $arr = explode(' ', $str);
+        foreach($arr as &$v){
+            $v = pack("H".strlen(base_convert($v, 2, 16)), base_convert($v, 2, 16));
+        }
+        return join('', $arr);
+    }
+
+    /**
+     * 生成随机数--都小于0，则不生成随机数 [] 想要一个介于 10 和 100 之间（包括 10 和 100）的随机整数，请使用 mt_rand (10,100)。
+     * @param int $mix  生成随机数的最小数 , 都小于0，则不生成随机数
+     * @param int $max  生成随机数的最大数
+     * @return string
+     */
+    public static function getRandNum($mix = 0, $max = 10000){
+        $randNum = '';
+        if(is_numeric($mix) &&  is_numeric($max) && $mix >= 0 && $max >=0 && $max >= $mix){
+            $randNum = mt_rand($mix, $max);
+        }
+        return $randNum;
+    }
+
+    /**
+     * 生成md5随机数（防重放）
+     * @param string $nonce 重放字符，为空则为 time()
+     * @param int $mix  生成随机数的最小数 , 都小于0，则不生成随机数
+     * @param int $max  生成随机数的最大数
+     * @param array 需要执行的加密操作,下标顺序代表执行顺序
+     *   $secureTypeArr = [
+     *        'md5' => [],// md5加密
+     *        'sha1' => [],// sha1加密
+     *       'hmac-md5' => ['key' => '', 'raw_output' => false],// sha1加密
+     *       'hmac-sha1' => ['key' => '', 'raw_output' => false],// sha1加密
+     *       'hmac-sha256' => ['key' => '', 'raw_output' => false],// sha1加密
+     *   ];
+     *   // 都可能会有的参数,下标顺序代表执行顺序
+     *   [
+     *        'operates' => ['base64','strtoupper','strtolower','urlencode', 'urldecode'],
+     *   ];
+     * @return string
+     */
+    public static function createNonce($nonce = '', $mix = 0, $max = 10000, $secureTypeArr = false)
+    {
+        if(!is_string($nonce) || strlen($nonce) <= 0)  $nonce = time();
+
+        // 后面加随机数
+        $nonce .= static::getRandNum($mix, $max);
+
+        $nonce = static::secureOperate($nonce, $secureTypeArr);
+        return $nonce;
+    }
+
+    /**
+     * 数据加密
+     * @param string $str 需要加密的数据
+     * @param array 需要执行的加密操作,下标顺序代表执行顺序
+     *   $secureTypeArr = [
+     *        'md5' => [],// md5加密
+     *        'sha1' => [],// sha1加密
+     *       'hmac-md5' => ['key' => '', 'raw_output' => false],// sha1加密
+     *       'hmac-sha1' => ['key' => '', 'raw_output' => false],// sha1加密
+     *       'hmac-sha256' => ['key' => '', 'raw_output' => false],// sha1加密
+     *   ];
+     *   // 都可能会有的参数,下标顺序代表执行顺序
+     *   [
+     *        'operates' => ['base64','strtoupper','strtolower','urlencode', 'urldecode'],
+     *   ];
+     * @return string
+     */
+    public static function secureOperate($str, $secureTypeArr = []){
+        // 签名类型1 md5 ; 2 sha1 ; 3 hash_hmac
+        foreach($secureTypeArr as $k => $info){
+            $operates = $info['operates'] ?? [];
+            if(!is_array($operates)) $operates = [];
+
+            $key = $info['key'] ?? '';
+            $raw_output = $info['raw_output'] ?? false;
+            if(!is_bool($raw_output)) $raw_output = false;
+            switch ($k)
+            {
+                case 'md5':// 1 md5 ;
+                    $str = md5($str);
+                    break;
+                case 'sha1'://  2 sha1 ;
+                    $str = sha1($str);
+                    break;
+                case 'hmac-md5':// 3 hash_hmac-- md5
+//                    $str = hash_hmac("md5", $str, $appsecret, true);// 原始二进制数据
+                    $str = hash_hmac("md5", $str, $key, $raw_output);// 原始二进制数据
+                    break;
+                case 'hmac-sha1':// 4 hash_hmac-- sha1
+//                    $str = hash_hmac("sha1", $str, $appsecret, true);// 原始二进制数据
+                    $str = hash_hmac("sha1", $str, $key, $raw_output);// 原始二进制数据
+                    break;
+                case 'hmac-sha256':// 5 hash_hmac-- sha256
+//                    $str = hash_hmac("sha256", $str, $appsecret, true);// 原始二进制数据
+                    $str = hash_hmac("sha256", $str, $key, $raw_output);// 原始二进制数据
+                    break;
+                default:
+//                    $str = md5($str);
+                    break;
+            }
+            // 数据格式处理
+            $str = static::secureStrOperate($str, $operates);
+        }
+        return $str;
+    }
+
+    /**
+     * 数据加密
+     * @param string $str 需要加密的数据
+     * @param array 都可能会有的参数,下标顺序代表执行顺序
+     *   $operates =
+     *   [
+     *        'operates' => ['base64','strtoupper','strtolower','urlencode', 'urldecode'],
+     *   ];
+     * @return string
+     */
+    public static function secureStrOperate($str, $operates = []){
+
+        // ['base64','strtoupper','strtolower','urlencode']
+        foreach($operates as $op_v){
+            switch ($op_v)
+            {
+                case 'base64':
+                    $str = base64_encode($str);
+                    break;
+                case 'strtoupper':
+                    $str = strtoupper($str);
+                    break;
+                case 'strtolower':
+                    $str = strtolower($str);
+                    break;
+                case 'urlencode':
+                    $str = urlencode($str);
+                    break;
+                case 'urldecode':
+                    $str = urldecode($str);
+                    break;
+                default:
+//                    $str = md5($str);
+                    break;
+            }
+        }
+        return $str;
+    }
+
+    /**
+     * @desc redis保存数据时，对数据进行序列化或格式化操作
+     * @param array $array 一/二维数组
+     * @param int $doType 操作类型 1 序列化 ;2返序列化或返解析
+     * @param int  $operate  操作类型 操作 1 转为json 2 序列化 3 不转换
+     * @return  mixed 处理好的的数据 一/二维数组
+     */
+    public static function dataFormatBath(&$array, $doType = 1, $operate = 3)
+    {
+        if (! is_array($array) || empty($array)) return $array;
+        // 如果是一维数组,则转为二维数组
+        $isMulti = static::isMultiArr($array, true);
+        foreach ($array as $key => $v) {
+            switch($doType){
+                case 1:
+                    $array[$key] = static::dataFormat($v, $operate);
+                    break;
+                case 2:
+                    $array[$key] = static::dataResolv($v, $operate);
+                    break;
+                default:
+                    break;
+            }
+        };
+        if(!$isMulti) $array = $array[0] ?? [];
+        return $array;
+    }
+
+    /**
+     * @desc redis保存数据时，对数据进行序列化或格式化操作
+     * @param mixed $value  需要处理的数据
+     * @param int  $operate  操作类型 操作 1 转为json 2 序列化 3 不转换
+     * @return  string 处理好的的数据
+     */
+    public static function dataFormat(&$value, $operate){
+
+        switch($operate){
+            case 1:
+                if(is_array($value)){
+                    $value = json_encode($value);
+                }
+                break;
+            case 2:
+                $value = serialize($value);
+                break;
+            default:
+                break;
+        }
+        return $value;
+    }
+
+    /**
+     * @desc 解析数据 返回redis保存数据，对数据进行反序列化或解析格式化操作
+     * @param mixed $value  需要处理的数据
+     * @param int  $operate  操作类型 操作 1 转为json 2 序列化 3 不转换
+     * @return  string 处理好的的数据
+     */
+    public static function dataResolv(&$value, $operate){
+        switch($operate){
+            case 1:
+                if (!static::isNotJson($value)) {
+                    $value = json_decode($value, true);
+                }
+                break;
+            case 2:
+                $value = unserialize($value);
+                break;
+            default:
+                break;
+        }
+        return $value;
+    }
+
 }

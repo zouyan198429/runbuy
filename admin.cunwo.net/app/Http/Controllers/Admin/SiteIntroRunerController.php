@@ -61,7 +61,7 @@ class SiteIntroRunerController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPISiteIntroRunerBusiness::getInfoData($request, $this, $id, [], '');
+            $info = CTAPISiteIntroRunerBusiness::getInfoData($request, $this, $id, [], '', []);
         }
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         $reDataArr['info'] = $info;
@@ -89,7 +89,7 @@ class SiteIntroRunerController extends WorksController
         ];
 
         if ($id > 0) { // 获得详情数据
-            $infoDatas =CTAPISiteIntroRunerBusiness::getInfoData($request, $this, $id, [], ['oprateStaffHistory']);
+            $infoDatas =CTAPISiteIntroRunerBusiness::getInfoData($request, $this, $id, [], ['oprateStaffHistory'], []);
             // 修改点击点
             $id = $infoDatas['id'] ??  0;
             $volume = $infoDatas['volume'] ??  0;
@@ -103,10 +103,10 @@ class SiteIntroRunerController extends WorksController
         $reDataArr['info'] = $infoDatas;
 
         // 上一条
-        $preList = CTAPISiteIntroRunerBusiness::getNearList($request, $this, $id, 1, 1, 0, [], '');
+        $preList = CTAPISiteIntroRunerBusiness::getNearList($request, $this, $id, 1, 1, 0, [], '', []);
         $reDataArr['preList'] = $preList;
         // 下一条
-        $nextList = CTAPISiteIntroRunerBusiness::getNearList($request, $this, $id, 2, 1, 0, [], '');
+        $nextList = CTAPISiteIntroRunerBusiness::getNearList($request, $this, $id, 2, 1, 0, [], '', []);
         $reDataArr['nextList'] = $nextList;
         return view('manage.notice.info', $reDataArr);
     }

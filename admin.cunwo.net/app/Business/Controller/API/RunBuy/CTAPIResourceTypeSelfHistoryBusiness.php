@@ -11,5 +11,6 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPIResourceTypeSelfHistoryBusiness extends CTAPIResourceTypeSelfBusiness
 {
     public static $model_name = 'API\RunBuy\ResourceTypeSelfHistoryAPI';
+    public static $table_name = 'resource_type_self_history';// 表名称
 
 }

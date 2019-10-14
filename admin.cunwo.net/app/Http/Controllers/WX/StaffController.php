@@ -32,7 +32,7 @@ class StaffController extends BaseController
     public function ajax_info(Request $request){
         $this->InitParams($request);
         $id = $this->user_id;
-        $info = CTAPIStaffBusiness::getInfoData($request, $this, $id, [], ['cityinfo', 'face', 'back']);// , ['city']
+        $info = CTAPIStaffBusiness::getInfoData($request, $this, $id, [], ['cityinfo', 'face', 'back'], []);// , ['city']
 
 
         $city_id = 0;

@@ -60,7 +60,7 @@ class SellerController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPISellerBusiness::getInfoData($request, $this, $id, [], ['sellerCityPartner']);
+            $info = CTAPISellerBusiness::getInfoData($request, $this, $id, [], ['sellerCityPartner'], []);
             $intro = $info['intro'] ?? '';
             $info['intro'] = replace_enter_char($intro,2);
         }else{

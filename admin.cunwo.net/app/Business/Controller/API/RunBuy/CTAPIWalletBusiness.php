@@ -11,4 +11,5 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPIWalletBusiness extends BasicPublicCTAPIBusiness
 {
     public static $model_name = 'API\RunBuy\WalletAPI';
+    public static $table_name = 'wallet';// 表名称
 }

@@ -38,10 +38,10 @@ function needCLodop(){
 //====页面引用CLodop云打印必须的JS文件：====
 if (needCLodop()) {
     //让其它电脑的浏览器通过本机打印（适用例子）：
-    oscript = document.createElement("script");
-    oscript.src ="/CLodopfuncs.js";
-    var head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
-    head.insertBefore( oscript,head.firstChild );
+    // oscript = document.createElement("script");
+    // oscript.src ="/CLodopfuncs.js";
+    // var head = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
+    // head.insertBefore( oscript,head.firstChild );
     //让本机浏览器打印(更优先)：
     var oscript = document.createElement("script");
     oscript.src ="http://localhost:8000/CLodopfuncs.js?priority=1";

@@ -11,5 +11,6 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPIReminderBusiness extends BasicPublicCTAPIBusiness
 {
     public static $model_name = 'API\RunBuy\ReminderAPI';
+    public static $table_name = 'reminder';// 表名称
 
 }

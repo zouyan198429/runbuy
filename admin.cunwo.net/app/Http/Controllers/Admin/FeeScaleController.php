@@ -67,7 +67,7 @@ class FeeScaleController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIFeeScaleBusiness::getInfoData($request, $this, $id, [], ['city']);
+            $info = CTAPIFeeScaleBusiness::getInfoData($request, $this, $id, [], ['city'], []);
         }else{
             if($city_site_id > 0 ){
                 $cityInfo = CTAPICityBusiness::getInfoHistoryId($request, $this, $city_site_id, []);
@@ -101,7 +101,7 @@ class FeeScaleController extends WorksController
         ];
 
         if ($id > 0) { // 获得详情数据
-            $infoDatas =CTAPIFeeScaleBusiness::getInfoData($request, $this, $id, [], ['oprateStaffHistory']);
+            $infoDatas =CTAPIFeeScaleBusiness::getInfoData($request, $this, $id, [], ['oprateStaffHistory'], []);
             // 修改点击点
             $id = $infoDatas['id'] ??  0;
             $volume = $infoDatas['volume'] ??  0;
@@ -115,10 +115,10 @@ class FeeScaleController extends WorksController
         $reDataArr['info'] = $infoDatas;
 
         // 上一条
-        $preList = CTAPIFeeScaleBusiness::getNearList($request, $this, $id, 1, 1, 0, [], '');
+        $preList = CTAPIFeeScaleBusiness::getNearList($request, $this, $id, 1, 1, 0, [], '', []);
         $reDataArr['preList'] = $preList;
         // 下一条
-        $nextList = CTAPIFeeScaleBusiness::getNearList($request, $this, $id, 2, 1, 0, [], '');
+        $nextList = CTAPIFeeScaleBusiness::getNearList($request, $this, $id, 2, 1, 0, [], '', []);
         $reDataArr['nextList'] = $nextList;
         return view('manage.feeScale.info', $reDataArr);
     }

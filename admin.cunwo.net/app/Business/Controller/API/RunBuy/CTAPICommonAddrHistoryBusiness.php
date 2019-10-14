@@ -11,5 +11,6 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPICommonAddrHistoryBusiness extends CTAPICommonAddrBusiness
 {
     public static $model_name = 'API\RunBuy\CommonAddrHistoryAPI';
+    public static $table_name = 'common_addr_history';// 表名称
 
 }

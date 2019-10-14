@@ -65,7 +65,7 @@ class PropController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIPropBusiness::getInfoData($request, $this, $id, [], ['propVals.name', 'name', 'shop']);// , 'seller'
+            $info = CTAPIPropBusiness::getInfoData($request, $this, $id, [], ['propVals.name', 'name', 'shop'], []);// , 'seller'
 //             pr($info);
         }else{
             if($shop_id > 0 ){

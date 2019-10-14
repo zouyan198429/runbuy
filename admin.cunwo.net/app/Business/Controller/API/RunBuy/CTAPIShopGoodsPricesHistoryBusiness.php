@@ -12,5 +12,6 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPIShopGoodsPricesHistoryBusiness extends CTAPIShopGoodsPricesBusiness
 {
     public static $model_name = 'API\RunBuy\ShopGoodsPricesHistoryAPI';
+    public static $table_name = 'shop_goods_prices_history';// 表名称
 
 }

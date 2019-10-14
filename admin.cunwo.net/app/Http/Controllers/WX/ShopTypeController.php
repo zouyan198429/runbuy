@@ -31,7 +31,7 @@ class ShopTypeController extends BaseController
         // $this->InitParams($request);
         if(!is_numeric($id) || $id <=0) return ajaxDataArr(0, null, '参数[id]有误！');
 
-        $info = CTAPIShopTypeBusiness::getInfoData($request, $this, $id, [], [ 'siteResources']);// , ['city']
+        $info = CTAPIShopTypeBusiness::getInfoData($request, $this, $id, [], [ 'siteResources'], []);// , ['city']
         $info['resource_url'] = $info['resource_list'][0]['resource_url'] ?? '';
         // if(isset($info['resource_list']))  unset($info['resource_list']);
         return ajaxDataArr(1, $info, '');

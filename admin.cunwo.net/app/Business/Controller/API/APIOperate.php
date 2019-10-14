@@ -17,6 +17,7 @@ use App\Http\Controllers\BaseController as Controller;
 class APIOperate
 {
     public static $model_name = '';// 中间层 App\Business\API 下面的表名称 API\RunBuy\CountSenderRegAPI
+    public static $table_name = '';// 表名称
 
     // 根据数据模型名称，返回数据中间层对象
 //    public static function getBusinessAPIObjByModelName($modelName, &$modelObj = null){
@@ -574,5 +575,27 @@ class APIOperate
         ];
         $infoHistory = static::exeDBBusinessMethodCT($request, $controller, '', 'getInfoHistoryId', $apiParams, $company_id, $notLog);
         return $infoHistory;
+    }
+
+
+    /**
+     * 获得扩展配置信息
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param string $pageKey  配置关键字下标
+     * @param string $funKey  功能关键字下标 -- 可为空:不返回功能配置，返回页面配置
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 配置数据
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getExtendParamsConfig(Request $request, Controller $controller, $pageKey = '', $funKey = '', $notLog = 0)
+    {
+        if (empty($pageKey)) return [];
+        $extParams = [];// 具体配置内容
+        $pageConfig = $extParams[$pageKey] ?? [];
+        if(empty($funKey)) return $pageConfig;
+
+        return $pageConfig[$funKey] ?? [];
     }
  }

@@ -151,11 +151,12 @@ function nullToEmpty($params){
 }
 
 function getErrArr($msg = '', $code = null, $data = null){
-    return [
+    $returnDataArr = [
         'code' => ($code === null) ? (config('public.apiErrorCode')) : $code,
         'msg'  => $msg,
         'data' => $data,
     ];
+    return jsonAPIFormatData($returnDataArr);// 接口json返回数据
 }
 
 function errorArray($msg = '', $code = null, $data = null)
@@ -166,16 +167,19 @@ function errorArray($msg = '', $code = null, $data = null)
 function errorJson($msg = '', $code = null, $data = null)
 {
     $resp = getErrArr($msg, $code, $data);
+    if(!is_array($resp)) return $resp;
     return toJSON($resp);
 }
 
 
 function getOkArr($data = null, $code = null){
-    return [
+
+    $returnDataArr = [
         'code' => ($code === null) ? (config('public.apiSuccesCode')) : $code,
         'msg'  => 'success',
         'data' => $data,
     ];
+    return jsonAPIFormatData($returnDataArr);// 接口json返回数据
 }
 
 function okJson($data = null, $code = null)
@@ -227,7 +231,45 @@ function outputJson($resp)
 // ajax返回正确数组
 function ajaxDataArr($status = 0, $data = [], $errorMsg = '')
 {
-    return ['apistatus' => $status, 'result' => $data, 'errorMsg' => $errorMsg];
+    $returnDataArr = ['apistatus' => $status, 'result' => $data, 'errorMsg' => $errorMsg];
+    return jsonAPIFormatData($returnDataArr);// 接口json返回数据
+}
+
+// 接口json返回数据
+function jsonAPIFormatData($returnDataArr)
+{
+    /**
+     *
+     *  JSON响应
+     *  json 方法会自动将 Content-Type 头设置为 application/json，并使用 PHP 函数 json_encode 方法将给定数组转化为 JSON 格式数据：
+     *
+     *  return response()->json([
+     *  'name' => 'Abigail',
+     *  'state' => 'CA'
+     *  ]);
+     *
+     *
+     *  如果你想要创建一个 JSONP 响应，可以在 json 方法之后调用 withCallback 方法：
+     *
+     *  return response()
+     *  ->json(['name' => 'Abigail', 'state' => 'CA'])
+     *  ->withCallback($request->input('callback'));
+     *  或者直接使用 jsonp 方法：
+     *
+     *  return response()
+     *  ->jsonp($request->input('callback'), ['name' => 'Abigail', 'state' => 'CA']);
+     *
+     */
+    $callback = request('callback', '');// 是否jsonp的方式
+
+    // 是jsonp的方式
+    if(is_string($callback) && strlen($callback) > 0){
+//        exit($callback . '(' . json_encode($returnDataArr) . ')'); // -- 原生php方式
+//        return $callback . '(' . json_encode($returnDataArr) . ')'; // -- 原生php方式
+        return response()->jsonp($callback, $returnDataArr);
+    }
+    // 正常方式
+    return $returnDataArr;
 }
 
 function setSessionByTag($key, $field, $value)
@@ -382,7 +424,7 @@ function showPage($totalpg, $pg = 1, $record = 0,$showpage = 9,$show_num = 0)
 }
 
 /**
- * 循环创建目录
+ * 循环创建目录---用这个
  *
  * @param string $dir 待创建的目录
  * @param  $mode 权限 需要注意一点，权限值最好使用八进制表示，即“0”开头，而且一定不要加引号。
@@ -394,6 +436,29 @@ function makeDir($dir, $mode = 0777) {
     if (!makeDir(dirname($dir), $mode))
         return false;
     return @mkdir($dir, $mode);
+}
+
+/**
+ *
+ * 创建目录，支持递归创建目录
+ * @param String $dirName 要创建的目录
+ * @param int $mode 目录权限
+ */
+function smkdir($dirName , $mode = 0777) {
+    $dirs = explode('/' , str_replace('\\' , '/' , $dirName));
+    $dir = '';
+    foreach ($dirs as $part) {
+        $dir .= $part . '/';
+        if ( ! is_dir($dir) && strlen($dir) > 0) {
+            if ( ! mkdir($dir , $mode)) {
+                return false;
+            }
+            if ( ! chmod($dir , $mode)) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 /**
@@ -652,5 +717,71 @@ if ( ! function_exists('day_format_time'))
         }else{
             return strtotime(date('Y-m-d',$unix_time)) + 60*60*24*(1+$day);//<;当天结束
         }
+    }
+}
+
+/**
+ *
+ * PHP 的笛卡尔积算法实现 https://www.ruoxiaozh.com/blog/article/55
+ * @details概念
+ * 在数学中，两个集合X和Y的笛卡儿积（Cartesian product），又称直积，表示为 X × Y。设A、B是任意两个集合，
+ * 在集合A中任意取一个元素x，在集合B中任意取一个元素y，组成一个有序对（x，y），把这样的有序对作为新的元素，
+ * 他们的全体组成的集合称为集合A和集合B的直积，记为A×B，即 A×B={（x，y）|x∈A且y∈B}。
+ * 假设集合 A={a, b}，集合 B={0, 1, 2}，则两个集合的笛卡尔积为 {(a, 0), (a, 1), (a, 2), (b, 0), (b, 1), (b, 2)}。
+ * 举例
+ * 给出三个域：
+ * D1 = { 张清玫，刘逸 }
+ * D2 = {计算机专业，信息专业}
+ * D3 = {李勇，刘晨，王敏}
+ * 则 D1，D2，D3 的笛卡尔积 D = D1×D2×D3，等于：
+ * {
+ *    (张清玫, 计算机专业, 李勇),
+ *    (张清玫, 计算机专业, 刘晨),
+ *    (张清玫, 计算机专业, 王敏),
+ *    (张清玫, 信息专业, 李勇),
+ *    (张清玫, 信息专业, 刘晨),
+ *    (张清玫, 信息专业, 王敏),
+ *    (刘逸, 计算机专业, 李勇),
+ *   (刘逸, 计算机专业, 刘晨),
+ *    (刘逸, 计算机专业, 王敏),
+ *   (刘逸, 信息专业, 李勇),
+ *   (刘逸, 信息专业, 刘晨),
+ *   (刘逸, 信息专业, 王敏)
+ * }
+ * 这样就把D1、D2、D3这三个集合中的每个元素加以对应组合，形成庞大的集合群。
+ * 本个例子中的D中就会有 2X2X3=12 个元素，如果一个集合有1000个元素，有这样3个集合，他们的笛卡尔积所组成的新集合会达到十亿个元素。
+ * 假若某个集合是无限集，那么新的集合就将是有无限个元素。
+ * @return array
+ *
+ */
+if ( ! function_exists('Descartes')) {
+    function Descartes()
+    {
+        $t = func_get_args();                                    // 获取传入的参数
+        if (func_num_args() == 1) {                               // 判断参数个数是否为1
+            return call_user_func_array(__FUNCTION__, $t[0]);  // 回调当前函数，并把第一个数组作为参数传入
+        }
+
+        $a = array_shift($t);        // 将 $t 中的第一个元素移动到 $a 中，$t 中索引值重新排序
+        if (!is_array($a)) {
+            $a = [$a];
+        }
+
+        $a = array_chunk($a, 1);     // 分割数组 $a ，为每个单元1个元素的新数组
+        do {
+            $r = [];
+            $b = array_shift($t);
+            if (!is_array($b)) {
+                $b = [$b];
+            }
+            foreach ($a as $p) {
+                foreach (array_chunk($b, 1) as $q) {
+                    $r[] = array_merge($p, $q);
+                }
+            }
+            $a = $r;
+        } while ($t);
+
+        return $r;
     }
 }

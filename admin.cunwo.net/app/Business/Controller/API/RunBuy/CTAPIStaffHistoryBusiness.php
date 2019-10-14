@@ -11,4 +11,5 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPIStaffHistoryBusiness extends CTAPIStaffBusiness
 {
     public static $model_name = 'API\RunBuy\StaffHistoryAPI';
+    public static $table_name = 'staff_history';// 表名称
 }

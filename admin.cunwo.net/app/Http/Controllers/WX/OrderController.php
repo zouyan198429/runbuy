@@ -100,7 +100,7 @@ class OrderController extends BaseController
             case 2:// 2 待接单的订单-- 所有的订单
                 $oprateBit = 1;
 
-                $staffInfo = CTAPIStaffBusiness::getInfoData($request, $this, $user_id, ['city_site_id'],'' );// , ['city']
+                $staffInfo = CTAPIStaffBusiness::getInfoData($request, $this, $user_id, ['city_site_id'],'', []);// , ['city']
 
                 $requestParams['city_site_id'] = $staffInfo['city_site_id'] ?? 0;
                 $requestParams['send_staff_id'] = 0;
@@ -269,7 +269,7 @@ class OrderController extends BaseController
                 break;
             case 2:// 2 待接单的订单
 
-                $staffInfo = CTAPIStaffBusiness::getInfoData($request, $this, $user_id, ['city_site_id'],'' );// , ['city']
+                $staffInfo = CTAPIStaffBusiness::getInfoData($request, $this, $user_id, ['city_site_id'],'', [] );// , ['city']
 
                 $city_site_id = $staffInfo['city_site_id'] ?? 0;
                 array_push($otherWhere, ['city_site_id', '=', $city_site_id]);

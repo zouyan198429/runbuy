@@ -9,6 +9,7 @@ use App\Http\Controllers\BaseController as Controller;
 class BasicCTAPIBusiness extends APIOperate
 {
     public static $model_name = '';// 中间层 App\Business\API 下面的表名称 API\RunBuy\CountSenderRegAPI
+    public static $table_name = '';// 表名称
 
     /**
      * 修改 Request的值

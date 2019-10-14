@@ -58,7 +58,7 @@ class CityPartnerController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPICityPartnerBusiness::getInfoData($request, $this, $id, [], ['cityPartnerCity']);
+            $info = CTAPICityPartnerBusiness::getInfoData($request, $this, $id, [], ['cityPartnerCity'], []);
             $intro = $info['intro'] ?? '';
             $info['intro'] = replace_enter_char($intro,2);
         }else{

@@ -2,9 +2,11 @@
 // 资源
 namespace App\Business\Controller\API\RunBuy;
 
+use App\Services\DBRelation\RelationDB;
 use App\Services\Excel\ImportExport;
 use App\Services\Request\API\HttpRequest;
 use App\Services\Tool;
+use App\Services\Upload\UploadFile;
 use Illuminate\Http\Request;
 use App\Services\Request\CommonRequest;
 use App\Http\Controllers\BaseController as Controller;
@@ -13,30 +15,31 @@ use Illuminate\Support\Facades\Log;
 class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
 {
     public static $model_name = 'API\RunBuy\ResourceAPI';
+    public static $table_name = 'resource';// 表名称
 
     // 大后台 admin/年/月/日/文件
     // 企业 company/[生产单元/]年/月/日/文件
-    protected static $source_path = '/resource/company/';
-    protected static $source_tmp_path = '/resource/tmp/';// 临时文件夹
-    protected static $cache_block = 2; // 1 redis缓存分片内容--适合redis内存比较大的服务器，2 临时文件缓存分片内容--redis内存比较小时
+//    protected static $source_path = '/resource/company/';
+//    protected static $source_tmp_path = '/resource/tmp/';// 临时文件夹
+//    protected static $cache_block = 2; // 1 redis缓存分片内容--适合redis内存比较大的服务器，2 临时文件缓存分片内容--redis内存比较小时
 
     // 1:图片;2:excel
-    public static $resource_type = [
-        '1' => [
-            'name' => '图片文件',
-            'ext' => ['jpg','jpeg','gif','png','bmp','ico'],// 扩展名
-            'dir' => 'images',// 文件夹名称
-            'maxSize' => 5,// 文件最大值  单位 M
-            'other' => [],// 其它各自类型需要判断的指标
-        ],
-        '2' => [
-            'name' => 'excel文件',
-            'ext' => ['xlsx', 'xls'],// 扩展名
-            'dir' => 'excel',// 文件夹名称
-            'maxSize' => 10,// 文件最大值 单位 M
-            'other' => [],// 其它各自类型需要判断的指标
-        ]
-    ];
+//    public static $resource_type = [
+//        '1' => [
+//            'name' => '图片文件',
+//            'ext' => ['jpg','jpeg','gif','png','bmp','ico'],// 扩展名
+//            'dir' => 'images',// 文件夹名称
+//            'maxSize' => 5,// 文件最大值  单位 M
+//            'other' => [],// 其它各自类型需要判断的指标
+//        ],
+//        '2' => [
+//            'name' => 'excel文件',
+//            'ext' => ['xlsx', 'xls'],// 扩展名
+//            'dir' => 'excel',// 文件夹名称
+//            'maxSize' => 10,// 文件最大值 单位 M
+//            'other' => [],// 其它各自类型需要判断的指标
+//        ]
+//    ];
 
     /**
      * 获得列表数据--所有数据
@@ -57,6 +60,11 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
      *           'whereNotIn' => '如果有值，则替换whereNotIn'
      *           'whereBetween' => '如果有值，则替换whereBetween'
      *           'whereNotBetween' => '如果有值，则替换whereNotBetween'
+     *       ],
+     *       'formatDataUbound' => [// 格式化数据[取指下下标、排除指定下标、修改下标名称]具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+     *           'needNotIn' => true, // keys在数组中不存在的，false:不要，true：空值 -- 用true的时候多
+     *           'includeUboundArr' => [],// 要获取的下标数组 [优先]--一维数组，可为空[ '新下标名' => '原下标名' ]  Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile'])
+     *           'exceptUboundArr' => [], // 要排除的下标数组 --一维数组，可为空[ '原下标名' ,....]
      *       ]
      *   ];
      * @param int $notLog 是否需要登陆 0需要1不需要
@@ -132,11 +140,14 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
         $result = static::getBaseListData($request, $controller, '', $queryParams, $relations , $oprateBit, $notLog);
 
         // 格式化数据
-//        $data_list = $result['data_list'] ?? [];
+        $data_list = $result['data_list'] ?? [];
+        RelationDB::resolvingRelationData($data_list, $relations);// 根据关系设置，格式化数据
 //        foreach($data_list as $k => $v){
 //
 //        }
-//        $result['data_list'] = $data_list;
+        $temFormatData = $extParams['formatDataUbound'] ?? [];// 格式化数据 具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+        Tool::formatArrUboundDo($data_list, $temFormatData);//格式化数据[取指下下标、排除指定下标、修改下标名称]
+        $result['data_list'] = $data_list;
         // 导出功能
         if($isExport == 1){
 //            $headArr = ['work_num'=>'工号', 'department_name'=>'部门'];
@@ -155,22 +166,139 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
      * @param int $id id
      * @param array $selectParams 查询字段参数--一维数组
      * @param mixed $relations 关系
+     * @param array $extParams 其它扩展参数，
+     *    $extParams = [
+     *       'formatDataUbound' => [// 格式化数据[取指下下标、排除指定下标、修改下标名称]具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+     *           'needNotIn' => true, // keys在数组中不存在的，false:不要，true：空值 -- 用true的时候多
+     *           'includeUboundArr' => [],// 要获取的下标数组 [优先]--一维数组，可为空[ '新下标名' => '原下标名' ]  Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile'])
+     *           'exceptUboundArr' => [], // 要排除的下标数组 --一维数组，可为空[ '原下标名' ,....]
+     *       ]
+     *   ];
      * @param int $notLog 是否需要登陆 0需要1不需要
      * @return  array 单条数据 - -维数组
      * @author zouyan(305463219@qq.com)
      */
-    public static function getInfoData(Request $request, Controller $controller, $id, $selectParams = [], $relations = '', $notLog = 0){
+    public static function getInfoData(Request $request, Controller $controller, $id, $selectParams = [], $relations = '', $extParams = [], $notLog = 0){
         $company_id = $controller->company_id;
         // $relations = '';
         // $resultDatas = APIRunBuyRequest::getinfoApi(self::$model_name, '', $relations, $company_id , $id);
         $info = static::getInfoDataBase($request, $controller,'', $id, $selectParams, $relations, $notLog);
+        RelationDB::resolvingRelationData($info, $relations);// 根据关系设置，格式化数据
         // 判断权限
 //        $judgeData = [
 //            // 'company_id' => $company_id,
 //            'id' => $company_id,
 //        ];
 //        static::judgePowerByObj($request, $controller, $info, $judgeData );
+        $temFormatData = $extParams['formatDataUbound'] ?? [];// 格式化数据 具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+        Tool::formatArrUboundDo($info, $temFormatData);//格式化数据[取指下下标、排除指定下标、修改下标名称]
         return $info;
+    }
+
+
+    /**
+     * 根据条件获得一条详情记录 - 一维
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param int $company_id 企业id
+     * @param array $queryParams 条件数组/json字符
+     *   $queryParams = [
+     *       'where' => [
+     *           ['order_type', '=', 1],
+     *           // ['staff_id', '=', $user_id],
+     *           ['order_no', '=', $order_no],
+     *           // ['id', '&' , '16=16'],
+     *           // ['company_id', $company_id],
+     *           // ['admin_type',self::$admin_type],
+     *       ],
+     *       // 'whereIn' => [
+     *           //   'id' => $subjectHistoryIds,
+     *       //],
+     *       'select' => ['id', 'status'],
+     *       // 'orderBy' => ['is_default'=>'desc', 'id'=>'desc'],
+     *   ];
+     * @param mixed $relations 关系
+     * @param array $extParams 其它扩展参数，
+     *    $extParams = [
+     *       'formatDataUbound' => [// 格式化数据[取指下下标、排除指定下标、修改下标名称]具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+     *           'needNotIn' => true, // keys在数组中不存在的，false:不要，true：空值 -- 用true的时候多
+     *           'includeUboundArr' => [],// 要获取的下标数组 [优先]--一维数组，可为空[ '新下标名' => '原下标名' ]  Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile'])
+     *           'exceptUboundArr' => [], // 要排除的下标数组 --一维数组，可为空[ '原下标名' ,....]
+     *       ]
+     *   ];
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 单条数据 - -维数组
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getInfoDataByQuery(Request $request, Controller $controller, $company_id, $queryParams = [], $relations = '', $extParams = [], $notLog = 0){
+        // $company_id = $controller->company_id;
+        // $relations = '';
+        // $resultDatas = APIRunBuyRequest::getinfoApi(self::$model_name, '', $relations, $company_id , $id);
+        $info = static::getInfoByQuery($request, $controller,'', $company_id, $queryParams, $relations, $notLog);
+        RelationDB::resolvingRelationData($info, $relations);// 根据关系设置，格式化数据
+        // 判断权限
+//        $judgeData = [
+//            // 'company_id' => $company_id,
+//            'id' => $company_id,
+//        ];
+//        static::judgePowerByObj($request, $controller, $info, $judgeData );
+        $temFormatData = $extParams['formatDataUbound'] ?? [];// 格式化数据 具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+        Tool::formatArrUboundDo($info, $temFormatData);//格式化数据[取指下下标、排除指定下标、修改下标名称]
+        return $info;
+    }
+
+
+    /**
+     * 根据条件获得一条详情记录 - pagesize 1:返回一维数组,>1 返回二维数组  -- 推荐有这个按条件查询详情
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param int $company_id 企业id
+     * @param int $pagesize 想获得的记录数量 1 , 2 。。 默认1
+     * @param array $queryParams 条件数组/json字符
+     *   $queryParams = [
+     *       'where' => [
+     *           ['order_type', '=', 1],
+     *           // ['staff_id', '=', $user_id],
+     *           ['order_no', '=', $order_no],
+     *           // ['id', '&' , '16=16'],
+     *           // ['company_id', $company_id],
+     *           // ['admin_type',self::$admin_type],
+     *       ],
+     *       // 'whereIn' => [
+     *           //   'id' => $subjectHistoryIds,
+     *       //],
+     *       'select' => ['id', 'status'],
+     *       // 'orderBy' => ['is_default'=>'desc', 'id'=>'desc'],
+     *   ];
+     * @param mixed $relations 关系
+     * @param array $extParams 其它扩展参数，
+     *    $extParams = [
+     *       'formatDataUbound' => [// 格式化数据[取指下下标、排除指定下标、修改下标名称]具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+     *           'needNotIn' => true, // keys在数组中不存在的，false:不要，true：空值 -- 用true的时候多
+     *           'includeUboundArr' => [],// 要获取的下标数组 [优先]--一维数组，可为空[ '新下标名' => '原下标名' ]  Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile'])
+     *           'exceptUboundArr' => [], // 要排除的下标数组 --一维数组，可为空[ '原下标名' ,....]
+     *       ]
+     *   ];
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 单条数据 - -维数组
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getLimitDataQuery(Request $request, Controller $controller, $company_id, $pagesize = 1, $queryParams = [], $relations = '', $extParams = [], $notLog = 0){
+        // $company_id = $controller->company_id;
+        // $relations = '';
+        $infoList = static::getInfoQuery($request, $controller,'', $company_id, $pagesize, $queryParams, $relations, $notLog);
+        RelationDB::resolvingRelationData($infoList, $relations);// 根据关系设置，格式化数据
+        // 判断权限
+//        $judgeData = [
+//            // 'company_id' => $company_id,
+//            'id' => $company_id,
+//        ];
+//        static::judgePowerByObj($request, $controller, $infoList, $judgeData );
+        $temFormatData = $extParams['formatDataUbound'] ?? [];// 格式化数据 具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+        Tool::formatArrUboundDo($infoList, $temFormatData);//格式化数据[取指下下标、排除指定下标、修改下标名称]
+        return $infoList;
     }
 
     /**
@@ -214,11 +342,19 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
      * @param int $offset 偏移数量
      * @param string $queryParams 条件数组/json字符
      * @param mixed $relations 关系
+     * @param array $extParams 其它扩展参数，
+     *    $extParams = [
+     *       'formatDataUbound' => [// 格式化数据[取指下下标、排除指定下标、修改下标名称]具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+     *           'needNotIn' => true, // keys在数组中不存在的，false:不要，true：空值 -- 用true的时候多
+     *           'includeUboundArr' => [],// 要获取的下标数组 [优先]--一维数组，可为空[ '新下标名' => '原下标名' ]  Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile'])
+     *           'exceptUboundArr' => [], // 要排除的下标数组 --一维数组，可为空[ '原下标名' ,....]
+     *       ]
+     *   ];
      * @param int $notLog 是否需要登陆 0需要1不需要
      * @return  array 列表数据 - 二维数组
      * @author zouyan(305463219@qq.com)
      */
-    public static function getNearList(Request $request, Controller $controller, $id = 0, $nearType = 1, $limit = 1, $offset = 0, $queryParams = [], $relations = '', $notLog = 0)
+    public static function getNearList(Request $request, Controller $controller, $id = 0, $nearType = 1, $limit = 1, $offset = 0, $queryParams = [], $relations = '', $extParams = [], $notLog = 0)
     {
         $company_id = $controller->company_id;
         // 前**条[默认]
@@ -259,9 +395,13 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
         if(empty($queryParams)){
             $queryParams = $defaultQueryParams;
         }
-        $result = static::getList($request, $controller, 1 + 0, $queryParams, $relations, [], $notLog);
+        $temFormatData = [
+            'formatDataUbound' => $extParams['formatDataUbound'] ?? [],// 格式化数据 具体参数使用说明，请参阅 Tool::formatArrUbound 方法
+        ];
+        $result = static::getList($request, $controller, 1 + 0, $queryParams, $relations, $temFormatData, $notLog);
         // 格式化数据
         $data_list = $result['result']['data_list'] ?? [];
+//        RelationDB::resolvingRelationData($data_list, $relations);// 根据关系设置，格式化数据 -- 已经在getList方法中处理过
         if($nearType == 1) $data_list = array_reverse($data_list); // 相反;
 //        foreach($data_list as $k => $v){
 //            // 公司名称
@@ -543,13 +683,14 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
         $relations = '';//['CompanyInfo'];// 关系
         $result = static::getBaseListData($request, $controller, '', $queryParams, $relations , $oprateBit, $notLog);
         // 格式化数据
-//        $data_list = $result['data_list'] ?? [];
+        $data_list = $result['data_list'] ?? [];
+        RelationDB::resolvingRelationData($data_list, $relations);// 根据关系设置，格式化数据
 //        foreach($data_list as $k => $v){
 //            // 公司名称
 //            $data_list[$k]['company_name'] = $v['company_info']['company_name'] ?? '';
 //            if(isset($data_list[$k]['company_info'])) unset($data_list[$k]['company_info']);
 //        }
-//        $result['data_list'] = $data_list;
+        $result['data_list'] = $data_list;
         return ajaxDataArr(1, $result, '');
     }
     // ***********通过组织条件获得kv***结束************************************************************
@@ -561,6 +702,7 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
      * @param Controller $controller 控制对象
      * @param int $resource_type 资源类型 1:图片;2:excel
      * @return  array 列表数据
+     * @author zouyan(305463219@qq.com)
      * @author zouyan(305463219@qq.com)
      */
     public static function uploadFile(Request $request, Controller $controller, $resource_type = 1)
@@ -650,11 +792,11 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
                     //分片临时文件名
                     $filename = md5($allBlockUuid).'-'.($num + 1).'.tmp';
                     //上传目录
-                    $path_name = self::$source_tmp_path . $filename;// 'uploads/tmp/'.$filename;
-                    if(self::$cache_block == 2){
+                    $path_name = UploadFile::$source_tmp_path . $filename;// 'uploads/tmp/'.$filename;
+                    if(UploadFile::$cache_block == 2){
                         //方式一、保存临时文件
                         // $bool = Storage::disk('tmp')->put($filename, file_get_contents($realPath));
-                         $store_result = $photo->storeAs(self::$source_tmp_path, $filename);// 保存片文件
+                         $store_result = $photo->storeAs(UploadFile::$source_tmp_path, $filename);// 保存片文件
                     }else{
                         // 方式二、将内容写入缓存
                         $publicPath = Tool::getPath('public');
@@ -696,7 +838,7 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
                         return [
                             'id' => 0,// 资源id
                             'name' => $name,// 文件名
-                            'savPath' => $path_name,// 保存路径 /结束
+                            'savePath' => $path_name,// 保存路径 /结束
                             'saveName' => $filename,// 保存文件名称
                             'store_result' => $path_name,// storeAs
                             // 'info' => [],// 资源表记录 一维
@@ -713,7 +855,7 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
                 if(!is_array($tmpFiles)) $tmpFiles = [];
                 if(!empty($tmpFiles)) Log::info('上传文件日志-分片失败，删除临时文件',[$tmpFiles]);
                 foreach($tmpFiles as $tmp_files){
-                    if(self::$cache_block == 2){
+                    if(UploadFile::$cache_block == 2){
                         // 方式一、删除临时文件
                          @unlink($tmp_files);
                     }else{
@@ -766,49 +908,57 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
         $size =  $fileArr['size'] ?? 0;
         $count =  $fileArr['count'] ?? 0;
         $saveData =  $fileArr['saveData'] ?? [];
+
+        $filePathArr = UploadFile::getFilePath($company_id, $resource_type, 1, [1,2,3,4], '', '', $ext, $size);
+        $publicPath = $filePathArr['publicPath'] ?? '';// public目录(系统的) 绝对路径 /srv/www/work/work.0101jz.com/public
+        $savePath = $filePathArr['savePath'] ?? '';// 文件目录 '/resource/company/1/images/2019/10/04/'
+        $saveName = $filePathArr['saveName'] ?? '';// 文件名  20191003121326d710d554edce12a1.png
+        $files_names = $filePathArr['files_names'] ?? '';//  文件目录+文件名 '/resource/company/1/images/2019/10/04/20191003121326d710d554edce12a1.png'
+        $full_names = $filePathArr['full_names'] ?? '';// 服务器中的全路径（目录+文件名）  站点public目录 + 文件目录+文件名 '/data/public/resource/company/1/images/2019/10/04/20191003121326d710d554edce12a1.png'
         // 生成保存路径
-        $savPath = self::$source_path . $company_id . '/';
-
-        $resourceTypeArr = self::$resource_type[$resource_type] ?? [];
-        if(empty($resourceTypeArr)) throws('不明确的资源类型!');
-        $typeName = $resourceTypeArr['name'] ?? '';// 类型名称
-        $typeExt = $resourceTypeArr['ext'] ?? [];// 扩展名
-        $typeDir = $resourceTypeArr['dir'] ?? '';// 文件夹名称
-        $typeMaxSize = $resourceTypeArr['maxSize'] ?? '0.5';// 文件最大值 单位 M
-        if(!is_numeric($typeMaxSize)) $typeMaxSize = 0.5;// 0.5M
-        $typeOther = $resourceTypeArr['other'] ?? [];// 其它各自类型需要判断的指标
-        if(!in_array($ext , $typeExt)) throws($typeName . '扩展名必须为[' . implode('、', $typeExt) . ']');
-        //这里可根据配置文件的设置，做得更灵活一点
-        if($size > $typeMaxSize * 1024 * 1024){
-            throws('上传文件不能超过[' . $typeMaxSize . 'M]');
-        }
-
-        if($typeDir != '' ) $savPath .=   $typeDir . '/';// 类型文件夹
-
-        //if(is_numeric($pro_unit_id)){
-        //    $savPath .=   'pro' . $pro_unit_id . '/';
-        //}
-
-        $savPath .= date('Y/m/d/',time());
-
-        $saveName = Tool::createUniqueNumber(30) .'.' . $ext;
+//        $savePath = UploadFile::$source_path . $company_id . '/';
+//
+//        // $resourceTypeArr = self::$resource_type[$resource_type] ?? [];
+//        $resourceTypeArr = UploadFile::$resource_type[$resource_type] ?? [];
+//        if(empty($resourceTypeArr)) throws('不明确的资源类型!');
+//        $typeName = $resourceTypeArr['name'] ?? '';// 类型名称
+//        $typeExt = $resourceTypeArr['ext'] ?? [];// 扩展名
+//        $typeDir = $resourceTypeArr['dir'] ?? '';// 文件夹名称
+//        $typeMaxSize = $resourceTypeArr['maxSize'] ?? '0.5';// 文件最大值 单位 M
+//        if(!is_numeric($typeMaxSize)) $typeMaxSize = 0.5;// 0.5M
+//        $typeOther = $resourceTypeArr['other'] ?? [];// 其它各自类型需要判断的指标
+//        if(!in_array($ext , $typeExt)) throws($typeName . '扩展名必须为[' . implode('、', $typeExt) . ']');
+//        //这里可根据配置文件的设置，做得更灵活一点
+//        if($size > $typeMaxSize * 1024 * 1024){
+//            throws('上传文件不能超过[' . $typeMaxSize . 'M]');
+//        }
+//
+//        if($typeDir != '' ) $savePath .=   $typeDir . '/';// 类型文件夹
+//
+//        //if(is_numeric($pro_unit_id)){
+//        //    $savePath .=   'pro' . $pro_unit_id . '/';
+//        //}
+//
+//        $savePath .= date('Y/m/d/',time());
+//
+//        $saveName = Tool::createUniqueNumber(30) .'.' . $ext;
         //$store_result = $photo->store('photo');
         try{
             if($operate_type == 1 ){// 小于等于0时，为没有分片上传 !empty($photo)
-                $store_result = $photo->storeAs($savPath, $saveName);// 返回 "resource/company/1/pro0/2018/10/13//20181013182843dc1a9783e212840f.jpeg"
+                $store_result = $photo->storeAs($savePath, $saveName);// 返回 "resource/company/1/pro0/2018/10/13//20181013182843dc1a9783e212840f.jpeg"
             }else{
-                $publicPath = Tool::getPath('public');
+//                $publicPath = Tool::getPath('public');
                 //最后合成后的名字及路径
                 // $files_names = 'uploads/'.date("YmdHis",time()).rand(100000,999999).'.'.$ext;
-                makeDir($publicPath . $savPath);// 创建目录
-                $files_names = $savPath . $saveName;
+//                makeDir($publicPath . $savePath);// 创建目录
+//                $files_names = $savePath . $saveName;
                 //打开文件
                 $fp = fopen($publicPath . $files_names,"ab");
                 //循环读取临时文件，写入最终文件
                 for($i = 0; $i < $count; $i++){
                     //临时文件路径及名称
-                    $tmp_files = self::$source_tmp_path . md5($allBlockUuid).'-'.($i+1).'.tmp'; // 'uploads/tmp/'.md5($allBlockUuid).'-'.($i+1).'.tmp';
-                    if(self::$cache_block == 2){
+                    $tmp_files = UploadFile::$source_tmp_path . md5($allBlockUuid).'-'.($i+1).'.tmp'; // 'uploads/tmp/'.md5($allBlockUuid).'-'.($i+1).'.tmp';
+                    if(UploadFile::$cache_block == 2){
                         //方式一、打开临时文件
                         $handle = fopen($publicPath . $tmp_files,"rb");
                         //读取临时文件 写入最终文件
@@ -840,7 +990,7 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
             $saveData = array_merge($saveData ,[
                 'resource_name' => $name,
                 'resource_type' => $resource_type,
-                'resource_url' => $savPath . $saveName,
+                'resource_url' => $savePath . $saveName,
             ]);
             Log::info('上传文件日志-保存数据',[$saveData]);
             // $reslut = CommonBusiness::createApi(self::$model_name, $saveData, $company_id);
@@ -859,7 +1009,7 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
         return [
             'id' => $id,// 资源id
             'name' => $name,// 文件名
-            'savPath' => $savPath,// 保存路径 /结束
+            'savePath' => $savePath,// 保存路径 /结束
             'saveName' => $saveName,// 保存文件名称
             'store_result' => $store_result,// storeAs
             // 'info' => $reslut,// 资源表记录 一维
@@ -882,13 +1032,13 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
             $sucArr = [
                 'result' => 'ok',// 文件上传成功
                 'id' => $result['id'] , // 文件在服务器上的唯一标识
-                'url'=> url($result['savPath'] . $result['saveName']),//'http://example.com/file-10001.jpg',// 文件的下载地址
+                'url'=> url($result['savePath'] . $result['saveName']),//'http://example.com/file-10001.jpg',// 文件的下载地址
                 'store_result' => $result['store_result'],
                 'data_list' => [
                     [
                         'id' => $result['id'],
                         'resource_name' => $result['name'],
-                        'resource_url' => url($result['savPath'] . $result['saveName']),
+                        'resource_url' => url($result['savePath'] . $result['saveName']),
                         'created_at' =>  date('Y-m-d H:i:s',time()),
                     ]
                 ],
@@ -920,8 +1070,8 @@ class CTAPIResourceBusiness extends BasicPublicCTAPIBusiness
             $result = self::uploadFile($request, $controller, $resource_type);
             $sucArr = [
                 'id' => $result['id'] , // 文件在服务器上的唯一标识
-                'url'=> url($result['savPath'] . $result['saveName']),//'http://example.com/file-10001.jpg',// 文件的下载地址
-                'filePath' => $result['savPath'] . $result['saveName'],
+                'url'=> url($result['savePath'] . $result['saveName']),//'http://example.com/file-10001.jpg',// 文件的下载地址
+                'filePath' => $result['savePath'] . $result['saveName'],
                 'store_result' => $result['store_result'],
                 'resource_name' => $result['name'],
                 'created_at' =>  date('Y-m-d H:i:s',time()),

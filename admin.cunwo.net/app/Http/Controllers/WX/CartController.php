@@ -165,14 +165,14 @@ class CartController extends BaseController
         if( !in_array($second_num, $second_num_arr) )  return ajaxDataArr(1, $startPrice, '');
 
         // 获得城市信息
-        $cityInfo = CTAPICityBusiness::getInfoData($request, $this, $city_site_id, ['price_distance_default', 'price_distance_every', 'price_shop_default', 'price_shop_every'], '');
+        $cityInfo = CTAPICityBusiness::getInfoData($request, $this, $city_site_id, ['price_distance_default', 'price_distance_every', 'price_shop_default', 'price_shop_every'], '', []);
         if(empty($cityInfo))   return ajaxDataArr(1, $startPrice, '');
         Log::info('根据距离算运费---City',[$cityInfo]);
         $price_distance_every = $cityInfo['price_distance_every'] ?? 0;
         $price_shop_every = $cityInfo['price_shop_every'] ?? 0;
 
         // 获得地址信息
-        $addrInfo = CTAPICommonAddrBusiness::getInfoData($request, $this, $addr_id, ['real_name', 'longitude', 'latitude']);// , ['city']
+        $addrInfo = CTAPICommonAddrBusiness::getInfoData($request, $this, $addr_id, ['real_name', 'longitude', 'latitude'], '', []);// , ['city']
         if(empty($addrInfo))   return ajaxDataArr(1, $startPrice, '');
 
         Log::info('根据距离算运费---CommonAddr',[$addrInfo]);

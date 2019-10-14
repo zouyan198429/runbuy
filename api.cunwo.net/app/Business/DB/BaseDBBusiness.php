@@ -849,14 +849,38 @@ class BaseDBBusiness
         // 加入操作人员信息
         static::addOprate($temArr, $operate_staff_id,$operate_staff_id_history);
         foreach($resourceIds as $resourceId){
+            if(empty($resourceId)) continue;
             $syncResourceArr[$resourceId] = $temArr;
             // 资源id 历史 resource_id_history
             $syncResourceArr[$resourceId]['resource_id_history'] = ResourceDBBusiness::getIdHistory($resourceId);
         }
-        $syncParams =[
-            'siteResources' => $syncResourceArr,//标签
-        ];
-        return static::sync($id, $syncParams);
+        // 为空，则是移除关系
+        if(empty($syncResourceArr)){// 解除关系
+            $syncParams =[
+                'siteResources' => $syncResourceArr,//标签
+            ];
+            return static::detach($id, $syncParams);
+        }else{// 绑定关系
+            $syncParams =[
+                'siteResources' => $syncResourceArr,//标签
+            ];
+            return static::sync($id, $syncParams);
+        }
     }
 
+    /**
+     * 删除图片资源关系
+     *
+     * @param int  $company_id 企业id
+     * @param int $id 主表记录id
+     * @param array $resourceIds 关系表id数组  空：移除所有，id数组：移除指定的
+     * @return null
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function delResourceDetach($id, $resourceIds = []){
+        $syncParams =[
+            'siteResources' => $resourceIds,//标签
+        ];
+        return static::detach($id, $syncParams);
+    }
 }

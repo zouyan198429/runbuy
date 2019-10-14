@@ -59,8 +59,16 @@ class Orders extends BasePublicModel
         '2' => '待退费',
     ];
 
+    // speed_id 送货速度id0未知1急递（24分钟）2极递（36分钟）3快递60分钟
+    public $speedArr = [
+        '0' => '未知',
+        '1' => '急递',
+        '2' => '极递',
+        '3' => '快递',
+    ];
+
     // 表里没有的字段
-    protected $appends = ['order_type_text', 'is_order_text', 'has_son_order_text', 'status_text', 'pay_type_text', 'pay_run_price_text', 'has_refund_text'];
+    protected $appends = ['order_type_text', 'is_order_text', 'has_son_order_text', 'status_text', 'pay_type_text', 'pay_run_price_text', 'has_refund_text', 'speed_text'];
 
     /**
      * 获取订单类型文字
@@ -130,6 +138,16 @@ class Orders extends BasePublicModel
     public function getHasRefundTextAttribute()
     {
         return $this->hasRefundArr[$this->has_refund] ?? '';
+    }
+
+    /**
+     * 获取送货速度文字
+     *
+     * @return string
+     */
+    public function getSpeedTextAttribute()
+    {
+        return $this->speedArr[$this->speed_id] ?? '';
     }
 
     /**

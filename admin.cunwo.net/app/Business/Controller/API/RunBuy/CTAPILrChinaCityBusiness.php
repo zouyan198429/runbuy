@@ -3,6 +3,7 @@
 namespace App\Business\Controller\API\RunBuy;
 
 
+use App\Services\DBRelation\RelationDB;
 use App\Services\Excel\ImportExport;
 use App\Services\Request\API\HttpRequest;
 use App\Services\Tool;
@@ -13,6 +14,7 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPILrChinaCityBusiness extends BasicPublicCTAPIBusiness
 {
     public static $model_name = 'API\RunBuy\LrChinaCityAPI';
+    public static $table_name = 'lr_china_city';// 表名称
 
     /**
      * 获得列表数据--所有数据
@@ -33,6 +35,11 @@ class CTAPILrChinaCityBusiness extends BasicPublicCTAPIBusiness
      *           'whereNotIn' => '如果有值，则替换whereNotIn'
      *           'whereBetween' => '如果有值，则替换whereBetween'
      *           'whereNotBetween' => '如果有值，则替换whereNotBetween'
+     *       ],
+     *       'formatDataUbound' => [// 格式化数据[取指下下标、排除指定下标、修改下标名称]具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+     *           'needNotIn' => true, // keys在数组中不存在的，false:不要，true：空值 -- 用true的时候多
+     *           'includeUboundArr' => [],// 要获取的下标数组 [优先]--一维数组，可为空[ '新下标名' => '原下标名' ]  Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile'])
+     *           'exceptUboundArr' => [], // 要排除的下标数组 --一维数组，可为空[ '原下标名' ,....]
      *       ]
      *   ];
      * @param int $notLog 是否需要登陆 0需要1不需要
@@ -88,12 +95,15 @@ class CTAPILrChinaCityBusiness extends BasicPublicCTAPIBusiness
 
         // 格式化数据
         $data_list = $result['data_list'] ?? [];
+        RelationDB::resolvingRelationData($data_list, $relations);// 根据关系设置，格式化数据
 //        foreach($data_list as $k => $v){
 //            // 公司名称
 //            $data_list[$k]['company_name'] = $v['company_info']['company_name'] ?? '';
 //            if(isset($data_list[$k]['company_info'])) unset($data_list[$k]['company_info']);
 //        }
-//        $result['data_list'] = $data_list;
+        $temFormatData = $extParams['formatDataUbound'] ?? [];// 格式化数据 具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+        Tool::formatArrUboundDo($data_list, $temFormatData);//格式化数据[取指下下标、排除指定下标、修改下标名称]
+        $result['data_list'] = $data_list;
         // 导出功能
         if($isExport == 1){
 //            $headArr = ['work_num'=>'工号', 'department_name'=>'部门'];
@@ -145,11 +155,19 @@ class CTAPILrChinaCityBusiness extends BasicPublicCTAPIBusiness
      * @param int $offset 偏移数量
      * @param string $queryParams 条件数组/json字符
      * @param mixed $relations 关系
+     * @param array $extParams 其它扩展参数，
+     *    $extParams = [
+     *       'formatDataUbound' => [// 格式化数据[取指下下标、排除指定下标、修改下标名称]具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+     *           'needNotIn' => true, // keys在数组中不存在的，false:不要，true：空值 -- 用true的时候多
+     *           'includeUboundArr' => [],// 要获取的下标数组 [优先]--一维数组，可为空[ '新下标名' => '原下标名' ]  Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile'])
+     *           'exceptUboundArr' => [], // 要排除的下标数组 --一维数组，可为空[ '原下标名' ,....]
+     *       ]
+     *   ];
      * @param int $notLog 是否需要登陆 0需要1不需要
      * @return  array 列表数据 - 二维数组
      * @author zouyan(305463219@qq.com)
      */
-    public static function getNearList(Request $request, Controller $controller, $id = 0, $nearType = 1, $limit = 1, $offset = 0, $queryParams = [], $relations = '', $notLog = 0)
+    public static function getNearList(Request $request, Controller $controller, $id = 0, $nearType = 1, $limit = 1, $offset = 0, $queryParams = [], $relations = '', $extParams = [], $notLog = 0)
     {
         $company_id = $controller->company_id;
         // 前**条[默认]
@@ -190,9 +208,13 @@ class CTAPILrChinaCityBusiness extends BasicPublicCTAPIBusiness
         if(empty($queryParams)){
             $queryParams = $defaultQueryParams;
         }
-        $result = static::getList($request, $controller, 1 + 0, $queryParams, $relations, [], $notLog);
+        $temFormatData = [
+            'formatDataUbound' => $extParams['formatDataUbound'] ?? [],// 格式化数据 具体参数使用说明，请参阅 Tool::formatArrUbound 方法
+        ];
+        $result = static::getList($request, $controller, 1 + 0, $queryParams, $relations, $temFormatData, $notLog);
         // 格式化数据
         $data_list = $result['result']['data_list'] ?? [];
+//        RelationDB::resolvingRelationData($data_list, $relations);// 根据关系设置，格式化数据 -- 已经在getList方法中处理过
         if($nearType == 1) $data_list = array_reverse($data_list); // 相反;
 //        foreach($data_list as $k => $v){
 //            // 公司名称
@@ -243,21 +265,138 @@ class CTAPILrChinaCityBusiness extends BasicPublicCTAPIBusiness
      * @param int $id id
      * @param array $selectParams 查询字段参数--一维数组
      * @param mixed $relations 关系
+     * @param array $extParams 其它扩展参数，
+     *    $extParams = [
+     *       'formatDataUbound' => [// 格式化数据[取指下下标、排除指定下标、修改下标名称]具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+     *           'needNotIn' => true, // keys在数组中不存在的，false:不要，true：空值 -- 用true的时候多
+     *           'includeUboundArr' => [],// 要获取的下标数组 [优先]--一维数组，可为空[ '新下标名' => '原下标名' ]  Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile'])
+     *           'exceptUboundArr' => [], // 要排除的下标数组 --一维数组，可为空[ '原下标名' ,....]
+     *       ]
+     *   ];
      * @param int $notLog 是否需要登陆 0需要1不需要
      * @return  array 单条数据 - -维数组
      * @author zouyan(305463219@qq.com)
      */
-    public static function getInfoData(Request $request, Controller $controller, $id, $selectParams = [], $relations = '', $notLog = 0){
+    public static function getInfoData(Request $request, Controller $controller, $id, $selectParams = [], $relations = '', $extParams = [], $notLog = 0){
         $company_id = $controller->company_id;
         // $relations = '';
         // $resultDatas = APIRunBuyRequest::getinfoApi(self::$model_name, '', $relations, $company_id , $id);
         $resultDatas = static::getInfoDataBase($request, $controller,'', $id, $selectParams, $relations, $notLog);
+        RelationDB::resolvingRelationData($resultDatas, $relations);// 根据关系设置，格式化数据
         // 判断权限
 //        $judgeData = [
 //            'company_id' => $company_id,
 //        ];
 //        static::judgePowerByObj($request, $controller, $resultDatas, $judgeData );
+        $temFormatData = $extParams['formatDataUbound'] ?? [];// 格式化数据 具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+        Tool::formatArrUboundDo($resultDatas, $temFormatData);//格式化数据[取指下下标、排除指定下标、修改下标名称]
         return $resultDatas;
+    }
+
+
+    /**
+     * 根据条件获得一条详情记录 - 一维
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param int $company_id 企业id
+     * @param array $queryParams 条件数组/json字符
+     *   $queryParams = [
+     *       'where' => [
+     *           ['order_type', '=', 1],
+     *           // ['staff_id', '=', $user_id],
+     *           ['order_no', '=', $order_no],
+     *           // ['id', '&' , '16=16'],
+     *           // ['company_id', $company_id],
+     *           // ['admin_type',self::$admin_type],
+     *       ],
+     *       // 'whereIn' => [
+     *           //   'id' => $subjectHistoryIds,
+     *       //],
+     *       'select' => ['id', 'status'],
+     *       // 'orderBy' => ['is_default'=>'desc', 'id'=>'desc'],
+     *   ];
+     * @param mixed $relations 关系
+     * @param array $extParams 其它扩展参数，
+     *    $extParams = [
+     *       'formatDataUbound' => [// 格式化数据[取指下下标、排除指定下标、修改下标名称]具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+     *           'needNotIn' => true, // keys在数组中不存在的，false:不要，true：空值 -- 用true的时候多
+     *           'includeUboundArr' => [],// 要获取的下标数组 [优先]--一维数组，可为空[ '新下标名' => '原下标名' ]  Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile'])
+     *           'exceptUboundArr' => [], // 要排除的下标数组 --一维数组，可为空[ '原下标名' ,....]
+     *       ]
+     *   ];
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 单条数据 - -维数组
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getInfoDataByQuery(Request $request, Controller $controller, $company_id, $queryParams = [], $relations = '', $extParams = [], $notLog = 0){
+        // $company_id = $controller->company_id;
+        // $relations = '';
+        // $resultDatas = APIRunBuyRequest::getinfoApi(self::$model_name, '', $relations, $company_id , $id);
+        $info = static::getInfoByQuery($request, $controller,'', $company_id, $queryParams, $relations, $notLog);
+        RelationDB::resolvingRelationData($info, $relations);// 根据关系设置，格式化数据
+        // 判断权限
+//        $judgeData = [
+//            // 'company_id' => $company_id,
+//            'id' => $company_id,
+//        ];
+//        static::judgePowerByObj($request, $controller, $info, $judgeData );
+        $temFormatData = $extParams['formatDataUbound'] ?? [];// 格式化数据 具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+        Tool::formatArrUboundDo($info, $temFormatData);//格式化数据[取指下下标、排除指定下标、修改下标名称]
+        return $info;
+    }
+
+
+    /**
+     * 根据条件获得一条详情记录 - pagesize 1:返回一维数组,>1 返回二维数组  -- 推荐有这个按条件查询详情
+     *
+     * @param Request $request 请求信息
+     * @param Controller $controller 控制对象
+     * @param int $company_id 企业id
+     * @param int $pagesize 想获得的记录数量 1 , 2 。。 默认1
+     * @param array $queryParams 条件数组/json字符
+     *   $queryParams = [
+     *       'where' => [
+     *           ['order_type', '=', 1],
+     *           // ['staff_id', '=', $user_id],
+     *           ['order_no', '=', $order_no],
+     *           // ['id', '&' , '16=16'],
+     *           // ['company_id', $company_id],
+     *           // ['admin_type',self::$admin_type],
+     *       ],
+     *       // 'whereIn' => [
+     *           //   'id' => $subjectHistoryIds,
+     *       //],
+     *       'select' => ['id', 'status'],
+     *       // 'orderBy' => ['is_default'=>'desc', 'id'=>'desc'],
+     *   ];
+     * @param mixed $relations 关系
+     * @param array $extParams 其它扩展参数，
+     *    $extParams = [
+     *       'formatDataUbound' => [// 格式化数据[取指下下标、排除指定下标、修改下标名称]具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+     *           'needNotIn' => true, // keys在数组中不存在的，false:不要，true：空值 -- 用true的时候多
+     *           'includeUboundArr' => [],// 要获取的下标数组 [优先]--一维数组，可为空[ '新下标名' => '原下标名' ]  Tool::arrEqualKeyVal(['shop_id', 'shop_name', 'linkman', 'mobile'])
+     *           'exceptUboundArr' => [], // 要排除的下标数组 --一维数组，可为空[ '原下标名' ,....]
+     *       ]
+     *   ];
+     * @param int $notLog 是否需要登陆 0需要1不需要
+     * @return  array 单条数据 - -维数组
+     * @author zouyan(305463219@qq.com)
+     */
+    public static function getLimitDataQuery(Request $request, Controller $controller, $company_id, $pagesize = 1, $queryParams = [], $relations = '', $extParams = [], $notLog = 0){
+        // $company_id = $controller->company_id;
+        // $relations = '';
+        $infoList = static::getInfoQuery($request, $controller,'', $company_id, $pagesize, $queryParams, $relations, $notLog);
+        RelationDB::resolvingRelationData($infoList, $relations);// 根据关系设置，格式化数据
+        // 判断权限
+//        $judgeData = [
+//            // 'company_id' => $company_id,
+//            'id' => $company_id,
+//        ];
+//        static::judgePowerByObj($request, $controller, $infoList, $judgeData );
+        $temFormatData = $extParams['formatDataUbound'] ?? [];// 格式化数据 具体参数使用说明，请参阅 Tool::formatArrUbound 方法  --为空数组代表不格式化
+        Tool::formatArrUboundDo($infoList, $temFormatData);//格式化数据[取指下下标、排除指定下标、修改下标名称]
+        return $infoList;
     }
 
     /**

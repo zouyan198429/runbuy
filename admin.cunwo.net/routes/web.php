@@ -16,7 +16,7 @@
 //});
 
 
-// Route::get('/test', 'IndexController@test');// 测试
+ Route::get('/test', 'IndexController@test');// 测试
 //Route::get('/test2', 'IndexController@test2');// 测试
 Route::get('/', 'IndexController@index');// 首页
 //Route::get('reg', 'IndexController@reg');// 注册
@@ -187,6 +187,7 @@ Route::get('admin/login', 'Admin\IndexController@login');//login.html 登录
 Route::get('admin/logout', 'Admin\IndexController@logout');// 注销
 Route::get('admin/password', 'Admin\IndexController@password');//psdmodify.html 个人信息-修改密码
 Route::get('admin/info', 'Admin\IndexController@info');//myinfo.html 个人信息--显示
+Route::get('admin/down_drive', 'Admin\IndexController@down_drive');// 下载网页打印机驱动
 // 腾讯地图
 Route::get('admin/qqMaps/latLngSelect', 'Admin\QQMapsController@latLngSelect');// 经纬度选择
 
@@ -290,6 +291,24 @@ Route::get('admin/shopGoodsType/export', 'Admin\ShopGoodsTypeController@export')
 Route::get('admin/shopGoodsType/import_template', 'Admin\ShopGoodsTypeController@import_template');// 导入模版
 
 
+// 桌位人数分类[一级分类]
+Route::get('admin/tablePerson', 'Admin\TablePersonController@index');// 列表
+Route::get('admin/tablePerson/add/{id}', 'Admin\TablePersonController@add');// 添加
+// Route::get('admin/tablePerson/select', 'Admin\TablePersonController@select');// 选择-弹窗
+Route::get('admin/tablePerson/export', 'Admin\TablePersonController@export');// 导出
+Route::get('admin/tablePerson/import_template', 'Admin\TablePersonController@import_template');// 导入模版
+
+
+// 桌位
+Route::get('admin/tables', 'Admin\TablesController@index');// 列表
+Route::get('admin/tables/add/{id}', 'Admin\TablesController@add');// 添加
+// Route::get('admin/tables/select', 'Admin\TablesController@select');// 选择-弹窗
+Route::get('admin/tables/export', 'Admin\TablesController@export');// 导出
+Route::get('admin/tables/import_template', 'Admin\TablesController@import_template');// 导入模版
+Route::get('admin/tables/print/{ids}', 'Admin\TablesController@print');// 打印二维码
+Route::get('admin/tables/down/{id}', 'Admin\TablesController@down');// 下载二维码
+
+
 // 店铺营业时间
 Route::get('admin/shopOpenTime', 'Admin\ShopOpenTimeController@index');// 列表
 Route::get('admin/shopOpenTime/add/{id}', 'Admin\ShopOpenTimeController@add');// 添加
@@ -320,6 +339,13 @@ Route::get('admin/labels/add/{id}', 'Admin\LabelsController@add');// 添加
 // Route::get('admin/labels/select', 'Admin\LabelsController@select');// 选择-弹窗
 Route::get('admin/labels/export', 'Admin\LabelsController@export');// 导出
 Route::get('admin/labels/import_template', 'Admin\LabelsController@import_template');// 导入模版
+
+// 单号前缀
+Route::get('admin/numPrefix', 'Admin\NumPrefixController@index');// 列表
+Route::get('admin/numPrefix/add/{id}', 'Admin\NumPrefixController@add');// 添加
+// Route::get('admin/numPrefix/select', 'Admin\NumPrefixController@select');// 选择-弹窗
+Route::get('admin/numPrefix/export', 'Admin\NumPrefixController@export');// 导出
+Route::get('admin/numPrefix/import_template', 'Admin\NumPrefixController@import_template');// 导入模版
 
 // 地址
 Route::get('admin/commonAddr', 'Admin\CommonAddrController@index');// 列表
@@ -354,6 +380,7 @@ Route::get('admin/feeScaleTime/import_template', 'Admin\FeeScaleTimeController@i
 // 订单
 Route::get('admin/order', 'Admin\OrdersController@index');// 列表
 Route::get('admin/order/add/{id}', 'Admin\OrdersController@add');// 添加
+Route::get('admin/order/print/{id}', 'Admin\OrdersController@print');// 打印订单
 // Route::get('admin/order/select', 'Admin\OrdersController@select');// 选择-弹窗
 Route::get('admin/order/export', 'Admin\OrdersController@export');// 导出
 Route::get('admin/order/import_template', 'Admin\OrdersController@import_template');// 导入模版
@@ -367,6 +394,7 @@ Route::get('city/login', 'City\IndexController@login');//login.html 登录
 Route::get('city/logout', 'City\IndexController@logout');// 注销
 Route::get('city/password', 'City\IndexController@password');//psdmodify.html 个人信息-修改密码
 Route::get('city/info', 'City\IndexController@info');//myinfo.html 个人信息--显示
+Route::get('city/down_drive', 'City\IndexController@down_drive');// 下载网页打印机驱动
 // 腾讯地图
 Route::get('city/qqMaps/latLngSelect', 'City\QQMapsController@latLngSelect');// 经纬度选择
 
@@ -468,6 +496,13 @@ Route::get('city/shopGoodsType/add/{id}', 'City\ShopGoodsTypeController@add');//
 Route::get('city/shopGoodsType/export', 'City\ShopGoodsTypeController@export');// 导出
 Route::get('city/shopGoodsType/import_template', 'City\ShopGoodsTypeController@import_template');// 导入模版
 
+// 桌位人数分类[一级分类]
+Route::get('city/tablePerson', 'City\TablePersonController@index');// 列表
+Route::get('city/tablePerson/add/{id}', 'City\TablePersonController@add');// 添加
+// Route::get('city/tablePerson/select', 'City\TablePersonController@select');// 选择-弹窗
+Route::get('city/tablePerson/export', 'City\TablePersonController@export');// 导出
+Route::get('city/tablePerson/import_template', 'City\TablePersonController@import_template');// 导入模版
+
 
 // 店铺营业时间
 Route::get('city/shopOpenTime', 'City\ShopOpenTimeController@index');// 列表
@@ -530,6 +565,7 @@ Route::get('seller/login', 'Seller\IndexController@login');//login.html 登录
 Route::get('seller/logout', 'Seller\IndexController@logout');// 注销
 Route::get('seller/password', 'Seller\IndexController@password');//psdmodify.html 个人信息-修改密码
 Route::get('seller/info', 'Seller\IndexController@info');//myinfo.html 个人信息--显示
+Route::get('seller/down_drive', 'Seller\IndexController@down_drive');// 下载网页打印机驱动
 // 腾讯地图
 Route::get('seller/qqMaps/latLngSelect', 'Seller\QQMapsController@latLngSelect');// 经纬度选择
 
@@ -631,6 +667,14 @@ Route::get('seller/shopGoodsType/add/{id}', 'Seller\ShopGoodsTypeController@add'
 Route::get('seller/shopGoodsType/export', 'Seller\ShopGoodsTypeController@export');// 导出
 Route::get('seller/shopGoodsType/import_template', 'Seller\ShopGoodsTypeController@import_template');// 导入模版
 
+// 桌位人数分类[一级分类]
+Route::get('seller/tablePerson', 'Seller\TablePersonController@index');// 列表
+Route::get('seller/tablePerson/add/{id}', 'Seller\TablePersonController@add');// 添加
+// Route::get('seller/tablePerson/select', 'Seller\TablePersonController@select');// 选择-弹窗
+Route::get('seller/tablePerson/export', 'Seller\TablePersonController@export');// 导出
+Route::get('seller/tablePerson/import_template', 'Seller\TablePersonController@import_template');// 导入模版
+
+
 // 店铺营业时间
 Route::get('seller/shopOpenTime', 'Seller\ShopOpenTimeController@index');// 列表
 Route::get('seller/shopOpenTime/add/{id}', 'Seller\ShopOpenTimeController@add');// 添加
@@ -677,6 +721,7 @@ Route::get('shop/login', 'Shop\IndexController@login');//login.html 登录
 Route::get('shop/logout', 'Shop\IndexController@logout');// 注销
 Route::get('shop/password', 'Shop\IndexController@password');//psdmodify.html 个人信息-修改密码
 Route::get('shop/info', 'Shop\IndexController@info');//myinfo.html 个人信息--显示
+Route::get('shop/down_drive', 'Shop\IndexController@down_drive');// 下载网页打印机驱动
 // 腾讯地图
 Route::get('shop/qqMaps/latLngSelect', 'Shop\QQMapsController@latLngSelect');// 经纬度选择
 
@@ -777,6 +822,14 @@ Route::get('shop/shopGoodsType/add/{id}', 'Shop\ShopGoodsTypeController@add');//
 // Route::get('shop/shopGoodsType/select', 'Shop\ShopGoodsTypeController@select');// 选择-弹窗
 Route::get('shop/shopGoodsType/export', 'Shop\ShopGoodsTypeController@export');// 导出
 Route::get('shop/shopGoodsType/import_template', 'Shop\ShopGoodsTypeController@import_template');// 导入模版
+
+// 桌位人数分类[一级分类]
+Route::get('shop/tablePerson', 'Shop\TablePersonController@index');// 列表
+Route::get('shop/tablePerson/add/{id}', 'Shop\TablePersonController@add');// 添加
+// Route::get('shop/tablePerson/select', 'Shop\TablePersonController@select');// 选择-弹窗
+Route::get('shop/tablePerson/export', 'Shop\TablePersonController@export');// 导出
+Route::get('shop/tablePerson/import_template', 'Shop\TablePersonController@import_template');// 导入模版
+
 
 // 店铺营业时间
 Route::get('shop/shopOpenTime', 'Shop\ShopOpenTimeController@index');// 列表

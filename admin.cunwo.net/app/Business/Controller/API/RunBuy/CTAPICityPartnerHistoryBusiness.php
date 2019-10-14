@@ -12,5 +12,6 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPICityPartnerHistoryBusiness extends CTAPICityPartnerBusiness
 {
     public static $model_name = 'API\RunBuy\CityPartnerHistoryAPI';
+    public static $table_name = 'city_partner_history';// 表名称
 
 }

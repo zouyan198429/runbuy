@@ -16,22 +16,22 @@ class MiniProgram
      * @param int $expiryMinutes 数据的有效时间 ,单位：分钟;默认2分钟
      * @return array 结果
      *
-     {
-        "openId": "owfFF4ydu2HmuvmSDS4goIoAIYEs",
-        "nickName": "笑对人生",
-        "gender": 1,
-        "language": "zh_CN",
-        "city": "Xi'an",
-        "province": "Shaanxi",
-        "country": "China",
-        "avatarUrl": "https://wx.qlogo.cn/mmopen/vi_32/E9ngLh0KSnSEwkBIIJ3ugheQNYJ4Im4fYvibYVY2uWXQVBCXQIclGOic4AttiaO1epPJKwWjgxtoO2YXaOiae0Dicicw/132",
-        "unionId" : "ocMvos6NjeKLIBqg5Mr9QjxrP1FA"
-        "watermark": {
-            "timestamp": 1551201390,
-            "appid": "wxcb82783fe211782f"
-        },
-       "session_key":"TBZO81wdyaWEOEOnqBfuPQ=="
-    }
+     *{
+     *   "openId": "owfFF4ydu2HmuvmSDS4goIoAIYEs",
+     *   "nickName": "笑对人生",
+     *   "gender": 1,
+     *   "language": "zh_CN",
+     *   "city": "Xi'an",
+     *   "province": "Shaanxi",
+     *   "country": "China",
+     *   "avatarUrl": "https://wx.qlogo.cn/mmopen/vi_32/E9ngLh0KSnSEwkBIIJ3ugheQNYJ4Im4fYvibYVY2uWXQVBCXQIclGOic4AttiaO1epPJKwWjgxtoO2YXaOiae0Dicicw/132",
+     *   "unionId" : "ocMvos6NjeKLIBqg5Mr9QjxrP1FA"
+     *   "watermark": {
+     *       "timestamp": 1551201390,
+     *       "appid": "wxcb82783fe211782f"
+     *   },
+     *  "session_key":"TBZO81wdyaWEOEOnqBfuPQ=="
+     *}
      *
      * @author zouyan(305463219@qq.com)
      */

@@ -21,7 +21,7 @@ class FeeScaleController extends BaseController
         // $this->InitParams($request);
         if(!is_numeric($id) || $id <=0) return ajaxDataArr(0, null, '参数[id]有误！');
 
-        $info = CTAPIFeeScaleBusiness::getInfoData($request, $this, $id, [], ['city', 'cityHistory']);// , ['city']
+        $info = CTAPIFeeScaleBusiness::getInfoData($request, $this, $id, [], ['city', 'cityHistory'], []);// , ['city']
         return ajaxDataArr(1, $info, '');
     }
 

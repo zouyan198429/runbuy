@@ -187,7 +187,7 @@ class ShopController extends BaseController
         $latitude =  CommonRequest::get($request, 'latitude'); // '34.32932';
         $longitude = CommonRequest::get($request, 'longitude'); // '108.70929';//
 
-        $info = CTAPIShopBusiness::getInfoData($request, $this, $id, [], ['shopSeller', 'labels', 'siteResources', 'shopType', 'openTimes']);// , ['city']
+        $info = CTAPIShopBusiness::getInfoData($request, $this, $id, [], ['shopSeller', 'labels', 'siteResources', 'shopType', 'openTimes'], []);// , ['city']
         $info['resource_url'] = $info['resource_list'][0]['resource_url'] ?? '';
         // if(isset($info['resource_list']))  unset($info['resource_list']);
 

@@ -55,7 +55,7 @@ class CityController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPICityBusiness::getInfoData($request, $this, $id, [], '');
+            $info = CTAPICityBusiness::getInfoData($request, $this, $id, [], '', []);
             $city_ids = $info['city_ids'] ?? '';
             $pIds = explode(',', $city_ids);
             if(count($pIds) >=3 ) $info['province_id'] = $pIds[0] ?? -1;

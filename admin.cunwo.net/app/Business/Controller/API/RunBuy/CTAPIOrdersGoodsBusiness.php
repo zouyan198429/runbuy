@@ -12,5 +12,6 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPIOrdersGoodsBusiness extends BasicPublicCTAPIBusiness
 {
     public static $model_name = 'API\RunBuy\OrdersGoodsAPI';
+    public static $table_name = 'orders_goods';// 表名称
 
 }

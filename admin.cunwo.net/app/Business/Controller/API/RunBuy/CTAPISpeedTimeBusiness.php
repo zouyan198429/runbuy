@@ -11,4 +11,5 @@ use App\Http\Controllers\BaseController as Controller;
 class CTAPISpeedTimeBusiness extends BasicPublicCTAPIBusiness
 {
     public static $model_name = 'API\RunBuy\SpeedTimeAPI';
+    public static $table_name = 'speed_time';// 表名称
 }

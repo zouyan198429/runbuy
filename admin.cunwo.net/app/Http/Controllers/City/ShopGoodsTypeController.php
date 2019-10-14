@@ -69,7 +69,7 @@ class ShopGoodsTypeController extends WorksController
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIShopGoodsTypeBusiness::getInfoData($request, $this, $id, [], ['shop']);
+            $info = CTAPIShopGoodsTypeBusiness::getInfoData($request, $this, $id, [], ['shop'], []);
         }else{
             if($shop_id > 0 ){
                 $partnerInfo = CTAPIShopBusiness::getInfoHistoryId($request, $this, $shop_id, []);

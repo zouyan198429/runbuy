@@ -9,6 +9,7 @@ use App\Http\Controllers\BaseController as Controller;
 class BasicPublicCTAPIBusiness extends BasicCTAPIBusiness
 {
     public static $model_name = '';
+    public static $table_name = '';// 表名称
 
     /**
      * 生成单号

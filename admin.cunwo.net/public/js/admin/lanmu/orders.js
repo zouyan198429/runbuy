@@ -140,7 +140,7 @@ function ajax_status_count(from_id ,staff_id, operate_staff_id){
                         }
 
                         // 刷新列表-当前页
-                        if( from_id == 1 && selected_status == temStatus){
+                        if( from_id == 1 && (selected_status == temStatus || (needPlay && selected_status == '' )) ){
                             console.log('刷新列表-当前页');
                             // reset_list(true, true);
                             reset_list_self(true,false,true,2);
@@ -196,6 +196,17 @@ var otheraction = {
         });
         return false;
     },
+    print : function(obj,order_no,order_id){// 打印订单
+        var obj = $(obj);
+        var index_query = layer.confirm('确定打印当前订单吗？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            printOrder(order_no,order_id);
+            layer.close(index_query);
+        }, function(){
+        });
+        return false;
+    },
 };
 // 取消订单
 function cancelOrder(order_no,pay_type){
@@ -222,6 +233,18 @@ function cancelOrder(order_no,pay_type){
     })
 }
 
+// 打印订单
+function printOrder(order_no,order_id){
+    var data = {'order_no':order_no,'order_id':order_id};
+    console.log(PRINT_ORDER_URL);
+    console.log(data);
+    var layer_index = layer.load();
+    //layer_alert("已打印"+print_nums+"打印第"+begin_page+"页-第"+end_page+"页;每次打"+per_page_num+"页",3);
+    var url = PRINT_ORDER_URL + '/' + order_id;
+    console.log('打印订单地址：', url);
+    PrintOneURL(url);
+    layer.close(layer_index)//手动关闭
+}
 (function() {
     document.write("");
     document.write("<!-- 前端模板部分 -->");
@@ -286,6 +309,7 @@ function cancelOrder(order_no,pay_type){
     document.write("                <%if(item.status == 2){%>");
     document.write("                <a class=\"cancel\" href=\"javascript:void(0);\" onclick=\"otheraction.cancel(this,\'<%=item.order_no%>\',\'<%=item.pay_type%>\')\" >取消订单<\/a>");
     document.write("                <%}%>");
+    document.write("                <a class=\"cancel\" href=\"javascript:void(0);\" onclick=\"otheraction.print(this,\'<%=item.order_no%>\',\'<%=item.id%>\')\" >打印订单<\/a>");
     document.write("            <\/div>");
 
     document.write("            <%for(var j = 0; j<item.shopList.length;j++){");

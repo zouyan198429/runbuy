@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Business\Controller\API\RunBuy\CTAPICityBusiness;
 use App\Business\Controller\API\RunBuy\CTAPICountOrdersGrabBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIOrdersBusiness;
+use App\Business\Controller\API\RunBuy\CTAPIOrdersDoingBusiness;
 use App\Business\Controller\API\RunBuy\CTAPIWalletRecordBusiness;
 use App\Http\Controllers\WorksController;
+use App\Services\DBRelation\RelationDB;
 use App\Services\Request\CommonRequest;
 use App\Services\Tool;
 use Illuminate\Http\Request;
@@ -71,18 +73,97 @@ class OrdersController extends WorksController
         $reDataArr = $this->reDataArr;
         $info = [
             'id'=>$id,
-          //   'department_id' => 0,
+            //   'department_id' => 0,
         ];
         $operate = "添加";
 
         if ($id > 0) { // 获得详情数据
             $operate = "修改";
-            $info = CTAPIOrdersBusiness::getInfoData($request, $this, $id, [], '');
+            $info = CTAPIOrdersBusiness::getInfoData($request, $this, $id, [], '', []);
         }
         // $reDataArr = array_merge($reDataArr, $resultDatas);
         $reDataArr['info'] = $info;
         $reDataArr['operate'] = $operate;
         return view('admin.orders.add', $reDataArr);
+    }
+
+    /**
+     * 打印订单--未完成状态的--不需要登录就能访问
+     *
+     * @param Request $request
+     * @param int $id
+     * @return mixed
+     * @author zouyan(305463219@qq.com)
+     */
+    public function print(Request $request,$id = 0)
+    {
+        // $this->InitParams($request);
+        // $this->source = 2;
+        $reDataArr = $this->reDataArr;
+        $relations = [
+            'addrHistory', 'staffHistory', 'partnerHistory', 'sendHistory'
+            ,'provinceHistory','cityHistory','areaHistory'
+            , 'sellerHistory', 'shopHistory'
+            ,'ordersGoods.goodsHistory'
+            ,'ordersGoods.resourcesHistory'
+            ,'ordersGoods.goodsPriceHistory.propName'
+            ,'ordersGoods.goodsPriceHistory.propValName'
+            ,'ordersGoods.props.propName'
+            ,'ordersGoods.props.propValName'
+        ];
+        //  显示到定位点的距离
+        CTAPIOrdersBusiness::mergeRequest($request, $this, [
+            'order_type' => 1,// 订单类型1普通订单/父订单4子订单
+        ]);
+        $defaultQueryParams = [
+            'where' => [
+//                ['company_id', $company_id],
+                ['id', $id],
+            ],
+//            'select' => [
+//                'id','company_id','position_name','sort_num'
+//                //,'operate_staff_id','operate_staff_id_history'
+//                ,'created_at'
+//            ],
+            'orderBy' => [ 'id'=>'desc'],// 'sort_num'=>'desc',
+            'limit' => 1,
+        ];// 查询条件参数
+        $result = CTAPIOrdersBusiness::getList($request, $this, 1, $defaultQueryParams, $relations, [], 1);
+        $data_list = $result['result']['data_list'] ?? [];
+        $parent_orders = $result['result']['parent_orders'] ?? [];
+        $childList = [];
+        if(!empty($parent_orders)){
+            CTAPIOrdersBusiness::mergeRequest($request, $this, [
+                'order_type' => 4,// 订单类型1普通订单/父订单4子订单
+                'parent_order_no' => implode(',', $parent_orders),
+            ]);
+            $childResult = CTAPIOrdersBusiness::getList($request, $this, 1, [], $relations, [], 1);
+            $childList = $childResult['result']['data_list'] ?? [];
+        }
+        $formatChildList = [];
+        foreach ($childList as $k => $v){
+            $formatChildList[$v['parent_order_no']][] = $v;
+        }
+
+        foreach($data_list as $k => $v){
+            $parent_order_no = $v['order_no'] ?? '';
+            $has_son_order = $v['has_son_order'] ?? 0;// 是否有子订单0无1有
+            $childOrder = $formatChildList[$parent_order_no] ?? [];
+            if($has_son_order == 1 ){// 有子订单
+                $data_list[$k]['shopList'] = $childOrder;
+            }else{
+                $data_list[$k]['shopList'][] = $v;
+                if(isset($v['orders_goods'])) unset($data_list[$k]['orders_goods']);
+            }
+        }
+
+        $data_list = array_values($data_list);
+//        pr($data_list);
+//        $result['result']['data_list'] = $data_list;
+//        return $result;
+        $reDataArr['webName'] = config('public.webName');// 系统名称
+        $reDataArr['orderList'] = $data_list;//订单列表
+        return view('admin.orders.print_order_detail', $reDataArr);
     }
 
 
