@@ -5,10 +5,20 @@ namespace App\Http\Controllers;
 
 use App\Services\DB\CommonDB;
 use App\Services\Tool;
+use Dingo\Api\Routing\Helpers;
 use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
+    /*
+     *  Dingo
+     * 响应生成器提供了一个流畅的接口去方便的建立一个更定制化的响应。响应的生成器通常是与 transformer 相结合。
+     * 要利用响应生成器，你的控制器需要使用 Dingo\Api\Routing\Helpers trait。为了在你的控制器里保持引入和使用这个 trait，
+     * 你可以创建一个基础控制器，然后你的所有的 API 控制器都继承它。
+     *
+     */
+    use Helpers;
+
     protected $company_id = null;
     protected $pro_unit_id = null;
     protected $cache_sel = 1 + 2;//是否强制不缓存 1:缓存读,读到则直接返回;2缓存数据

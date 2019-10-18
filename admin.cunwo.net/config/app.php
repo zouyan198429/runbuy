@@ -164,7 +164,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Overtrue\LaravelPinyin\ServiceProvider::class,
-
+        // Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
     ],
 
     /*
@@ -215,6 +215,10 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Pinyin' => Overtrue\LaravelPinyin\Facades\Pinyin::class,
+        'API'          => Dingo\Api\Facade\API::class,
+        'ApiRoute'     => Dingo\Api\Facade\Route::class,
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
     ],
 
 ];

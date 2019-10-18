@@ -6,7 +6,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable implements JWTSubject
+class Member extends Authenticatable implements JWTSubject
 {
     use Notifiable;
 
@@ -36,7 +36,7 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTIdentifier()
     {
 
-        return $this->getKey();
+         return $this->getKey();
     }
 
     /**
@@ -55,7 +55,12 @@ class User extends Authenticatable implements JWTSubject
 //                'password' => '我是邹燕bb',
 //            ]
 //        ];
-        // return ['id' => 8, 'userData' =>'aaaaaa'];//$tokenData;
+      // return ['id' => 8, 'userData' =>'aaaaaa'];//$tokenData;
         return [];
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 }

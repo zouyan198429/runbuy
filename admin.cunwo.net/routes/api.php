@@ -13,6 +13,49 @@ use Illuminate\Http\Request;
 |
 
 */
+$api = app('Dingo\Api\Routing\Router');
+
+$api->version('v1', function ($api) {
+    $api->post ('user/register', 'App\Api\Controllers\UserController@register');// 测试
+
+    $api->group(["namespace" => "App\Http\Controllers\Api\V1",'middleware'=>'auth:api'], function ($api) {
+        //之后在这里写api
+        // $api->post('decode', 'AccountController@decode');
+    });
+
+    $api->group(["namespace" => "App\Http\Controllers\Api\V1"], function ($api) {
+        //之前在这里写api
+        // $api->post('login', 'AccountController@login');
+        $api->get('users/{id}', 'UserController@show');
+    });
+
+});
+
+// jwt测试
+Route::post('login', 'ApiController@login');
+Route::post('register', 'ApiController@register');
+Route::post('testaa', 'ApiController@testaa');
+Route::post('testbb', 'ApiController@testbb');
+
+Route::group(['middleware' => 'auth.jwt'], function () {
+    Route::get('logout', 'ApiController@logout');
+    Route::get('usera', 'ApiController@getAuthUser');
+
+    Route::get('products', 'ProductController@index');
+    Route::get('products/{id}', 'ProductController@show');
+    Route::post('products', 'ProductController@store');
+    Route::put('products/{id}', 'ProductController@update');
+    Route::delete('products/{id}', 'ProductController@destroy');
+});
+// 原文链接：https://blog.csdn.net/qq_37788558/article/details/91886363
+// 然后在标头请求中添加“Authorization：Bearer {token}”
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('login', 'Auth\JwtAuthController@login');
+    Route::post('logout', 'Auth\JwtAuthController@logout');
+    Route::post('refresh', 'Auth\JwtAuthController@refresh');
+    Route::post('me', 'Auth\JwtAuthController@me');
+});
+
 // 文件上传 any(
 // Route::post('file/upload', 'IndexController@upload');
 Route::post('upload', 'UploadController@index');

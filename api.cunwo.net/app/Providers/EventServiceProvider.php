@@ -16,6 +16,10 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\Event' => [
             'App\Listeners\EventListener',
         ],
+        // 监听事件
+//        'Dingo\Api\Event\ResponseWasMorphed' => [
+//            'App\Listeners\AddPaginationLinksToResponse'
+//        ]
     ];
 
     /**

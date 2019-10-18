@@ -42,7 +42,8 @@ return [
         ],
 
         'api' => [
-            'driver' => 'token',
+            // 'jwt' api 为使用 jwt 机制，provider 对应你要用的用户认证表，一般就是登录注册那张表
+            'driver' => 'jwt',// .原值'token',
             'provider' => 'users',
         ],
     ],

@@ -13,6 +13,11 @@ use Illuminate\Http\Request;
 |
 */
 
+$api = app('Dingo\Api\Routing\Router');
+$api->version('v1', function ($api) {
+    $api->get('users/{id}', 'App\Api\Controllers\UserController@show');
+});
+
 // 通用公共接口,不需要任何参数
 // any(
 // 手机站访问接口,其它参数 企业id-company_id; 生产单元id unit_id;

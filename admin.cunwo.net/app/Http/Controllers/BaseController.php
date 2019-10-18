@@ -4,10 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Services\Request\API\Sites\APIRunBuyRequest;
 use App\Services\Tool;
+use Dingo\Api\Routing\Helpers;
 use Illuminate\Http\Request;
 
 class BaseController extends Controller
 {
+    /*
+     *  Dingo
+     * 响应生成器提供了一个流畅的接口去方便的建立一个更定制化的响应。响应的生成器通常是与 transformer 相结合。
+     * 要利用响应生成器，你的控制器需要使用 Dingo\Api\Routing\Helpers trait。为了在你的控制器里保持引入和使用这个 trait，
+     * 你可以创建一个基础控制器，然后你的所有的 API 控制器都继承它。
+     *
+     */
+    use Helpers;
+
     public $company_id = null ;
     public $model_name = null;
     public $user_info = [];

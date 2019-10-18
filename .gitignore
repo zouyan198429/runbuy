@@ -4,6 +4,8 @@ piwik/tmp
 piwik/misc/GeoLite2-City.mmdb
 runers
 shoping
+/admin.cunwo.net/composer.json
+/admin.cunwo.net/composer.lock
 /admin.cunwo.net/config/wechat.php
 /admin.cunwo.net/.idea
 /admin.cunwo.net/public/resource
@@ -16,6 +18,8 @@ shoping
 /admin.cunwo.net/.env
 /admin.cunwo.net/resources/views/piwik.blade.php
 
+/api.cunwo.net/composer.json
+/api.cunwo.net/composer.lock
 /api.cunwo.net/.idea
 /api.cunwo.net/public/resource
 /api.cunwo.net/public/.well-known
